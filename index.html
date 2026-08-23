@@ -6542,6 +6542,354 @@ resolveAttack = function(rolls){
 ========================================= */
 
 renderInventory();
+  /* =========================================
+   Ver.0.7 STEP 1
+   WEAPON + ARMOR 2 SLOT SYSTEM
+========================================= */
+
+
+/* =========================================
+   ARMORデータ
+========================================= */
+
+/*
+  まだ防具未実装なので
+  初期状態は「なし」
+*/
+
+if(!window.armor){
+
+  window.armor = {
+    name:"なし",
+    icon:"🛡️",
+    rarity:"NORMAL",
+
+    /* 固定軽減値 */
+    defense:0,
+
+    /* %軽減 */
+    reduction:0,
+
+    stars:0,
+
+    type:"armor"
+  };
+
+}
+
+
+/* =========================================
+   ARMORだけ別保存
+   既存セーブデータを壊さない
+========================================= */
+
+function saveArmorData(){
+
+  try{
+
+    localStorage.setItem(
+      "onePercentDropArmor",
+      JSON.stringify(
+        window.armor
+      )
+    );
+
+  }catch(e){}
+
+}
+
+
+function loadArmorData(){
+
+  try{
+
+    const raw =
+      localStorage.getItem(
+        "onePercentDropArmor"
+      );
+
+
+    if(!raw){
+
+      return;
+
+    }
+
+
+    const data =
+      JSON.parse(raw);
+
+
+    if(data){
+
+      window.armor = data;
+
+    }
+
+  }catch(e){}
+
+}
+
+
+loadArmorData();
+
+
+/* =========================================
+   PLAYER欄を2枠化
+========================================= */
+
+const playerPanelV07 =
+  document.querySelector(
+    ".playerPanel"
+  );
+
+
+if(playerPanelV07){
+
+  /*
+    すでに追加済みなら
+    二重生成しない
+  */
+
+  if(
+    !document.getElementById(
+      "armorEquipRow"
+    )
+  ){
+
+    const armorRow =
+      document.createElement(
+        "div"
+      );
+
+
+    armorRow.id =
+      "armorEquipRow";
+
+
+    armorRow.innerHTML = `
+
+      <div
+        style="
+          margin-top:10px;
+          padding-top:10px;
+
+          border-top:
+          1px solid #29324f;
+
+          display:flex;
+
+          justify-content:
+          space-between;
+
+          align-items:center;
+
+          gap:10px;
+
+          font-size:13px;
+        "
+      >
+
+        <span
+          style="
+            color:#aeb9dd;
+            font-weight:900;
+          "
+        >
+          🛡️ ARMOR
+        </span>
+
+
+        <span
+          id="armorText"
+
+          style="
+            color:#63d9ff;
+            font-weight:1000;
+
+            text-align:right;
+          "
+        >
+          なし
+        </span>
+
+      </div>
+
+    `;
+
+
+    /*
+      HPバーより下に追加
+    */
+
+    playerPanelV07.appendChild(
+      armorRow
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   既存WEAPON表示にも
+   ラベルを追加
+========================================= */
+
+const weaponDisplayV07 =
+  document.getElementById(
+    "weaponText"
+  );
+
+
+if(weaponDisplayV07){
+
+  weaponDisplayV07.style
+    .textAlign =
+    "right";
+
+}
+
+
+/* =========================================
+   ARMOR表示更新
+========================================= */
+
+function updateArmorDisplay(){
+
+  const armorText =
+    document.getElementById(
+      "armorText"
+    );
+
+
+  if(!armorText){
+
+    return;
+
+  }
+
+
+  const a =
+    window.armor;
+
+
+  if(
+    !a ||
+    a.name === "なし"
+  ){
+
+    armorText.textContent =
+      "なし";
+
+    armorText.style.color =
+      "#8892ad";
+
+    return;
+
+  }
+
+
+  /*
+    将来、
+    防御値や%軽減を表示できる
+  */
+
+  let effectText = "";
+
+
+  if(
+    Number(a.defense || 0) > 0
+  ){
+
+    effectText =
+      " DEF +"+
+      a.defense;
+
+  }
+
+
+  if(
+    Number(a.reduction || 0) > 0
+  ){
+
+    effectText =
+      " -"+
+      a.reduction+
+      "%";
+
+  }
+
+
+  armorText.textContent =
+    (a.icon || "🛡️")+
+    " "+
+    a.name+
+    effectText;
+
+
+  /*
+    レア度別表示色
+  */
+
+  const colors = {
+
+    NORMAL:"#c4cadb",
+    RARE:"#49aaff",
+    EPIC:"#c568ff",
+    LEGEND:"#ffd83d",
+    GOD:"#ff6ce8"
+
+  };
+
+
+  armorText.style.color =
+    colors[a.rarity] ||
+    "#ffffff";
+
+}
+
+
+/* =========================================
+   update()へ接続
+========================================= */
+
+const armorOldUpdate =
+  update;
+
+
+update = function(){
+
+  armorOldUpdate();
+
+  updateArmorDisplay();
+
+};
+
+
+/* =========================================
+   既存saveGame()にも
+   ARMOR保存を追加
+========================================= */
+
+const armorOldSaveGame =
+  saveGame;
+
+
+saveGame = function(){
+
+  armorOldSaveGame();
+
+  saveArmorData();
+
+};
+
+
+/* =========================================
+   初回表示
+========================================= */
+
+updateArmorDisplay();
 </script>
 
 </body>
