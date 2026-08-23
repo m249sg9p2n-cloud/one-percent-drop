@@ -16721,6 +16721,975 @@ function safeGodReveal(
   },2050);
 
 }
+	/* =====================================================
+   Ver.1.02
+   DROP SOUND OVERDRIVE
+===================================================== */
+
+
+/* =====================================================
+   軽量ノイズ生成
+===================================================== */
+
+function playNoise(
+  duration=.08,
+  volume=.05,
+  delay=0
+){
+
+  if(!audioCtx) return;
+
+
+  const length =
+    Math.floor(
+      audioCtx.sampleRate *
+      duration
+    );
+
+
+  const buffer =
+    audioCtx.createBuffer(
+      1,
+      length,
+      audioCtx.sampleRate
+    );
+
+
+  const data =
+    buffer.getChannelData(0);
+
+
+  for(
+    let i=0;
+    i<length;
+    i++
+  ){
+
+    data[i] =
+      Math.random()*2-1;
+
+  }
+
+
+  const source =
+    audioCtx.createBufferSource();
+
+
+  const gain =
+    audioCtx.createGain();
+
+
+  source.buffer =
+    buffer;
+
+
+  gain.gain.setValueAtTime(
+    volume,
+    audioCtx.currentTime+
+    delay
+  );
+
+
+  gain.gain.exponentialRampToValueAtTime(
+    .001,
+    audioCtx.currentTime+
+    delay+
+    duration
+  );
+
+
+  source.connect(
+    gain
+  );
+
+
+  gain.connect(
+    audioCtx.destination
+  );
+
+
+  source.start(
+    audioCtx.currentTime+
+    delay
+  );
+
+
+  source.stop(
+    audioCtx.currentTime+
+    delay+
+    duration
+  );
+
+}
+
+
+/* =====================================================
+   KICK
+===================================================== */
+
+function sfxKick(
+  delay=0,
+  volume=.16
+){
+
+  if(!audioCtx) return;
+
+
+  const osc =
+    audioCtx.createOscillator();
+
+
+  const gain =
+    audioCtx.createGain();
+
+
+  osc.type =
+    "sine";
+
+
+  osc.frequency
+  .setValueAtTime(
+    120,
+    audioCtx.currentTime+
+    delay
+  );
+
+
+  osc.frequency
+  .exponentialRampToValueAtTime(
+    42,
+    audioCtx.currentTime+
+    delay+
+    .18
+  );
+
+
+  gain.gain
+  .setValueAtTime(
+    volume,
+    audioCtx.currentTime+
+    delay
+  );
+
+
+  gain.gain
+  .exponentialRampToValueAtTime(
+    .001,
+    audioCtx.currentTime+
+    delay+
+    .22
+  );
+
+
+  osc.connect(
+    gain
+  );
+
+
+  gain.connect(
+    audioCtx.destination
+  );
+
+
+  osc.start(
+    audioCtx.currentTime+
+    delay
+  );
+
+
+  osc.stop(
+    audioCtx.currentTime+
+    delay+
+    .24
+  );
+
+}
+
+
+/* =====================================================
+   SNARE
+===================================================== */
+
+function sfxSnare(
+  delay=0
+){
+
+  playNoise(
+    .09,
+    .045,
+    delay
+  );
+
+
+  tone(
+    180,
+    .08,
+    "triangle",
+    .035,
+    delay
+  );
+
+}
+
+
+/* =====================================================
+   HAT
+===================================================== */
+
+function sfxHat(
+  delay=0
+){
+
+  playNoise(
+    .025,
+    .018,
+    delay
+  );
+
+}
+
+
+/* =====================================================
+   上昇SYNTH
+===================================================== */
+
+function sfxRiser(
+  delay=0,
+  length=.8
+){
+
+  if(!audioCtx) return;
+
+
+  const osc =
+    audioCtx.createOscillator();
+
+
+  const gain =
+    audioCtx.createGain();
+
+
+  osc.type =
+    "sawtooth";
+
+
+  osc.frequency
+  .setValueAtTime(
+    160,
+    audioCtx.currentTime+
+    delay
+  );
+
+
+  osc.frequency
+  .exponentialRampToValueAtTime(
+    1500,
+    audioCtx.currentTime+
+    delay+
+    length
+  );
+
+
+  gain.gain
+  .setValueAtTime(
+    .001,
+    audioCtx.currentTime+
+    delay
+  );
+
+
+  gain.gain
+  .linearRampToValueAtTime(
+    .035,
+    audioCtx.currentTime+
+    delay+
+    length*.65
+  );
+
+
+  gain.gain
+  .exponentialRampToValueAtTime(
+    .001,
+    audioCtx.currentTime+
+    delay+
+    length
+  );
+
+
+  osc.connect(
+    gain
+  );
+
+
+  gain.connect(
+    audioCtx.destination
+  );
+
+
+  osc.start(
+    audioCtx.currentTime+
+    delay
+  );
+
+
+  osc.stop(
+    audioCtx.currentTime+
+    delay+
+    length
+  );
+
+}
+
+
+/* =====================================================
+   キュイン
+===================================================== */
+
+function sfxKyuiin(
+  delay=0,
+  power=1
+){
+
+  tone(
+    800,
+    .08,
+    "sine",
+    .06*power,
+    delay
+  );
+
+
+  tone(
+    1200,
+    .10,
+    "sine",
+    .07*power,
+    delay+.06
+  );
+
+
+  tone(
+    1800,
+    .13,
+    "sine",
+    .08*power,
+    delay+.13
+  );
+
+
+  tone(
+    2600,
+    .22,
+    "sine",
+    .07*power,
+    delay+.22
+  );
+
+}
+
+
+/* =====================================================
+   CHIME
+===================================================== */
+
+function sfxChime(
+  delay=0
+){
+
+  tone(
+    659,
+    .18,
+    "sine",
+    .055,
+    delay
+  );
+
+
+  tone(
+    784,
+    .18,
+    "sine",
+    .055,
+    delay+.10
+  );
+
+
+  tone(
+    988,
+    .25,
+    "sine",
+    .06,
+    delay+.20
+  );
+
+
+  tone(
+    1318,
+    .35,
+    "sine",
+    .055,
+    delay+.31
+  );
+
+}
+
+
+/* =====================================================
+   爆発SE
+===================================================== */
+
+function sfxHeavyImpact(
+  delay=0
+){
+
+  sfxKick(
+    delay,
+    .20
+  );
+
+
+  playNoise(
+    .22,
+    .075,
+    delay
+  );
+
+
+  tone(
+    70,
+    .30,
+    "sawtooth",
+    .09,
+    delay
+  );
+
+
+  tone(
+    45,
+    .40,
+    "sine",
+    .10,
+    delay+.03
+  );
+
+}
+
+
+/* =====================================================
+   EPIC専用リズム
+===================================================== */
+
+function playEpicDropSound(){
+
+  initAudio();
+
+
+  /*
+    ドン・タッ・ドン・ドン
+  */
+
+  sfxKick(0);
+  sfxHat(.12);
+
+  sfxSnare(.24);
+
+  sfxKick(.43);
+  sfxHat(.53);
+
+  sfxKick(.65);
+
+  sfxRiser(
+    .05,
+    .75
+  );
+
+
+  sfxKyuiin(
+    .72,
+    .75
+  );
+
+
+  sfxHeavyImpact(
+    1.02
+  );
+
+
+  sfxChime(
+    1.14
+  );
+
+}
+
+
+/* =====================================================
+   LEGEND専用リズム
+===================================================== */
+
+function playLegendDropSound(){
+
+  initAudio();
+
+
+  /*
+    重めの前半
+  */
+
+  sfxKick(
+    0,
+    .18
+  );
+
+  sfxKick(
+    .32,
+    .18
+  );
+
+
+  sfxSnare(
+    .54
+  );
+
+
+  /*
+    ここから加速
+  */
+
+  sfxKick(
+    .72,
+    .17
+  );
+
+  sfxHat(
+    .82
+  );
+
+  sfxKick(
+    .94,
+    .18
+  );
+
+  sfxHat(
+    1.04
+  );
+
+  sfxKick(
+    1.15,
+    .19
+  );
+
+
+  sfxRiser(
+    .35,
+    1.05
+  );
+
+
+  sfxKyuiin(
+    1.18,
+    1
+  );
+
+}
+
+
+/* =====================================================
+   LEGEND PUSH成功音
+===================================================== */
+
+function playLegendPushSound(){
+
+  initAudio();
+
+
+  sfxHeavyImpact(
+    0
+  );
+
+
+  sfxKyuiin(
+    .10,
+    1.1
+  );
+
+
+  sfxChime(
+    .38
+  );
+
+
+  /*
+    短い祝福フレーズ
+  */
+
+  tone(
+    523,
+    .18,
+    "sine",
+    .07,
+    .48
+  );
+
+  tone(
+    659,
+    .18,
+    "sine",
+    .07,
+    .62
+  );
+
+  tone(
+    784,
+    .20,
+    "sine",
+    .08,
+    .76
+  );
+
+  tone(
+    1046,
+    .35,
+    "sine",
+    .09,
+    .92
+  );
+
+}
+
+
+/* =====================================================
+   GOD専用
+
+   四つ打ち → 加速 → PUSH待ち
+===================================================== */
+
+function playGodDropSound(){
+
+  initAudio();
+
+
+  /*
+    最初は低音4つ打ち
+  */
+
+  sfxKick(
+    0,
+    .20
+  );
+
+  sfxHat(
+    .12
+  );
+
+
+  sfxKick(
+    .30,
+    .20
+  );
+
+  sfxHat(
+    .42
+  );
+
+
+  sfxKick(
+    .60,
+    .21
+  );
+
+  sfxHat(
+    .72
+  );
+
+
+  sfxKick(
+    .90,
+    .22
+  );
+
+  sfxHat(
+    1.02
+  );
+
+
+  /*
+    ここから倍テンポ感
+  */
+
+  sfxKick(
+    1.17,
+    .18
+  );
+
+  sfxHat(
+    1.24
+  );
+
+
+  sfxKick(
+    1.33,
+    .18
+  );
+
+  sfxHat(
+    1.40
+  );
+
+
+  sfxKick(
+    1.49,
+    .19
+  );
+
+  sfxHat(
+    1.56
+  );
+
+
+  sfxKick(
+    1.65,
+    .20
+  );
+
+
+  /*
+    上昇
+  */
+
+  sfxRiser(
+    .40,
+    1.35
+  );
+
+
+  sfxKyuiin(
+    1.55,
+    .85
+  );
+
+}
+
+
+/* =====================================================
+   GOD PUSH
+
+   一番気持ちいい部分
+===================================================== */
+
+function playGodPushSound(){
+
+  initAudio();
+
+
+  /*
+    PUSH直後の超重低音
+  */
+
+  sfxHeavyImpact(
+    0
+  );
+
+
+  sfxKick(
+    .10,
+    .22
+  );
+
+
+  /*
+    高音確定音
+  */
+
+  sfxKyuiin(
+    .14,
+    1.2
+  );
+
+
+  /*
+    シャーン
+  */
+
+  playNoise(
+    .35,
+    .055,
+    .30
+  );
+
+
+  /*
+    ファンファーレ
+  */
+
+  tone(
+    523,
+    .22,
+    "sine",
+    .075,
+    .40
+  );
+
+
+  tone(
+    659,
+    .22,
+    "sine",
+    .075,
+    .54
+  );
+
+
+  tone(
+    784,
+    .24,
+    "sine",
+    .08,
+    .68
+  );
+
+
+  tone(
+    1046,
+    .28,
+    "sine",
+    .09,
+    .84
+  );
+
+
+  tone(
+    1318,
+    .50,
+    "sine",
+    .085,
+    1.02
+  );
+
+
+  /*
+    最後にもう1発
+  */
+
+  sfxHeavyImpact(
+    1.16
+  );
+
+}
+
+
+/* =====================================================
+   既存演出へ音を接続
+===================================================== */
+
+
+/*
+  EPIC
+*/
+
+const soundOldEpicSequence =
+superEpicSequence;
+
+
+superEpicSequence =
+function(item){
+
+  playEpicDropSound();
+
+  soundOldEpicSequence(
+    item
+  );
+
+};
+
+
+/*
+  LEGEND
+*/
+
+const soundOldLegendSequence =
+superLegendSequence;
+
+
+superLegendSequence =
+function(item){
+
+  playLegendDropSound();
+
+  soundOldLegendSequence(
+    item
+  );
+
+};
+
+
+/*
+  LEGEND PUSH
+*/
+
+const soundOldLegendReveal =
+safeLegendReveal;
+
+
+safeLegendReveal =
+function(item){
+
+  playLegendPushSound();
+
+  soundOldLegendReveal(
+    item
+  );
+
+};
+
+
+/*
+  GOD
+*/
+
+const soundOldGodSequence =
+superGodSequence;
+
+
+superGodSequence =
+function(item){
+
+  /*
+    プチュン自体は
+    既存演出側で鳴る
+  */
+
+  setTimeout(()=>{
+
+    playGodDropSound();
+
+  },420);
+
+
+  soundOldGodSequence(
+    item
+  );
+
+};
+
+
+/*
+  GOD PUSH
+*/
+
+const soundOldGodReveal =
+safeGodReveal;
+
+
+safeGodReveal =
+function(item){
+
+  playGodPushSound();
+
+  soundOldGodReveal(
+    item
+  );
+
+};
 </script>
 
 </body>
