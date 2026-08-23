@@ -1005,7 +1005,410 @@ function loadGame(){
 
 loadGame();
 update();
+/* =========================================
+   1% DROP - 脳汁演出強化パック Ver.0.2
+========================================= */
 
+let audioCtx = null;
+
+function initAudio(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if(audioCtx.state === "suspended"){
+    audioCtx.resume();
+  }
+}
+
+function tone(freq, duration, type="sine", volume=0.12, delay=0){
+  if(!audioCtx) return;
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = type;
+  osc.frequency.value = freq;
+
+  gain.gain.setValueAtTime(0.001, audioCtx.currentTime + delay);
+  gain.gain.exponentialRampToValueAtTime(
+    volume,
+    audioCtx.currentTime + delay + 0.01
+  );
+  gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    audioCtx.currentTime + delay + duration
+  );
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start(audioCtx.currentTime + delay);
+  osc.stop(audioCtx.currentTime + delay + duration + 0.05);
+}
+
+
+/* 🎲 ダイス */
+function sfxDice(){
+  for(let i=0;i<9;i++){
+    tone(
+      180 + Math.random()*220,
+      0.05,
+      "square",
+      0.035,
+      i*0.075
+    );
+  }
+
+  tone(110,0.12,"square",0.08,0.72);
+}
+
+
+/* ⚔️ 通常攻撃 */
+function sfxHit(){
+  tone(130,0.09,"sawtooth",0.10);
+  tone(75,0.14,"square",0.08,0.03);
+}
+
+
+/* 💢 敵の反撃 */
+function sfxEnemyHit(){
+  tone(95,0.14,"sawtooth",0.10);
+  tone(55,0.18,"square",0.07,0.04);
+}
+
+
+/* ⚡ クリティカル */
+function sfxCritical(){
+
+  tone(750,0.08,"square",0.10);
+  tone(1100,0.10,"square",0.10,0.06);
+
+  tone(95,0.32,"sawtooth",0.18,0.13);
+  tone(52,0.40,"square",0.16,0.15);
+
+  screenShake(14,500);
+  bigFlash("#fff4a3");
+}
+
+
+/* 💥 撃破 */
+function sfxDefeat(){
+
+  tone(180,0.12,"sawtooth",0.12);
+  tone(105,0.22,"square",0.14,0.08);
+  tone(55,0.35,"sawtooth",0.13,0.15);
+
+  screenShake(10,420);
+
+  spawnParticles("💥",12);
+}
+
+
+/* 🎒 装備 */
+function sfxEquip(){
+
+  tone(440,0.10,"sine",0.08);
+  tone(660,0.12,"sine",0.09,0.08);
+  tone(880,0.18,"sine",0.10,0.16);
+}
+
+
+/* 💎 DROP音 */
+function sfxDrop(rarity){
+
+  if(rarity==="NORMAL"){
+
+    tone(320,0.12,"sine",0.07);
+
+  }
+
+  else if(rarity==="RARE"){
+
+    tone(480,0.12,"sine",0.08);
+    tone(720,0.16,"sine",0.09,0.10);
+
+    spawnParticles("🔹",8);
+
+  }
+
+  else if(rarity==="EPIC"){
+
+    tone(350,0.12,"square",0.08);
+    tone(600,0.15,"sine",0.10,0.10);
+    tone(900,0.22,"sine",0.11,0.22);
+
+    bigFlash("#b95cff");
+    screenShake(5,300);
+
+    spawnParticles("✨",13);
+
+  }
+
+  else if(rarity==="LEGEND"){
+
+    setTimeout(()=>{
+
+      tone(120,0.35,"sawtooth",0.12);
+
+    },150);
+
+    setTimeout(()=>{
+
+      tone(523,0.15,"sine",0.11);
+      tone(659,0.15,"sine",0.11,0.12);
+      tone(784,0.28,"sine",0.14,0.24);
+
+      bigFlash("#ffd83d");
+      screenShake(10,520);
+
+      spawnParticles("⭐",22);
+
+    },500);
+
+  }
+
+  else if(rarity==="GOD"){
+
+    godSequence();
+
+  }
+}
+
+
+/* 🌈 GOD専用 */
+function godSequence(){
+
+  const overlay = document.getElementById("dropOverlay");
+
+  overlay.style.transition="filter .3s";
+  overlay.style.filter="brightness(.05)";
+
+  tone(55,0.55,"sine",0.15);
+
+  setTimeout(()=>{
+
+    tone(65,0.18,"sine",0.18);
+    screenShake(3,150);
+
+  },550);
+
+  setTimeout(()=>{
+
+    tone(65,0.18,"sine",0.18);
+    screenShake(4,150);
+
+  },900);
+
+  setTimeout(()=>{
+
+    overlay.style.filter="brightness(1)";
+
+    bigFlash("#ffffff");
+
+    tone(261,0.18,"sine",0.10);
+    tone(392,0.20,"sine",0.11,0.08);
+    tone(523,0.24,"sine",0.13,0.16);
+    tone(784,0.35,"sine",0.16,0.27);
+    tone(1046,0.50,"sine",0.18,0.40);
+
+    screenShake(18,850);
+
+    spawnParticles("🌈",28);
+    spawnParticles("✨",30);
+
+  },1350);
+}
+
+
+/* 📳 画面揺れ */
+function screenShake(power=8,duration=300){
+
+  const game=document.getElementById("game");
+
+  const start=Date.now();
+
+  const timer=setInterval(()=>{
+
+    const elapsed=Date.now()-start;
+
+    if(elapsed>=duration){
+
+      clearInterval(timer);
+      game.style.transform="";
+      return;
+
+    }
+
+    const x=(Math.random()-.5)*power*2;
+    const y=(Math.random()-.5)*power*2;
+
+    game.style.transform=
+      `translate(${x}px,${y}px)`;
+
+  },30);
+}
+
+
+/* ✨ フラッシュ */
+function bigFlash(color="#fff"){
+
+  const div=document.createElement("div");
+
+  div.style.position="fixed";
+  div.style.inset="0";
+  div.style.background=color;
+  div.style.zIndex="9999";
+  div.style.pointerEvents="none";
+  div.style.opacity="0.9";
+  div.style.transition="opacity .45s";
+
+  document.body.appendChild(div);
+
+  requestAnimationFrame(()=>{
+
+    setTimeout(()=>{
+
+      div.style.opacity="0";
+
+    },40);
+
+  });
+
+  setTimeout(()=>div.remove(),550);
+}
+
+
+/* 🎉 パーティクル */
+function spawnParticles(symbol,count=15){
+
+  for(let i=0;i<count;i++){
+
+    const p=document.createElement("div");
+
+    p.textContent=symbol;
+
+    p.style.position="fixed";
+    p.style.left="50%";
+    p.style.top="45%";
+    p.style.fontSize=(18+Math.random()*25)+"px";
+    p.style.zIndex="9998";
+    p.style.pointerEvents="none";
+    p.style.transition=
+      "transform 1s cubic-bezier(.1,.8,.2,1), opacity 1s";
+
+    document.body.appendChild(p);
+
+    const x=(Math.random()-.5)*window.innerWidth*.9;
+    const y=(Math.random()-.5)*window.innerHeight*.65;
+
+    requestAnimationFrame(()=>{
+
+      p.style.transform=
+        `translate(${x}px,${y}px) rotate(${Math.random()*720}deg)`;
+
+      p.style.opacity="0";
+
+    });
+
+    setTimeout(()=>p.remove(),1100);
+  }
+}
+
+
+/* =========================================
+   既存ゲームへ接続
+========================================= */
+
+
+/* ダイス開始 */
+const originalAttackFX = attack;
+
+attack = function(){
+
+  initAudio();
+
+  sfxDice();
+
+  screenShake(2,550);
+
+  originalAttackFX();
+};
+
+
+/* 攻撃結果 */
+const originalResolveAttackFX = resolveAttack;
+
+resolveAttack = function(rolls){
+
+  const sixes=rolls.filter(x=>x===6).length;
+
+  if(sixes>=2){
+
+    sfxCritical();
+
+  }else{
+
+    sfxHit();
+
+  }
+
+  originalResolveAttackFX(rolls);
+};
+
+
+/* 敵の反撃 */
+const originalEnemyAttackFX = enemyAttack;
+
+enemyAttack = function(){
+
+  sfxEnemyHit();
+
+  screenShake(4,180);
+
+  originalEnemyAttackFX();
+};
+
+
+/* 敵撃破 */
+const originalDefeatEnemyFX = defeatEnemy;
+
+defeatEnemy = function(){
+
+  sfxDefeat();
+
+  originalDefeatEnemyFX();
+};
+
+
+/* DROP */
+const originalShowDropFX = showDrop;
+
+showDrop = function(item){
+
+  originalShowDropFX(item);
+
+  setTimeout(()=>{
+
+    sfxDrop(item.rarity);
+
+  },200);
+};
+
+
+/* 装備 */
+const originalCloseDropFX = closeDrop;
+
+closeDrop = function(equip){
+
+  if(equip){
+
+    initAudio();
+    sfxEquip();
+
+  }
+
+  originalCloseDropFX(equip);
+};
 </script>
 
 </body>
