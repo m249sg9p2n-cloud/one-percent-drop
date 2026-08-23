@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>1% DROP</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top,#20294a 0%,#11162b 35%,#080b15 75%);
+  color:white;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  overflow-x:hidden;
+}
+
+#game{
+  width:min(100%,480px);
+  margin:auto;
+  padding:20px 16px 50px;
+}
+
+.title{
+  text-align:center;
+  font-size:36px;
+  font-weight:1000;
+  letter-spacing:2px;
+  margin-top:5px;
+}
+
+.title span{
+  color:#ffd84a;
+}
+
+.subtitle{
+  text-align:center;
+  color:#8c97bd;
+  font-size:12px;
+  margin-bottom:18px;
+}
+
+.card{
+  border:1px solid #343d65;
+  background:rgba(22,28,53,.88);
+  border-radius:22px;
+  padding:16px;
+  box-shadow:0 16px 30px rgba(0,0,0,.28);
+}
+
+.topStats{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.stat{
+  flex:1;
+  background:#10162c;
+  border:1px solid #303a61;
+  border-radius:15px;
+  padding:10px 6px;
+  text-align:center;
+}
+
+.stat small{
+  display:block;
+  color:#8f9abe;
+  font-size:10px;
+}
+
+.stat strong{
+  font-size:16px;
+}
+
+.enemyArea{
+  text-align:center;
+}
+
+.stage{
+  color:#ffd84a;
+  font-weight:900;
+  font-size:12px;
+  letter-spacing:1px;
+}
+
+.enemyEmoji{
+  font-size:92px;
+  margin:8px 0;
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.35));
+  transition:.15s;
+}
+
+.enemyEmoji.hit{
+  transform:translateX(-10px) rotate(-6deg) scale(.92);
+  filter:brightness(2);
+}
+
+.enemyName{
+  font-weight:1000;
+  font-size:23px;
+}
+
+.hpText{
+  margin-top:9px;
+  font-weight:800;
+}
+
+.bar{
+  height:15px;
+  background:#070a13;
+  border-radius:999px;
+  overflow:hidden;
+  border:1px solid #333b5c;
+  margin-top:7px;
+}
+
+.enemyHP{
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg,#ff365f,#ff7848);
+  transition:.35s;
+}
+
+.playerHP{
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg,#20d990,#59f0b6);
+  transition:.35s;
+}
+
+.playerPanel{
+  margin-top:13px;
+  padding:12px;
+  background:#0d1328;
+  border-radius:15px;
+}
+
+.playerRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:13px;
+}
+
+.weapon{
+  color:#ffd84a;
+  font-weight:900;
+}
+
+.diceBox{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin:19px 0 13px;
+}
+
+.die{
+  width:74px;
+  height:74px;
+  border-radius:17px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:49px;
+  background:linear-gradient(145deg,#fff,#d8dcf4);
+  color:#161a2a;
+  box-shadow:
+    0 9px 0 #9ca3c5,
+    0 15px 22px rgba(0,0,0,.45);
+}
+
+.die.rolling{
+  animation:roll .12s linear infinite;
+}
+
+@keyframes roll{
+  0%{transform:rotate(-8deg) scale(.94);}
+  50%{transform:rotate(8deg) scale(1.06);}
+  100%{transform:rotate(-8deg) scale(.94);}
+}
+
+.attackBtn{
+  width:100%;
+  border:0;
+  border-radius:18px;
+  padding:17px;
+  font-size:21px;
+  font-weight:1000;
+  color:#171100;
+  background:linear-gradient(#ffe75b,#ffb91f);
+  box-shadow:0 7px 0 #ad7200;
+  cursor:pointer;
+}
+
+.attackBtn:active{
+  transform:translateY(5px);
+  box-shadow:0 2px 0 #ad7200;
+}
+
+.attackBtn:disabled{
+  filter:grayscale(.8);
+  opacity:.6;
+}
+
+.message{
+  min-height:58px;
+  margin-top:15px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:11px;
+  border-radius:15px;
+  background:#0c1122;
+  border:1px solid #2c3452;
+  color:#dbe1ff;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.crit{
+  color:#ffd84a;
+  font-size:21px;
+  font-weight:1000;
+  text-shadow:0 0 16px #ffb400;
+}
+
+.inventoryTitle{
+  margin:20px 4px 9px;
+  font-weight:1000;
+}
+
+.inventory{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.item{
+  padding:12px;
+  border-radius:14px;
+  background:#10162b;
+  border:1px solid #303957;
+  font-size:12px;
+}
+
+.item strong{
+  display:block;
+  margin-top:4px;
+  font-size:13px;
+}
+
+.NORMAL{border-color:#7e8799;}
+.RARE{border-color:#3d9dff;box-shadow:inset 0 0 15px rgba(61,157,255,.12);}
+.EPIC{border-color:#b95cff;box-shadow:inset 0 0 15px rgba(185,92,255,.15);}
+.LEGEND{border-color:#ffd337;box-shadow:0 0 13px rgba(255,211,55,.23);}
+.GOD{
+  border-color:#ff63e6;
+  animation:godBorder 1s infinite alternate;
+}
+
+@keyframes godBorder{
+  to{
+    box-shadow:
+      0 0 12px #54eaff,
+      0 0 25px #ff62e8;
+  }
+}
+
+/* DROP演出 */
+#dropOverlay{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(2,4,10,.94);
+}
+
+#dropOverlay.show{
+  display:flex;
+}
+
+.dropCard{
+  width:min(92vw,410px);
+  text-align:center;
+  border-radius:27px;
+  padding:28px 18px;
+  background:#11172c;
+  border:2px solid white;
+  transform:scale(.7);
+  animation:dropIn .48s cubic-bezier(.2,1.5,.4,1) forwards;
+}
+
+@keyframes dropIn{
+  to{transform:scale(1);}
+}
+
+.dropLabel{
+  letter-spacing:4px;
+  font-weight:900;
+  color:#aab3d2;
+}
+
+.dropRarity{
+  font-size:38px;
+  font-weight:1000;
+  margin:8px 0;
+}
+
+.dropIcon{
+  font-size:80px;
+}
+
+.dropName{
+  font-size:24px;
+  font-weight:1000;
+  margin-top:10px;
+}
+
+.dropEffect{
+  margin-top:9px;
+  color:#cbd2ed;
+}
+
+.dropChance{
+  margin-top:9px;
+  font-size:12px;
+  opacity:.7;
+}
+
+.dropButtons{
+  display:flex;
+  gap:9px;
+  margin-top:20px;
+}
+
+.dropButtons button{
+  flex:1;
+  border:0;
+  border-radius:13px;
+  padding:14px 5px;
+  font-weight:900;
+  font-size:14px;
+}
+
+.keepBtn{
+  background:#303852;
+  color:white;
+}
+
+.equipBtn{
+  background:#ffe04c;
+  color:#151000;
+}
+
+.flash{
+  position:fixed;
+  inset:0;
+  background:white;
+  z-index:100;
+  pointer-events:none;
+  opacity:0;
+}
+
+.flash.go{
+  animation:flash .5s;
+}
+
+@keyframes flash{
+  0%{opacity:0;}
+  20%{opacity:1;}
+  100%{opacity:0;}
+}
+
+.damageText{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:37px;
+  font-weight:1000;
+  color:#fff;
+  text-shadow:0 3px 0 #ad143a;
+  animation:damageFly .7s forwards;
+  pointer-events:none;
+}
+
+@keyframes damageFly{
+  from{opacity:1;transform:translate(-50%,0) scale(.7);}
+  to{opacity:0;transform:translate(-50%,-80px) scale(1.25);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="flash" id="flash"></div>
+
+<div id="game">
+
+  <div class="title"><span>1%</span> DROP</div>
+  <div class="subtitle">ROLL・DEFEAT・LOOT</div>
+
+  <div class="topStats">
+    <div class="stat">
+      <small>撃破数</small>
+      <strong id="kills">0</strong>
+    </div>
+
+    <div class="stat">
+      <small>最高レア</small>
+      <strong id="best">---</strong>
+    </div>
+
+    <div class="stat">
+      <small>所持品</small>
+      <strong id="itemCount">0</strong>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <div class="enemyArea">
+
+      <div class="stage" id="stageText">STAGE 1</div>
+
+      <div class="enemyEmoji" id="enemyEmoji">🟢</div>
+
+      <div class="enemyName" id="enemyName">スライム</div>
+
+      <div class="hpText">
+        HP <span id="enemyHpText">30 / 30</span>
+      </div>
+
+      <div class="bar">
+        <div class="enemyHP" id="enemyHpBar"></div>
+      </div>
+
+    </div>
+
+    <div class="playerPanel">
+
+      <div class="playerRow">
+        <span>あなた ❤️ <b id="playerHpText">60 / 60</b></span>
+        <span class="weapon" id="weaponText">素手 +0</span>
+      </div>
+
+      <div class="bar">
+        <div class="playerHP" id="playerHpBar"></div>
+      </div>
+
+    </div>
+
+    <div class="diceBox">
+      <div class="die" id="d1">⚀</div>
+      <div class="die" id="d2">⚀</div>
+      <div class="die" id="d3">⚀</div>
+    </div>
+
+    <button class="attackBtn" id="attackBtn" onclick="attack()">
+      🎲 ダイスを振る
+    </button>
+
+    <div class="message" id="message">
+      ダイス3個の合計値で攻撃します。
+    </div>
+
+  </div>
+
+  <div class="inventoryTitle">🎒 ドロップ図鑑</div>
+
+  <div class="inventory" id="inventory">
+    <div style="grid-column:1/3;text-align:center;color:#717b9e;padding:20px;">
+      まだアイテムを持っていません
+    </div>
+  </div>
+
+</div>
+
+
+<div id="dropOverlay">
+
+  <div class="dropCard" id="dropCard">
+
+    <div class="dropLabel">ITEM DROP</div>
+
+    <div class="dropRarity" id="dropRarity">NORMAL</div>
+
+    <div class="dropIcon" id="dropIcon">🗡️</div>
+
+    <div class="dropName" id="dropName">木の剣</div>
+
+    <div class="dropEffect" id="dropEffect">
+      攻撃力 +1
+    </div>
+
+    <div class="dropChance" id="dropChance"></div>
+
+    <div class="dropButtons">
+      <button class="keepBtn" onclick="closeDrop(false)">
+        保管する
+      </button>
+
+      <button class="equipBtn" onclick="closeDrop(true)">
+        装備する
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const diceChars=["⚀","⚁","⚂","⚃","⚄","⚅"];
+
+const enemies=[
+  {name:"スライム",emoji:"🟢",hp:30,min:2,max:6},
+  {name:"コウモリ",emoji:"🦇",hp:48,min:3,max:8},
+  {name:"ゴブリン",emoji:"👺",hp:70,min:4,max:10},
+  {name:"ゴブリンキング",emoji:"👑",hp:110,min:6,max:13},
+  {name:"炎竜",emoji:"🐉",hp:170,min:8,max:16}
+];
+
+const loot={
+ NORMAL:[
+  {name:"木の剣",icon:"🗡️",atk:1},
+  {name:"石のナイフ",icon:"🔪",atk:2},
+  {name:"冒険者の剣",icon:"⚔️",atk:3}
+ ],
+
+ RARE:[
+  {name:"蒼鉄の剣",icon:"🗡️",atk:5},
+  {name:"雷の短剣",icon:"⚡",atk:6},
+  {name:"騎士の大剣",icon:"⚔️",atk:7}
+ ],
+
+ EPIC:[
+  {name:"紫電剣",icon:"💜",atk:10},
+  {name:"魔導ブレード",icon:"🔮",atk:12},
+  {name:"鬼神の刀",icon:"👹",atk:14}
+ ],
+
+ LEGEND:[
+  {name:"炎龍剣",icon:"🔥",atk:22},
+  {name:"王者の聖剣",icon:"👑",atk:25},
+  {name:"天雷剣",icon:"⚡",atk:28}
+ ],
+
+ GOD:[
+  {name:"神滅剣・アポカリプス",icon:"🌈",atk:50},
+  {name:"終焉の魔剣",icon:"💀",atk:55},
+  {name:"創世神の剣",icon:"✨",atk:60}
+ ]
+};
+
+let stage=0;
+let enemyHp=enemies[0].hp;
+
+let playerMaxHp=60;
+let playerHp=playerMaxHp;
+
+let kills=0;
+
+let weapon={
+ name:"素手",
+ atk:0,
+ rarity:"NORMAL"
+};
+
+let inventory=[];
+
+let currentDrop=null;
+let busy=false;
+
+function rand(min,max){
+ return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+function vibrate(pattern){
+ if(navigator.vibrate){
+  navigator.vibrate(pattern);
+ }
+}
+
+function update(){
+
+ const e=enemies[stage];
+
+ document.getElementById("stageText").textContent=
+ "STAGE "+(stage+1);
+
+ document.getElementById("enemyEmoji").textContent=e.emoji;
+ document.getElementById("enemyName").textContent=e.name;
+
+ document.getElementById("enemyHpText").textContent=
+ Math.max(0,enemyHp)+" / "+e.hp;
+
+ document.getElementById("enemyHpBar").style.width=
+ Math.max(0,(enemyHp/e.hp)*100)+"%";
+
+ document.getElementById("playerHpText").textContent=
+ playerHp+" / "+playerMaxHp;
+
+ document.getElementById("playerHpBar").style.width=
+ (playerHp/playerMaxHp*100)+"%";
+
+ document.getElementById("weaponText").textContent=
+ weapon.name+" +"+weapon.atk;
+
+ document.getElementById("kills").textContent=kills;
+ document.getElementById("itemCount").textContent=inventory.length;
+
+ renderInventory();
+}
+
+function attack(){
+
+ if(busy)return;
+
+ busy=true;
+
+ const btn=document.getElementById("attackBtn");
+ btn.disabled=true;
+
+ const dice=[
+  document.getElementById("d1"),
+  document.getElementById("d2"),
+  document.getElementById("d3")
+ ];
+
+ dice.forEach(d=>d.classList.add("rolling"));
+
+ document.getElementById("message").innerHTML=
+ "🎲 ダイスロール...";
+
+ let ticks=0;
+
+ const anim=setInterval(()=>{
+
+  dice.forEach(d=>{
+   d.textContent=diceChars[rand(0,5)];
+  });
+
+  ticks++;
+
+  if(ticks>=12){
+
+   clearInterval(anim);
+
+   dice.forEach(d=>d.classList.remove("rolling"));
+
+   const rolls=[rand(1,6),rand(1,6),rand(1,6)];
+
+   dice.forEach((d,i)=>{
+    d.textContent=diceChars[rolls[i]-1];
+   });
+
+   resolveAttack(rolls);
+  }
+
+ },70);
+}
+
+function resolveAttack(rolls){
+
+ let damage=rolls.reduce((a,b)=>a+b,0)+weapon.atk;
+
+ const sixCount=rolls.filter(x=>x===6).length;
+
+ let critical=false;
+
+ if(sixCount>=2){
+  damage*=2;
+  critical=true;
+ }
+
+ enemyHp-=damage;
+
+ hitEnemy(damage);
+
+ vibrate(critical ? [40,40,80] : 35);
+
+ if(critical){
+
+  document.getElementById("message").innerHTML=
+  '<div class="crit">⚡ CRITICAL!!<br>💥 '+damage+' DAMAGE!!</div>';
+
+ }else{
+
+  document.getElementById("message").innerHTML=
+  "⚔️ "+damage+" ダメージ！";
+ }
+
+ update();
+
+ setTimeout(()=>{
+
+  if(enemyHp<=0){
+   defeatEnemy();
+  }else{
+   enemyAttack();
+  }
+
+ },700);
+}
+
+function hitEnemy(damage){
+
+ const enemy=document.getElementById("enemyEmoji");
+
+ enemy.classList.add("hit");
+
+ setTimeout(()=>{
+  enemy.classList.remove("hit");
+ },180);
+
+ const text=document.createElement("div");
+
+ text.className="damageText";
+ text.textContent="-"+damage;
+ text.style.top=(enemy.getBoundingClientRect().top+40)+"px";
+
+ document.body.appendChild(text);
+
+ setTimeout(()=>{
+  text.remove();
+ },700);
+}
+
+function enemyAttack(){
+
+ const e=enemies[stage];
+
+ const dmg=rand(e.min,e.max);
+
+ playerHp-=dmg;
+
+ if(playerHp<0)playerHp=0;
+
+ vibrate(60);
+
+ document.getElementById("message").innerHTML=
+ "💢 "+e.name+"の反撃！<br>❤️ -"+dmg;
+
+ update();
+
+ if(playerHp<=0){
+
+  setTimeout(()=>{
+
+   document.getElementById("message").innerHTML=
+   "💀 敗北…<br>HPを全回復して再挑戦！";
+
+   playerHp=playerMaxHp;
+   enemyHp=e.hp;
+
+   update();
+
+   busy=false;
+   document.getElementById("attackBtn").disabled=false;
+
+  },1000);
+
+ }else{
+
+  busy=false;
+  document.getElementById("attackBtn").disabled=false;
+ }
+}
+
+function defeatEnemy(){
+
+ kills++;
+
+ document.getElementById("message").innerHTML=
+ "💥 撃破！！<br>DROP判定中……";
+
+ vibrate([60,50,100]);
+
+ playerHp=Math.min(playerMaxHp,playerHp+12);
+
+ update();
+
+ setTimeout(()=>{
+  rollDrop();
+ },1100);
+}
+
+function rollDrop(){
+
+ const r=Math.random()*100;
+
+ let rarity;
+
+ if(r<0.1){
+  rarity="GOD";
+ }else if(r<2){
+  rarity="LEGEND";
+ }else if(r<10){
+  rarity="EPIC";
+ }else if(r<30){
+  rarity="RARE";
+ }else{
+  rarity="NORMAL";
+ }
+
+ const pool=loot[rarity];
+
+ const item={
+  ...pool[rand(0,pool.length-1)],
+  rarity:rarity
+ };
+
+ currentDrop=item;
+
+ showDrop(item);
+}
+
+function showDrop(item){
+
+ const overlay=document.getElementById("dropOverlay");
+ const card=document.getElementById("dropCard");
+
+ card.className="dropCard "+item.rarity;
+
+ document.getElementById("dropRarity").textContent=item.rarity;
+ document.getElementById("dropIcon").textContent=item.icon;
+ document.getElementById("dropName").textContent=item.name;
+ document.getElementById("dropEffect").textContent=
+ "攻撃力 +"+item.atk;
+
+ const chance={
+  NORMAL:"70%",
+  RARE:"20%",
+  EPIC:"8%",
+  LEGEND:"1.9%",
+  GOD:"0.1%"
+ };
+
+ document.getElementById("dropChance").textContent=
+ "出現率 "+chance[item.rarity];
+
+ const rarityColors={
+  NORMAL:"#d8dce8",
+  RARE:"#45a7ff",
+  EPIC:"#c367ff",
+  LEGEND:"#ffd83d",
+  GOD:"#ff66e8"
+ };
+
+ document.getElementById("dropRarity").style.color=
+ rarityColors[item.rarity];
+
+ if(item.rarity==="LEGEND" || item.rarity==="GOD"){
+
+  document.getElementById("flash").classList.add("go");
+
+  setTimeout(()=>{
+   document.getElementById("flash").classList.remove("go");
+  },550);
+ }
+
+ if(item.rarity==="GOD"){
+  vibrate([100,60,100,60,200]);
+ }
+
+ overlay.classList.add("show");
+}
+
+function closeDrop(equip){
+
+ inventory.push(currentDrop);
+
+ if(equip){
+  weapon=currentDrop;
+ }
+
+ setBest(currentDrop.rarity);
+
+ document.getElementById("dropOverlay").classList.remove("show");
+
+ stage++;
+
+ if(stage>=enemies.length){
+  stage=0;
+ }
+
+ enemyHp=enemies[stage].hp;
+
+ currentDrop=null;
+
+ update();
+ saveGame();
+
+ document.getElementById("message").innerHTML=
+ equip
+ ? "✨ 新しい装備を装着！<br>次の敵が現れた！"
+ : "🎒 アイテムを保管しました。<br>次の敵へ！";
+
+ busy=false;
+ document.getElementById("attackBtn").disabled=false;
+}
+
+function rarityRank(r){
+
+ return {
+  NORMAL:1,
+  RARE:2,
+  EPIC:3,
+  LEGEND:4,
+  GOD:5
+ }[r] || 0;
+}
+
+let bestRarity="";
+
+function setBest(r){
+
+ if(rarityRank(r)>rarityRank(bestRarity)){
+
+  bestRarity=r;
+
+  document.getElementById("best").textContent=r;
+ }
+}
+
+function renderInventory(){
+
+ const el=document.getElementById("inventory");
+
+ if(inventory.length===0){
+
+  el.innerHTML=
+  '<div style="grid-column:1/3;text-align:center;color:#717b9e;padding:20px;">まだアイテムを持っていません</div>';
+
+  return;
+ }
+
+ el.innerHTML="";
+
+ inventory.slice().reverse().slice(0,12).forEach(item=>{
+
+  const div=document.createElement("div");
+
+  div.className="item "+item.rarity;
+
+  div.innerHTML=
+   item.icon+" "+item.rarity+
+   "<strong>"+item.name+"</strong>"+
+   "攻撃力 +"+item.atk;
+
+  el.appendChild(div);
+ });
+}
+
+function saveGame(){
+
+ const data={
+  kills,
+  inventory,
+  weapon,
+  bestRarity
+ };
+
+ localStorage.setItem("onePercentDropSave",JSON.stringify(data));
+}
+
+function loadGame(){
+
+ const raw=localStorage.getItem("onePercentDropSave");
+
+ if(!raw)return;
+
+ try{
+
+  const data=JSON.parse(raw);
+
+  kills=data.kills || 0;
+  inventory=data.inventory || [];
+
+  if(data.weapon){
+   weapon=data.weapon;
+  }
+
+  bestRarity=data.bestRarity || "";
+
+  if(bestRarity){
+   document.getElementById("best").textContent=bestRarity;
+  }
+
+ }catch(e){}
+}
+
+loadGame();
+update();
+
+</script>
+
+</body>
+</html>
