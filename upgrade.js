@@ -555,3 +555,467 @@
   );
 
 })();
+// =====================================================
+// UPGRADE SYSTEM Ver.3
+// 既存覚醒装備の新倍率への自動移行
+//
+// ★1 = 元攻撃力 ×2.5
+// ★2 = 元攻撃力 ×6.25 + 固有スキル
+// =====================================================
+
+(() => {
+
+  if (window.__UPGRADE_MIGRATION_V3__) return;
+  window.__UPGRADE_MIGRATION_V3__ = true;
+
+
+  const MIGRATION_KEY =
+    "onePercentUpgradeMigrationV3";
+
+
+  // =====================================================
+  // 元攻撃力を推定
+  // =====================================================
+
+  function findOriginalAtk(item){
+
+    if(!item) return 0;
+
+
+    // すでに元攻撃力が保存されている
+    if(
+      Number(item.originalAtk) > 0
+    ){
+
+      return Number(
+        item.originalAtk
+      );
+
+    }
+
+
+    const stars =
+      typeof getStars === "function"
+      ? getStars(item)
+      : Number(item.stars || 0);
+
+
+    // 無印ならそのまま
+    if(stars === 0){
+
+      return Number(
+        item.atk || 0
+      );
+
+    }
+
+
+    /*
+      既存★1・★2は、
+      装備名から元データを探す
+    */
+
+    const baseName =
+      typeof getBaseName === "function"
+      ? getBaseName(item)
+      : (
+          item.baseName ||
+          item.name
+        );
+
+
+    // lootから探す
+    if(
+      typeof loot !== "undefined"
+    ){
+
+      for(
+        const rarity of
+        Object.keys(loot)
+      ){
+
+        const found =
+          loot[rarity]
+          .find(x=>
+            x.name === baseName
+          );
+
+
+        if(found){
+
+          return Number(
+            found.atk || 0
+          );
+
+        }
+
+      }
+
+    }
+
+
+    /*
+      lootから見つからない特殊武器用。
+
+      最後の保険として
+      既存性能から逆算。
+    */
+
+    if(stars === 1){
+
+      return Math.max(
+        1,
+        Math.round(
+          Number(item.atk || 0) /
+          1.35
+        )
+      );
+
+    }
+
+
+    if(stars === 2){
+
+      return Math.max(
+        1,
+        Math.round(
+          Number(item.atk || 0) /
+          2
+        )
+      );
+
+    }
+
+
+    return Number(
+      item.atk || 0
+    );
+
+  }
+
+
+  // =====================================================
+  // 1個の装備を新ルールへ変換
+  // =====================================================
+
+  function migrateWeapon(item){
+
+    if(!item){
+      return item;
+    }
+
+
+    /*
+      防具は今回は対象外
+    */
+
+    if(
+      item.type === "armor"
+    ){
+
+      return item;
+
+    }
+
+
+    const stars =
+      typeof getStars === "function"
+      ? getStars(item)
+      : Number(item.stars || 0);
+
+
+    if(stars <= 0){
+
+      return item;
+
+    }
+
+
+    const originalAtk =
+      findOriginalAtk(
+        item
+      );
+
+
+    if(originalAtk <= 0){
+
+      return item;
+
+    }
+
+
+    const migrated = {
+      ...item,
+
+      originalAtk:
+        originalAtk
+    };
+
+
+    // ===================================================
+    // ★1
+    // ===================================================
+
+    if(stars === 1){
+
+      migrated.atk =
+        Math.ceil(
+          originalAtk * 2.5
+        );
+
+
+      migrated.stars =
+        1;
+
+
+      return migrated;
+
+    }
+
+
+    // ===================================================
+    // ★2
+    // ===================================================
+
+    if(stars >= 2){
+
+      migrated.atk =
+        Math.ceil(
+          originalAtk * 6.25
+        );
+
+
+      migrated.stars =
+        2;
+
+
+      migrated.awakened =
+        true;
+
+
+      /*
+        新しい固有スキルを付与
+      */
+
+      if(
+        typeof getAwakeningAbility ===
+        "function"
+      ){
+
+        const ability =
+          getAwakeningAbility(
+            migrated
+          );
+
+
+        if(ability){
+
+          migrated.awakeningType =
+            ability.type;
+
+          migrated.awakeningName =
+            ability.name;
+
+          migrated.awakeningText =
+            ability.text;
+
+        }
+
+      }
+
+
+      return migrated;
+
+    }
+
+
+    return migrated;
+
+  }
+
+
+  // =====================================================
+  // 全所持武器を変換
+  // =====================================================
+
+  function migrateAllWeapons(){
+
+    /*
+      すでに移行済みなら何もしない
+    */
+
+    if(
+      localStorage.getItem(
+        MIGRATION_KEY
+      ) === "1"
+    ){
+
+      return;
+
+    }
+
+
+    let changed = false;
+
+
+    // -------------------------
+    // INVENTORY
+    // -------------------------
+
+    if(
+      typeof inventory !==
+      "undefined" &&
+      Array.isArray(inventory)
+    ){
+
+      inventory =
+        inventory.map(item=>{
+
+          const stars =
+            typeof getStars ===
+            "function"
+            ? getStars(item)
+            : Number(
+                item.stars || 0
+              );
+
+
+          if(
+            stars > 0 &&
+            item.type !== "armor"
+          ){
+
+            changed = true;
+
+            return migrateWeapon(
+              item
+            );
+
+          }
+
+
+          return item;
+
+        });
+
+    }
+
+
+    // -------------------------
+    // 装備中武器
+    // -------------------------
+
+    if(
+      typeof weapon !==
+      "undefined" &&
+      weapon
+    ){
+
+      const stars =
+        typeof getStars ===
+        "function"
+        ? getStars(weapon)
+        : Number(
+            weapon.stars || 0
+          );
+
+
+      if(stars > 0){
+
+        weapon =
+          migrateWeapon(
+            weapon
+          );
+
+
+        changed = true;
+
+      }
+
+    }
+
+
+    // -------------------------
+    // 保存
+    // -------------------------
+
+    if(changed){
+
+      if(
+        typeof saveGame ===
+        "function"
+      ){
+
+        saveGame();
+
+      }
+
+
+      if(
+        typeof update ===
+        "function"
+      ){
+
+        update();
+
+      }
+
+    }
+
+
+    /*
+      移行済みフラグ
+    */
+
+    localStorage.setItem(
+      MIGRATION_KEY,
+      "1"
+    );
+
+
+    console.log(
+      "OLD WEAPONS MIGRATED TO NEW AWAKENING SYSTEM"
+    );
+
+  }
+
+
+  // =====================================================
+  // 読み込み完了後に一度だけ実行
+  // =====================================================
+
+  setTimeout(()=>{
+
+    migrateAllWeapons();
+
+  },500);
+
+
+  // =====================================================
+  // DEV用
+  //
+  // もし後から倍率を変更して
+  // 再移行したくなった時用
+  // =====================================================
+
+  window.ONE_PERCENT_UPGRADE = {
+
+    remigrate(){
+
+      localStorage.removeItem(
+        MIGRATION_KEY
+      );
+
+
+      migrateAllWeapons();
+
+    }
+
+  };
+
+
+  console.log(
+    "UPGRADE MIGRATION V3 READY"
+  );
+
+})();
