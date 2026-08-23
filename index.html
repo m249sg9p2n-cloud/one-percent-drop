@@ -8065,6 +8065,1921 @@ updateArmorDisplay();
 updateDangerSystem();
 
 renderEquipment();
+	/* =========================================
+   Ver.0.8
+   ARMOR SYNTHESIS + AWAKENING
+========================================= */
+
+
+/* =========================================
+   防具の★
+========================================= */
+
+function getArmorStars(item){
+
+  return Number(
+    item && item.stars || 0
+  );
+
+}
+
+
+function getArmorBaseName(item){
+
+  return (
+    item.baseName ||
+    item.name
+  );
+
+}
+
+
+function armorStarLabel(item){
+
+  const stars =
+    getArmorStars(item);
+
+  if(stars === 1){
+    return " ★";
+  }
+
+  if(stars >= 2){
+    return " ★★";
+  }
+
+  return "";
+
+}
+
+
+/* =========================================
+   同じ防具か判定
+========================================= */
+
+function sameArmorSynthesisItem(a,b){
+
+  return (
+
+    getArmorBaseName(a) ===
+    getArmorBaseName(b) &&
+
+    a.rarity ===
+    b.rarity &&
+
+    getArmorStars(a) ===
+    getArmorStars(b)
+
+  );
+
+}
+
+
+/* =========================================
+   合成素材数
+========================================= */
+
+function armorSynthesisCount(item){
+
+  return armorInventory
+  .filter(x=>
+
+    sameArmorSynthesisItem(
+      x,
+      item
+    )
+
+  ).length;
+
+}
+
+
+/* =========================================
+   ★1性能
+========================================= */
+
+function makeArmorStar1(item){
+
+  const evolved = {
+    ...item,
+
+    baseName:
+      getArmorBaseName(item),
+
+    stars:1,
+
+    type:"armor"
+  };
+
+
+  /*
+    %軽減防具
+  */
+
+  if(
+    Number(
+      item.reduction || 0
+    ) > 0
+  ){
+
+    evolved.reduction =
+      Number(item.reduction) + 5;
+
+  }
+
+
+  /*
+    固定軽減防具
+  */
+
+  else{
+
+    const base =
+      Number(
+        item.defense || 0
+      );
+
+
+    evolved.defense =
+      base +
+      Math.max(
+        2,
+        Math.ceil(
+          base * .5
+        )
+      );
+
+  }
+
+
+  return evolved;
+
+}
+
+
+/* =========================================
+   ★2覚醒能力
+========================================= */
+
+function getArmorAwakening(item){
+
+  switch(item.rarity){
+
+
+    case "NORMAL":
+
+      return {
+
+        type:"dangerDefense",
+
+        name:"背水の守り",
+
+        text:
+        "🩸 DANGER中、さらに被ダメージ -4"
+
+      };
+
+
+    case "RARE":
+
+      return {
+
+        type:"magicBarrier",
+
+        name:"魔導結界",
+
+        text:
+        "🔷 受けるダメージをさらに10%軽減"
+
+      };
+
+
+    case "EPIC":
+
+      return {
+
+        type:"crisisProtection",
+
+        name:"不屈の加護",
+
+        text:
+        "💜 HP50%以下でさらに25%軽減"
+
+      };
+
+
+    case "LEGEND":
+
+      return {
+
+        type:"kingBarrier",
+
+        name:"王者の障壁",
+
+        text:
+        "👑 受けるダメージをさらに15%軽減"
+
+      };
+
+
+    case "GOD":
+
+      return {
+
+        type:"absoluteDomain",
+
+        name:"絶対神域",
+
+        text:
+        "🌈 受けるダメージをさらに25%軽減"
+
+      };
+
+  }
+
+}
+
+
+/* =========================================
+   ★2性能
+========================================= */
+
+function makeArmorStar2(item){
+
+  const ability =
+    getArmorAwakening(item);
+
+
+  const evolved = {
+
+    ...item,
+
+    baseName:
+      getArmorBaseName(item),
+
+    stars:2,
+
+    awakened:true,
+
+    type:"armor",
+
+    armorAwakeningType:
+      ability.type,
+
+    armorAwakeningName:
+      ability.name,
+
+    armorAwakeningText:
+      ability.text
+
+  };
+
+
+  /*
+    固定軽減タイプ
+  */
+
+  if(
+    Number(
+      item.reduction || 0
+    ) <= 0
+  ){
+
+    const base =
+      Number(
+        item.defense || 0
+      );
+
+
+    switch(item.rarity){
+
+      case "NORMAL":
+
+        evolved.defense =
+          Math.max(
+            8,
+            base * 3
+          );
+
+        break;
+
+
+      case "RARE":
+
+        evolved.defense =
+          Math.max(
+            12,
+            base * 3
+          );
+
+        break;
+
+
+      case "EPIC":
+
+        evolved.defense =
+          Math.max(
+            18,
+            base * 3
+          );
+
+        break;
+
+    }
+
+  }
+
+
+  /*
+    %軽減タイプ
+  */
+
+  else{
+
+    switch(item.rarity){
+
+      case "LEGEND":
+
+        evolved.reduction =
+          Math.max(
+            35,
+            Number(
+              item.reduction
+            ) + 15
+          );
+
+        break;
+
+
+      case "GOD":
+
+        evolved.reduction =
+          Math.max(
+            50,
+            Number(
+              item.reduction
+            ) + 20
+          );
+
+        break;
+
+    }
+
+  }
+
+
+  return evolved;
+
+}
+
+
+/* =========================================
+   防具合成
+========================================= */
+
+function synthesizeArmor(item){
+
+  const stars =
+    getArmorStars(item);
+
+
+  if(stars >= 2){
+
+    return;
+
+  }
+
+
+  const count =
+    armorSynthesisCount(
+      item
+    );
+
+
+  if(count < 10){
+
+    return;
+
+  }
+
+
+  /*
+    装備中か確認
+  */
+
+  const wasEquipped =
+
+    window.armor &&
+
+    getArmorBaseName(
+      window.armor
+    ) ===
+    getArmorBaseName(
+      item
+    ) &&
+
+    getArmorStars(
+      window.armor
+    ) === stars;
+
+
+  /*
+    10個消費
+  */
+
+  let removed = 0;
+
+
+  armorInventory =
+    armorInventory
+    .filter(x=>{
+
+      if(
+
+        removed < 10 &&
+
+        sameArmorSynthesisItem(
+          x,
+          item
+        )
+
+      ){
+
+        removed++;
+
+        return false;
+
+      }
+
+
+      return true;
+
+    });
+
+
+  let evolved;
+
+
+  /*
+    無印 → ★1
+  */
+
+  if(stars === 0){
+
+    evolved =
+      makeArmorStar1(
+        item
+      );
+
+  }
+
+
+  /*
+    ★1 → ★2
+  */
+
+  else{
+
+    evolved =
+      makeArmorStar2(
+        item
+      );
+
+  }
+
+
+  delete evolved.count;
+
+
+  armorInventory.push(
+    evolved
+  );
+
+
+  /*
+    元防具を装備していた場合
+    進化後へ自動更新
+  */
+
+  if(wasEquipped){
+
+    window.armor = {
+      ...evolved
+    };
+
+
+    saveArmorData();
+
+  }
+
+
+  saveArmorInventory();
+
+  saveGame();
+
+
+  if(stars === 0){
+
+    showArmorLimitBreak(
+      evolved
+    );
+
+  }else{
+
+    showArmorAwakening(
+      evolved
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   ★1 LIMIT BREAK演出
+========================================= */
+
+function showArmorLimitBreak(item){
+
+  initAudio();
+
+
+  synthesisOverlay
+  .style.display =
+    "flex";
+
+
+  synthesisOverlay
+  .style.background =
+    "#050810";
+
+
+  synthesisOverlay
+  .innerHTML = `
+
+    <div>
+
+      <div
+        style="
+          font-size:42px;
+          line-height:1.6;
+        "
+      >
+
+        ${item.icon}
+        ${item.icon}
+        ${item.icon}
+
+        <br>
+
+        ${item.icon}
+        ${item.icon}
+        ${item.icon}
+        ${item.icon}
+
+        <br>
+
+        ${item.icon}
+        ${item.icon}
+        ${item.icon}
+
+      </div>
+
+
+      <div
+        style="
+          margin-top:20px;
+
+          color:#63dbff;
+
+          font-size:14px;
+
+          font-weight:1000;
+
+          letter-spacing:5px;
+        "
+      >
+
+        ARMOR COMBINE
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  tone(
+    110,
+    .55,
+    "sawtooth",
+    .09
+  );
+
+
+  setTimeout(()=>{
+
+
+    bigFlash(
+      "#83e7ff"
+    );
+
+
+    screenShake(
+      7,
+      450
+    );
+
+
+    vibrate([
+      70,
+      40,
+      110
+    ]);
+
+
+    tone(
+      330,
+      .14,
+      "sine",
+      .10
+    );
+
+
+    tone(
+      600,
+      .18,
+      "sine",
+      .12,
+      .12
+    );
+
+
+    tone(
+      900,
+      .30,
+      "sine",
+      .14,
+      .25
+    );
+
+
+    let effect = "";
+
+
+    if(
+      Number(
+        item.reduction || 0
+      ) > 0
+    ){
+
+      effect =
+        "被ダメージ "
+        +item.reduction+
+        "%軽減";
+
+    }else{
+
+      effect =
+        "被ダメージ -"
+        +item.defense;
+
+    }
+
+
+    synthesisOverlay
+    .innerHTML = `
+
+      <div>
+
+        <div
+          style="
+            color:#7ce5ff;
+
+            font-size:37px;
+
+            font-weight:1000;
+
+            text-shadow:
+            0 0 25px #009dff;
+          "
+        >
+
+          LIMIT BREAK!!
+
+        </div>
+
+
+        <div
+          style="
+            font-size:95px;
+
+            margin-top:25px;
+          "
+        >
+
+          ${item.icon}
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:12px;
+
+            font-size:25px;
+
+            font-weight:1000;
+          "
+        >
+
+          ${getArmorBaseName(item)}
+          ★
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:10px;
+
+            color:#7fe8ff;
+
+            font-size:17px;
+
+            font-weight:900;
+          "
+        >
+
+          ${effect}
+
+        </div>
+
+
+        <button
+          onclick="
+            finishArmorSynthesis()
+          "
+
+          style="
+            margin-top:35px;
+
+            width:180px;
+
+            padding:15px;
+
+            border:0;
+
+            border-radius:14px;
+
+            background:#65dfff;
+
+            color:#06151c;
+
+            font-size:16px;
+
+            font-weight:1000;
+          "
+        >
+
+          OK
+
+        </button>
+
+      </div>
+
+    `;
+
+
+    spawnParticles(
+      "🛡️",
+      10
+    );
+
+
+    spawnParticles(
+      "✨",
+      15
+    );
+
+
+  },1100);
+
+}
+
+
+/* =========================================
+   ★2 AWAKENING演出
+========================================= */
+
+function showArmorAwakening(item){
+
+  initAudio();
+
+
+  synthesisOverlay
+  .style.display =
+    "flex";
+
+
+  synthesisOverlay
+  .style.background =
+    "#000";
+
+
+  synthesisOverlay
+  .innerHTML = `
+
+    <div
+      style="
+        color:#7ddfff;
+
+        font-size:17px;
+
+        font-weight:1000;
+
+        letter-spacing:5px;
+      "
+    >
+
+      ARMOR EVOLUTION
+
+    </div>
+
+  `;
+
+
+  tone(
+    50,
+    .8,
+    "sine",
+    .13
+  );
+
+
+  vibrate(
+    80
+  );
+
+
+  setTimeout(()=>{
+
+
+    synthesisOverlay
+    .innerHTML = `
+
+      <div>
+
+        <div
+          style="
+            color:#ca68ff;
+
+            font-size:14px;
+
+            font-weight:1000;
+
+            letter-spacing:5px;
+          "
+        >
+
+          AWAKENING READY
+
+        </div>
+
+
+        <div
+          style="
+            font-size:90px;
+
+            margin-top:25px;
+          "
+        >
+
+          ${item.icon}
+
+        </div>
+
+
+        <button
+          id="armorAwakeningPush"
+
+          style="
+            width:180px;
+
+            height:180px;
+
+            margin-top:30px;
+
+            border-radius:50%;
+
+            border:
+            7px solid #c4f5ff;
+
+            background:
+            radial-gradient(
+              circle,
+              #ffffff,
+              #67e2ff 42%,
+              #7435c7 72%
+            );
+
+            box-shadow:
+            0 0 30px #63e6ff,
+            0 0 90px #ae43ff;
+
+            color:#091528;
+
+            font-size:30px;
+
+            font-weight:1000;
+          "
+        >
+
+          PUSH
+
+        </button>
+
+      </div>
+
+    `;
+
+
+    document
+    .getElementById(
+      "armorAwakeningPush"
+    )
+    .onclick = ()=>{
+
+      revealArmorAwakening(
+        item
+      );
+
+    };
+
+
+    tone(
+      500,
+      .18,
+      "sine",
+      .10
+    );
+
+
+  },1300);
+
+}
+
+
+/* =========================================
+   覚醒公開
+========================================= */
+
+function revealArmorAwakening(item){
+
+  synthesisOverlay
+  .innerHTML =
+    "";
+
+
+  synthesisOverlay
+  .style.background =
+    "#fff";
+
+
+  screenShake(
+    20,
+    800
+  );
+
+
+  vibrate([
+    100,
+    50,
+    100,
+    50,
+    180
+  ]);
+
+
+  tone(
+    60,
+    .6,
+    "sawtooth",
+    .18
+  );
+
+
+  tone(
+    392,
+    .20,
+    "sine",
+    .10,
+    .14
+  );
+
+
+  tone(
+    659,
+    .25,
+    "sine",
+    .13,
+    .30
+  );
+
+
+  tone(
+    1046,
+    .55,
+    "sine",
+    .17,
+    .48
+  );
+
+
+  setTimeout(()=>{
+
+
+    let effect = "";
+
+
+    if(
+      Number(
+        item.reduction || 0
+      ) > 0
+    ){
+
+      effect =
+        "被ダメージ "
+        +item.reduction+
+        "%軽減";
+
+    }else{
+
+      effect =
+        "被ダメージ -"
+        +item.defense;
+
+    }
+
+
+    synthesisOverlay
+    .style.background = `
+
+      radial-gradient(
+        circle,
+        #c9f8ff 0%,
+        #6248d7 28%,
+        #25105b 55%,
+        #03030a 85%
+      )
+
+    `;
+
+
+    synthesisOverlay
+    .innerHTML = `
+
+      <div
+        style="
+          width:min(94vw,430px);
+
+          padding:25px;
+
+          text-align:center;
+        "
+      >
+
+        <div
+          style="
+            color:#70e7ff;
+
+            font-size:12px;
+
+            letter-spacing:5px;
+
+            font-weight:1000;
+          "
+        >
+
+          AWAKENED ARMOR
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:7px;
+
+            font-size:38px;
+
+            font-weight:1000;
+
+            text-shadow:
+            0 0 15px #65e6ff,
+            0 0 35px #b63cff;
+          "
+        >
+
+          ★★ AWAKENING
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:20px;
+
+            font-size:100px;
+          "
+        >
+
+          ${item.icon}
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:10px;
+
+            font-size:27px;
+
+            font-weight:1000;
+          "
+        >
+
+          ${getArmorBaseName(item)}
+          ★★
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:8px;
+
+            color:#7ee7ff;
+
+            font-size:18px;
+
+            font-weight:1000;
+          "
+        >
+
+          ${effect}
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:25px;
+
+            padding:18px;
+
+            border-radius:18px;
+
+            border:
+            1px solid #ad76ff;
+
+            background:
+            rgba(50,20,100,.6);
+
+            box-shadow:
+            0 0 30px
+            rgba(123,90,255,.3);
+          "
+        >
+
+          <div
+            style="
+              color:#ffe258;
+
+              font-size:11px;
+
+              font-weight:1000;
+
+              letter-spacing:3px;
+            "
+          >
+
+            AWAKENING ABILITY
+
+          </div>
+
+
+          <div
+            style="
+              margin-top:9px;
+
+              font-size:22px;
+
+              font-weight:1000;
+            "
+          >
+
+            ${item.armorAwakeningName}
+
+          </div>
+
+
+          <div
+            style="
+              margin-top:8px;
+
+              color:#e8dcff;
+
+              font-size:14px;
+
+              line-height:1.5;
+            "
+          >
+
+            ${item.armorAwakeningText}
+
+          </div>
+
+        </div>
+
+
+        <button
+          onclick="
+            finishArmorSynthesis()
+          "
+
+          style="
+            margin-top:28px;
+
+            width:180px;
+
+            padding:15px;
+
+            border:0;
+
+            border-radius:14px;
+
+            background:#72e7ff;
+
+            color:#07141e;
+
+            font-size:16px;
+
+            font-weight:1000;
+          "
+        >
+
+          OK
+
+        </button>
+
+      </div>
+
+    `;
+
+
+    spawnParticles(
+      "🛡️",
+      20
+    );
+
+
+    spawnParticles(
+      "✨",
+      30
+    );
+
+
+    spawnParticles(
+      "💜",
+      15
+    );
+
+
+  },180);
+
+}
+
+
+/* =========================================
+   合成終了
+========================================= */
+
+function finishArmorSynthesis(){
+
+  synthesisOverlay
+  .style.display =
+    "none";
+
+
+  synthesisOverlay
+  .innerHTML =
+    "";
+
+
+  saveArmorInventory();
+
+  saveArmorData();
+
+
+  updateArmorDisplay();
+
+  updateDangerSystem();
+
+  renderEquipment();
+
+}
+
+
+/* =========================================
+   ★2覚醒能力を
+   実際のダメージへ接続
+========================================= */
+
+const armorAwakeOldCalculate =
+  calculateArmorDamage;
+
+
+calculateArmorDamage =
+function(rawDamage){
+
+  /*
+    まず通常防具性能
+  */
+
+  let damage =
+    armorAwakeOldCalculate(
+      rawDamage
+    );
+
+
+  const a =
+    window.armor;
+
+
+  if(
+    !a ||
+    getArmorStars(a) < 2 ||
+    !a.armorAwakeningType
+  ){
+
+    return damage;
+
+  }
+
+
+  /* =========================
+     NORMAL
+     DANGER中 -4
+  ========================= */
+
+  if(
+    a.armorAwakeningType ===
+    "dangerDefense"
+  ){
+
+    const enemy =
+      enemies[stage];
+
+
+    if(enemy){
+
+      const dangerDamage =
+        armorAwakeOldCalculate(
+          enemy.max
+        );
+
+
+      if(
+        playerHp <=
+        dangerDamage
+      ){
+
+        damage -= 4;
+
+      }
+
+    }
+
+  }
+
+
+  /* =========================
+     RARE
+     追加10%軽減
+  ========================= */
+
+  else if(
+    a.armorAwakeningType ===
+    "magicBarrier"
+  ){
+
+    damage =
+      Math.ceil(
+        damage * .90
+      );
+
+  }
+
+
+  /* =========================
+     EPIC
+     HP50%以下 25%軽減
+  ========================= */
+
+  else if(
+    a.armorAwakeningType ===
+    "crisisProtection"
+  ){
+
+    if(
+      playerHp <=
+      playerMaxHp * .5
+    ){
+
+      damage =
+        Math.ceil(
+          damage * .75
+        );
+
+    }
+
+  }
+
+
+  /* =========================
+     LEGEND
+     追加15%軽減
+  ========================= */
+
+  else if(
+    a.armorAwakeningType ===
+    "kingBarrier"
+  ){
+
+    damage =
+      Math.ceil(
+        damage * .85
+      );
+
+  }
+
+
+  /* =========================
+     GOD
+     追加25%軽減
+  ========================= */
+
+  else if(
+    a.armorAwakeningType ===
+    "absoluteDomain"
+  ){
+
+    damage =
+      Math.ceil(
+        damage * .75
+      );
+
+  }
+
+
+  return Math.max(
+    1,
+    damage
+  );
+
+};
+
+
+/* =========================================
+   ARMOR合成メニューを
+   EQUIPMENTへ追加
+========================================= */
+
+const armorAwakeOldRenderEquipment =
+  renderEquipment;
+
+
+renderEquipment =
+function(){
+
+  armorAwakeOldRenderEquipment();
+
+
+  const list =
+    document.getElementById(
+      "equipList"
+    );
+
+
+  if(!list){
+
+    return;
+
+  }
+
+
+  const title =
+    document.createElement(
+      "div"
+    );
+
+
+  title.style
+    .gridColumn =
+    "1 / -1";
+
+
+  title.innerHTML = `
+
+    <div
+      style="
+        margin:
+        28px 2px 10px;
+
+        padding:
+        12px;
+
+        border-radius:
+        14px;
+
+        background:
+        linear-gradient(
+          135deg,
+          #16374a,
+          #201642
+        );
+
+        color:#7de8ff;
+
+        font-size:14px;
+
+        font-weight:1000;
+
+        letter-spacing:1px;
+      "
+    >
+
+      🧪 ARMOR SYNTHESIS
+
+    </div>
+
+  `;
+
+
+  list.appendChild(
+    title
+  );
+
+
+  const grouped =
+    getGroupedArmor();
+
+
+  grouped.forEach(item=>{
+
+
+    const stars =
+      getArmorStars(
+        item
+      );
+
+
+    const count =
+      armorSynthesisCount(
+        item
+      );
+
+
+    const card =
+      document.createElement(
+        "div"
+      );
+
+
+    card.className =
+      "equipCard "+
+      item.rarity;
+
+
+    if(stars === 2){
+
+      card.style.border =
+        "2px solid #a96aff";
+
+
+      card.style.boxShadow =
+        "0 0 18px #6ce8ff55, 0 0 30px #b240ff44";
+
+    }
+
+
+    let effect = "";
+
+
+    if(
+      Number(
+        item.reduction || 0
+      ) > 0
+    ){
+
+      effect =
+        item.reduction+
+        "%軽減";
+
+    }else{
+
+      effect =
+        "-"+
+        item.defense;
+
+    }
+
+
+    card.innerHTML = `
+
+      <div
+        class="equipIcon"
+      >
+
+        ${item.icon}
+
+      </div>
+
+
+      <div
+        class="equipInfo"
+      >
+
+        <div
+          class="equipRarity"
+        >
+
+          ${
+            stars === 2
+            ? "AWAKENED"
+            : item.rarity
+          }
+
+        </div>
+
+
+        <strong>
+
+          ${getArmorBaseName(item)}
+          ${armorStarLabel(item)}
+
+        </strong>
+
+
+        <div
+          class="equipAtk"
+        >
+
+          被ダメージ ${effect}
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:5px;
+
+            color:#70e5ff;
+
+            font-size:11px;
+
+            font-weight:900;
+          "
+        >
+
+          所持 ×${count}
+
+        </div>
+
+
+        ${
+          stars === 2
+
+          ? `
+
+            <div
+              style="
+                margin-top:6px;
+
+                color:#d598ff;
+
+                font-size:11px;
+
+                font-weight:900;
+              "
+            >
+
+              ✨
+              ${item.armorAwakeningName}
+
+            </div>
+
+          `
+
+          : ""
+        }
+
+      </div>
+
+
+      <div>
+
+
+        ${
+          stars < 2
+
+          ? `
+
+            <button
+              class="
+                armorSynthesisBtn
+              "
+
+              style="
+                border:0;
+
+                border-radius:11px;
+
+                padding:
+                10px 9px;
+
+                ${
+                  count >= 10
+
+                  ? `
+                    background:#70e4ff;
+                    color:#06141d;
+                  `
+
+                  : `
+                    background:#252d44;
+                    color:#78829d;
+                  `
+                }
+
+                font-size:10px;
+
+                font-weight:1000;
+              "
+            >
+
+              ${
+                count >= 10
+
+                ? (
+                  stars === 0
+                  ? "🛡️ 合成可能"
+                  : "✨ 覚醒可能"
+                )
+
+                : count+
+                  " / 10"
+              }
+
+            </button>
+
+          `
+
+          : `
+
+            <div
+              style="
+                padding:8px;
+
+                color:#d878ff;
+
+                font-size:10px;
+
+                font-weight:1000;
+              "
+            >
+
+              ★★ MAX
+
+            </div>
+
+          `
+        }
+
+      </div>
+
+    `;
+
+
+    const button =
+      card.querySelector(
+        ".armorSynthesisBtn"
+      );
+
+
+    if(
+      button &&
+      count >= 10
+    ){
+
+      button.onclick =
+        ()=>{
+
+          synthesizeArmor(
+            item
+          );
+
+        };
+
+    }
+
+
+    list.appendChild(
+      card
+    );
+
+  });
+
+};
+
+
+/* =========================================
+   ARMOR欄の★表示も更新
+========================================= */
+
+const armorAwakeOldDisplay =
+  updateArmorDisplay;
+
+
+updateArmorDisplay =
+function(){
+
+  armorAwakeOldDisplay();
+
+
+  const text =
+    document.getElementById(
+      "armorText"
+    );
+
+
+  const a =
+    window.armor;
+
+
+  if(
+    !text ||
+    !a ||
+    a.name === "なし"
+  ){
+
+    return;
+
+  }
+
+
+  let effect = "";
+
+
+  if(
+    Number(
+      a.reduction || 0
+    ) > 0
+  ){
+
+    effect =
+      a.reduction+
+      "%軽減";
+
+  }else{
+
+    effect =
+      "-"+
+      a.defense;
+
+  }
+
+
+  text.textContent =
+
+    (a.icon || "🛡️")+
+    " "+
+    getArmorBaseName(a)+
+    armorStarLabel(a)+
+    " "+
+    effect;
+
+};
+
+
+/* =========================================
+   初期更新
+========================================= */
+
+updateArmorDisplay();
+
+updateDangerSystem();
+
+renderEquipment();
 </script>
 
 </body>
