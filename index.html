@@ -20819,6 +20819,1285 @@ function(item){
   );
 
 };
+	/* =====================================================
+   Ver.1.12
+   ASCENSION SHOWTIME PATCH
+
+   ・EPIC / LEGEND = PUSH昇格継続
+   ・GOD = RAREから直接プチュン
+   ・派手背景 / スタンプ / リズム復活
+   ・iPhone軽量設計
+===================================================== */
+
+
+/* =====================================================
+   CSS
+===================================================== */
+
+const ascShowtimeStyle =
+document.createElement("style");
+
+ascShowtimeStyle.textContent = `
+
+.ascPartyLayer{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:3;
+}
+
+.ascPartyStamp{
+  position:absolute;
+  font-size:38px;
+  font-weight:1000;
+  opacity:0;
+  pointer-events:none;
+
+  animation:
+    ascPartyFly
+    .75s cubic-bezier(.1,.8,.2,1)
+    forwards;
+}
+
+@keyframes ascPartyFly{
+
+  0%{
+    opacity:0;
+    transform:
+      translate(-50%,-50%)
+      scale(.35)
+      rotate(-20deg);
+  }
+
+  22%{
+    opacity:1;
+  }
+
+  100%{
+    opacity:0;
+    transform:
+      translate(-50%,-50%)
+      scale(1.7)
+      rotate(25deg);
+  }
+}
+
+
+/* 軽量な放射背景 */
+
+.ascPartyRays{
+  position:absolute;
+
+  left:-30%;
+  top:-30%;
+
+  width:160%;
+  height:160%;
+
+  opacity:.72;
+
+  pointer-events:none;
+
+  animation:
+    ascPartyRayMove
+    .9s ease-out forwards;
+}
+
+@keyframes ascPartyRayMove{
+
+  from{
+    transform:
+      rotate(-8deg)
+      scale(.55);
+
+    opacity:.15;
+  }
+
+  to{
+    transform:
+      rotate(10deg)
+      scale(1.18);
+
+    opacity:.85;
+  }
+}
+
+
+.ascEpicRays{
+
+  background:
+
+    repeating-conic-gradient(
+      from 0deg,
+
+      white 0deg 1deg,
+      #ec8cff 1deg 3deg,
+      transparent 3deg 8deg,
+      #7045ff 8deg 10deg,
+      transparent 10deg 16deg
+    );
+
+}
+
+
+.ascLegendRays{
+
+  background:
+
+    repeating-conic-gradient(
+      from 0deg,
+
+      white 0deg 1deg,
+      #fff200 1deg 3deg,
+      transparent 3deg 8deg,
+      #ff7200 8deg 10deg,
+      transparent 10deg 16deg
+    );
+
+}
+
+
+.ascGodRays{
+
+  background:
+
+    repeating-conic-gradient(
+      from 0deg,
+
+      white 0deg 1deg,
+      #ff1744 1deg 2deg,
+      #ffe600 2deg 3deg,
+      #00e676 3deg 4deg,
+      #00e5ff 4deg 5deg,
+      #7c4dff 5deg 6deg,
+      #e040fb 6deg 7deg,
+      transparent 7deg 12deg
+    );
+
+}
+
+
+/* PUSH周辺も派手に */
+
+.ascShowtimePush{
+
+  animation:
+    ascShowtimePulse
+    .38s infinite alternate !important;
+}
+
+@keyframes ascShowtimePulse{
+
+  from{
+    transform:scale(.93);
+  }
+
+  to{
+    transform:scale(1.08);
+  }
+
+}
+
+
+/* GODプチュン */
+
+.ascGodBlackout{
+
+  background:#000 !important;
+
+}
+
+.ascGodLine{
+
+  width:10px;
+  height:2px;
+
+  background:white;
+
+  box-shadow:
+    0 0 12px white,
+    0 0 30px #00eaff,
+    0 0 50px #ff35db;
+
+  animation:
+    ascGodLineOpen
+    .55s ease-out forwards;
+}
+
+@keyframes ascGodLineOpen{
+
+  from{
+    width:8px;
+    opacity:.2;
+  }
+
+  to{
+    width:88%;
+    opacity:1;
+  }
+}
+
+`;
+
+document.head.appendChild(
+  ascShowtimeStyle
+);
+
+
+/* =====================================================
+   軽量スタンプ祭り
+===================================================== */
+
+function ascensionStampParty(
+  rarity,
+  count=14
+){
+
+  const layer =
+  document.createElement("div");
+
+  layer.className =
+  "ascPartyLayer";
+
+
+  const sets = {
+
+    EPIC:[
+      "⚡",
+      "💜",
+      "✨",
+      "✦",
+      "💥"
+    ],
+
+    LEGEND:[
+      "🔥",
+      "⭐",
+      "⚡",
+      "✨",
+      "💥",
+      "👑"
+    ],
+
+    GOD:[
+      "🌈",
+      "⭐",
+      "✨",
+      "⚡",
+      "🔥",
+      "💥"
+    ]
+
+  };
+
+
+  const symbols =
+  sets[rarity] ||
+  sets.EPIC;
+
+
+  /*
+    iPhone対策
+    GODでも最大20個
+  */
+
+  count =
+  Math.min(
+    count,
+    20
+  );
+
+
+  for(
+    let i=0;
+    i<count;
+    i++
+  ){
+
+    const stamp =
+    document.createElement("div");
+
+    stamp.className =
+    "ascPartyStamp";
+
+
+    stamp.textContent =
+    symbols[
+      Math.floor(
+        Math.random() *
+        symbols.length
+      )
+    ];
+
+
+    stamp.style.left =
+    (
+      8 +
+      Math.random()*84
+    )+"%";
+
+
+    stamp.style.top =
+    (
+      10 +
+      Math.random()*80
+    )+"%";
+
+
+    stamp.style.animationDelay =
+    (
+      Math.random()*.25
+    )+"s";
+
+
+    layer.appendChild(
+      stamp
+    );
+
+  }
+
+
+  ascensionOverlay
+  .appendChild(
+    layer
+  );
+
+
+  setTimeout(()=>{
+
+    layer.remove();
+
+  },1100);
+
+}
+
+
+/* =====================================================
+   放射背景
+===================================================== */
+
+function ascensionPartyRays(
+  rarity
+){
+
+  const rays =
+  document.createElement("div");
+
+
+  rays.className =
+  "ascPartyRays";
+
+
+  if(
+    rarity==="EPIC"
+  ){
+
+    rays.classList.add(
+      "ascEpicRays"
+    );
+
+  }
+
+  else if(
+    rarity==="LEGEND"
+  ){
+
+    rays.classList.add(
+      "ascLegendRays"
+    );
+
+  }
+
+  else{
+
+    rays.classList.add(
+      "ascGodRays"
+    );
+
+  }
+
+
+  ascensionOverlay
+  .appendChild(
+    rays
+  );
+
+
+  setTimeout(()=>{
+
+    rays.remove();
+
+  },1000);
+
+}
+
+
+/* =====================================================
+   気持ちいい昇格リズム
+===================================================== */
+
+function ascensionRhythm(
+  rarity
+){
+
+  initAudio();
+
+
+  /*
+    ドン・タッ・ドン・ドドン
+  */
+
+  sfxKick(
+    0,
+    .15
+  );
+
+  sfxHat(
+    .12
+  );
+
+
+  sfxKick(
+    .28,
+    .16
+  );
+
+  sfxSnare(
+    .42
+  );
+
+
+  sfxKick(
+    .57,
+    .16
+  );
+
+  sfxHat(
+    .67
+  );
+
+
+  sfxKick(
+    .76,
+    .18
+  );
+
+
+  if(
+    rarity==="LEGEND"
+  ){
+
+    sfxKick(
+      .90,
+      .19
+    );
+
+    sfxKyuiin(
+      .72,
+      .85
+    );
+
+  }
+
+
+  if(
+    rarity==="GOD"
+  ){
+
+    sfxKick(
+      .88,
+      .20
+    );
+
+    sfxKick(
+      1.02,
+      .21
+    );
+
+    sfxKyuiin(
+      .78,
+      1
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   PUSH画面を派手に上書き
+===================================================== */
+
+const showtimeOldPush =
+showAscensionPush;
+
+
+showAscensionPush =
+function(
+  currentRarity,
+  nextRarity,
+  willPromote
+){
+
+  /*
+    元のPUSH処理を使用
+  */
+
+  showtimeOldPush(
+    currentRarity,
+    nextRarity,
+    willPromote
+  );
+
+
+  const button =
+  ascensionOverlay
+  .querySelector(
+    ".ascensionPush"
+  );
+
+
+  if(button){
+
+    button.classList.add(
+      "ascShowtimePush"
+    );
+
+  }
+
+
+  /*
+    今から昇格予定の色で
+    周囲を派手にする
+  */
+
+  if(
+    nextRarity==="EPIC"
+  ){
+
+    ascensionPartyRays(
+      "EPIC"
+    );
+
+
+    ascensionStampParty(
+      "EPIC",
+      11
+    );
+
+
+    superFlash(
+      "#8e35ff",
+      130
+    );
+
+  }
+
+
+  else if(
+    nextRarity==="LEGEND"
+  ){
+
+    ascensionPartyRays(
+      "LEGEND"
+    );
+
+
+    ascensionStampParty(
+      "LEGEND",
+      14
+    );
+
+
+    superFlash(
+      "#ffb300",
+      130
+    );
+
+  }
+
+};
+
+
+/* =====================================================
+   昇格成功をさらに派手に
+===================================================== */
+
+const showtimeOldSuccess =
+playAscensionSuccess;
+
+
+playAscensionSuccess =
+function(
+  fromRarity,
+  toRarity,
+  premium=false
+){
+
+  /*
+    先に祝福演出
+  */
+
+  ascensionRhythm(
+    toRarity
+  );
+
+
+  if(
+    toRarity==="EPIC"
+  ){
+
+    ascensionPartyRays(
+      "EPIC"
+    );
+
+
+    ascensionStampParty(
+      "EPIC",
+      16
+    );
+
+
+    superFlash(
+      "#ffffff",
+      140
+    );
+
+
+    setTimeout(()=>{
+
+      superFlash(
+        "#b740ff",
+        140
+      );
+
+    },150);
+
+  }
+
+
+  if(
+    toRarity==="LEGEND"
+  ){
+
+    ascensionPartyRays(
+      "LEGEND"
+    );
+
+
+    ascensionStampParty(
+      "LEGEND",
+      20
+    );
+
+
+    superFlash(
+      "#ffffff",
+      140
+    );
+
+
+    setTimeout(()=>{
+
+      superFlash(
+        "#ffd600",
+        140
+      );
+
+    },140);
+
+
+    setTimeout(()=>{
+
+      superFlash(
+        "#ff7200",
+        140
+      );
+
+    },280);
+
+  }
+
+
+  /*
+    元の成功演出
+  */
+
+  showtimeOldSuccess(
+    fromRarity,
+    toRarity,
+    premium
+  );
+
+};
+
+
+/* =====================================================
+   復活成功もさらに派手に
+===================================================== */
+
+const showtimeOldRevival =
+playAscensionRevival;
+
+
+playAscensionRevival =
+function(
+  fromRarity,
+  toRarity
+){
+
+  /*
+    元のFAILED→復活を残す
+  */
+
+  showtimeOldRevival(
+    fromRarity,
+    toRarity
+  );
+
+
+  /*
+    復活タイミングに追加祭り
+  */
+
+  setTimeout(()=>{
+
+    ascensionRhythm(
+      toRarity
+    );
+
+
+    ascensionPartyRays(
+      toRarity
+    );
+
+
+    ascensionStampParty(
+      toRarity,
+      toRarity==="LEGEND"
+      ? 20
+      : 17
+    );
+
+
+  },1000);
+
+};
+
+
+/* =====================================================
+   GOD専用
+
+   ★ステップアップ完全廃止★
+
+   RARE
+     ↓
+   プチュン
+     ↓
+   GOD CHANCE
+     ↓
+   虹PUSH
+     ↓
+   GOD
+===================================================== */
+
+function startDirectGodAscension(
+  item
+){
+
+  ascensionItem =
+  item;
+
+
+  ascensionFinalRarity =
+  "GOD";
+
+
+  ascensionCurrentIndex =
+  0;
+
+
+  /*
+    最初だけRAREを表示
+  */
+
+  showAscensionRarity(
+    "RARE",
+    "ITEM DROP"
+  );
+
+
+  superFlash(
+    "#448cff",
+    130
+  );
+
+
+  tone(
+    430,
+    .12,
+    "sine",
+    .05
+  );
+
+
+  /*
+    いきなりプチュン
+  */
+
+  setTimeout(()=>{
+
+    ascensionClear();
+
+
+    ascensionOverlay.className =
+    "show ascGodBlackout";
+
+
+    /*
+      プチュンSE
+    */
+
+    tone(
+      100,
+      .05,
+      "square",
+      .075
+    );
+
+
+    tone(
+      45,
+      .22,
+      "sine",
+      .075,
+      .03
+    );
+
+
+    vibrate(
+      75
+    );
+
+
+  },650);
+
+
+  /*
+    暗闇から光線
+  */
+
+  setTimeout(()=>{
+
+    const line =
+    document.createElement(
+      "div"
+    );
+
+
+    line.className =
+    "ascGodLine";
+
+
+    ascensionOverlay
+    .appendChild(
+      line
+    );
+
+
+    sfxKick(
+      0,
+      .18
+    );
+
+
+  },1050);
+
+
+  /*
+    GOD CHANCE開放
+  */
+
+  setTimeout(()=>{
+
+    ascensionClear();
+
+
+    ascensionOverlay.className =
+    "show";
+
+
+    const stage =
+    document.createElement(
+      "div"
+    );
+
+
+    stage.className =
+    "ascensionStage ascensionGod";
+
+
+    stage.innerHTML = `
+
+      <div
+        style="
+          position:relative;
+          z-index:8;
+
+          color:white;
+
+          font-size:16px;
+
+          font-weight:1000;
+
+          letter-spacing:8px;
+        "
+      >
+
+        0.1%
+
+      </div>
+
+
+      <div
+        style="
+          position:relative;
+
+          z-index:8;
+
+          margin-top:5px;
+
+          color:white;
+
+          font-size:58px;
+
+          font-weight:1000;
+
+          text-shadow:
+          0 0 15px white,
+          0 0 35px #ffe600,
+          0 0 60px #ff40dc;
+        "
+      >
+
+        GOD CHANCE
+
+      </div>
+
+
+      <button
+        id="directGodPush"
+
+        class="
+          ascensionPush
+          ascensionRainbowPush
+          ascShowtimePush
+        "
+
+        style="
+          width:215px;
+          height:215px;
+
+          font-size:36px;
+        "
+      >
+
+        🌈<br>
+        PUSH
+
+      </button>
+
+    `;
+
+
+    ascensionOverlay
+    .appendChild(
+      stage
+    );
+
+
+    /*
+      背景派手祭り
+    */
+
+    ascensionPartyRays(
+      "GOD"
+    );
+
+
+    ascensionStampParty(
+      "GOD",
+      20
+    );
+
+
+    ascensionRhythm(
+      "GOD"
+    );
+
+
+    superFlash(
+      "#ffffff",
+      130
+    );
+
+
+    setTimeout(()=>{
+
+      superFlash(
+        "#ffea00",
+        130
+      );
+
+    },150);
+
+
+    setTimeout(()=>{
+
+      superFlash(
+        "#00e5ff",
+        130
+      );
+
+    },300);
+
+
+    document
+    .getElementById(
+      "directGodPush"
+    )
+    .onclick = ()=>{
+
+      revealDirectGod(
+        item
+      );
+
+    };
+
+
+  },1500);
+
+}
+
+
+/* =====================================================
+   GOD PUSH後
+===================================================== */
+
+function revealDirectGod(
+  item
+){
+
+  ascensionRhythm(
+    "GOD"
+  );
+
+
+  ascensionPartyRays(
+    "GOD"
+  );
+
+
+  ascensionStampParty(
+    "GOD",
+    20
+  );
+
+
+  /*
+    画面全部光る
+  */
+
+  superFlash(
+    "#ffffff",
+    160
+  );
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ffea00",
+      150
+    );
+
+  },170);
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ff3de0",
+      150
+    );
+
+  },340);
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#00e5ff",
+      150
+    );
+
+  },510);
+
+
+  screenShake(
+    15,
+    700
+  );
+
+
+  vibrate([
+    100,
+    35,
+    130,
+    35,
+    170
+  ]);
+
+
+  playGodPushSound();
+
+
+  /*
+    GOD文字
+  */
+
+  ascensionOverlay
+  .innerHTML = `
+
+    <div
+      class="
+        ascensionStage
+        ascensionGod
+      "
+    >
+
+      <div
+        class="
+          ascensionTitle
+          ascensionSuccess
+        "
+
+        style="
+          color:white;
+
+          font-size:120px;
+
+          text-shadow:
+          0 0 20px white,
+          0 0 45px #ffe600,
+          0 0 70px #ff32db,
+          0 0 90px #00e5ff;
+        "
+      >
+
+        GOD
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  /*
+    DOMを書き換えたので
+    改めて少量だけスタンプ
+  */
+
+  setTimeout(()=>{
+
+    ascensionPartyRays(
+      "GOD"
+    );
+
+
+    ascensionStampParty(
+      "GOD",
+      18
+    );
+
+  },70);
+
+
+  /*
+    アイテム公開
+  */
+
+  setTimeout(()=>{
+
+    ascensionClear();
+
+
+    revealSuperDropCard(
+      item
+    );
+
+
+    ascensionItem =
+    null;
+
+
+    ascensionFinalRarity =
+    null;
+
+
+    ascensionCurrentIndex =
+    0;
+
+
+  },1900);
+
+}
+
+
+/* =====================================================
+   startRarityAscensionを変更
+
+   GODだけ完全別ルート
+===================================================== */
+
+const showtimeOldStartAscension =
+startRarityAscension;
+
+
+startRarityAscension =
+function(item){
+
+  /*
+    GODなら
+    ステップアップに入れない
+  */
+
+  if(
+    item &&
+    item.rarity==="GOD"
+  ){
+
+    startDirectGodAscension(
+      item
+    );
+
+    return;
+
+  }
+
+
+  /*
+    RARE / EPIC / LEGENDは
+    今までのPUSH昇格
+  */
+
+  showtimeOldStartAscension(
+    item
+  );
+
+};
 </script>
 
 </body>
