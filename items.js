@@ -1266,3 +1266,800 @@
   );
 
 })();
+
+// =====================================================
+// GOLD SYSTEM Ver.1
+// ステージ連動GOLD・BONUS・保存
+// =====================================================
+
+(() => {
+
+  // 二重追加防止
+  if (window.__ONE_PERCENT_GOLD_V1__) return;
+  window.__ONE_PERCENT_GOLD_V1__ = true;
+
+
+  // =====================================================
+  // SAVE
+  // =====================================================
+
+  const GOLD_SAVE_KEY =
+    "onePercentDropGoldV1";
+
+
+  let playerGold =
+    Number(
+      localStorage.getItem(
+        GOLD_SAVE_KEY
+      ) || 0
+    );
+
+
+  function saveGold(){
+
+    try{
+
+      localStorage.setItem(
+        GOLD_SAVE_KEY,
+        String(playerGold)
+      );
+
+    }catch(e){
+
+      console.log(
+        "GOLD SAVE ERROR",
+        e
+      );
+
+    }
+
+  }
+
+
+  // =====================================================
+  // GOLD表示CSS
+  // =====================================================
+
+  const goldStyle =
+    document.createElement(
+      "style"
+    );
+
+
+  goldStyle.textContent = `
+
+    #goldDisplay{
+
+      margin-top:10px;
+
+      padding:
+        10px 14px;
+
+      border-radius:
+        14px;
+
+      border:
+        1px solid #66551d;
+
+      background:
+        linear-gradient(
+          135deg,
+          #282311,
+          #151309
+        );
+
+      color:#ffe36a;
+
+      font-size:14px;
+
+      font-weight:1000;
+
+      text-align:center;
+
+      letter-spacing:1px;
+
+      box-shadow:
+        inset 0 0 15px
+        rgba(255,210,40,.08);
+
+    }
+
+
+    #goldDisplay strong{
+
+      margin-left:7px;
+
+      color:#fff1a1;
+
+      font-size:18px;
+
+    }
+
+
+    .goldGainPopup{
+
+      position:fixed;
+
+      left:50%;
+
+      top:28%;
+
+      z-index:350000;
+
+      transform:
+        translateX(-50%)
+        scale(.7);
+
+      opacity:0;
+
+      pointer-events:none;
+
+      padding:
+        10px 18px;
+
+      border-radius:
+        999px;
+
+      color:#251800;
+
+      background:
+        linear-gradient(
+          #fff7a3,
+          #ffd42d
+        );
+
+      border:
+        2px solid white;
+
+      font-size:23px;
+
+      font-weight:1000;
+
+      box-shadow:
+        0 0 15px white,
+        0 0 35px
+        rgba(255,210,0,.7);
+
+      animation:
+        goldGainPop
+        1.15s
+        cubic-bezier(.15,1.4,.3,1)
+        forwards;
+
+    }
+
+
+    @keyframes goldGainPop{
+
+      0%{
+
+        opacity:0;
+
+        transform:
+          translateX(-50%)
+          scale(.55)
+          translateY(20px);
+
+      }
+
+
+      22%{
+
+        opacity:1;
+
+        transform:
+          translateX(-50%)
+          scale(1.12)
+          translateY(0);
+
+      }
+
+
+      70%{
+
+        opacity:1;
+
+      }
+
+
+      100%{
+
+        opacity:0;
+
+        transform:
+          translateX(-50%)
+          scale(.95)
+          translateY(-45px);
+
+      }
+
+    }
+
+
+    .goldBonusText{
+
+      display:block;
+
+      margin-bottom:3px;
+
+      color:#e75118;
+
+      font-size:11px;
+
+      letter-spacing:2px;
+
+    }
+
+  `;
+
+
+  document.head.appendChild(
+    goldStyle
+  );
+
+
+  // =====================================================
+  // GOLD表示を作る
+  // =====================================================
+
+  const goldDisplay =
+    document.createElement(
+      "div"
+    );
+
+
+  goldDisplay.id =
+    "goldDisplay";
+
+
+  goldDisplay.innerHTML = `
+
+    💰 GOLD
+
+    <strong id="goldAmount">
+      0G
+    </strong>
+
+  `;
+
+
+  /*
+    上部ステータスの下へ追加
+  */
+
+  const topStats =
+    document.querySelector(
+      ".topStats"
+    );
+
+
+  if(topStats){
+
+    topStats.insertAdjacentElement(
+      "afterend",
+      goldDisplay
+    );
+
+  }
+
+
+  // =====================================================
+  // 表示更新
+  // =====================================================
+
+  function updateGoldDisplay(){
+
+    const amount =
+      document.getElementById(
+        "goldAmount"
+      );
+
+
+    if(!amount) return;
+
+
+    amount.textContent =
+      playerGold.toLocaleString(
+        "ja-JP"
+      ) + "G";
+
+  }
+
+
+  updateGoldDisplay();
+
+
+  // =====================================================
+  // GOLD報酬計算
+  // =====================================================
+
+  function calculateGoldReward(){
+
+    /*
+      stageは内部では0始まりなので
+      画面上のSTAGE番号へ変換
+    */
+
+    const stageNumber =
+      typeof stage !== "undefined"
+      ? Number(stage) + 1
+      : 1;
+
+
+    /*
+      基本式
+
+      30
+      +
+      ステージ × 12
+      +
+      ランダム0〜30
+    */
+
+    const randomBonus =
+      typeof rand === "function"
+      ? rand(0,30)
+      : Math.floor(
+          Math.random() * 31
+        );
+
+
+    let gold =
+      30 +
+      stageNumber * 12 +
+      randomBonus;
+
+
+    // -------------------------
+    // GOLD BONUS抽選
+    // -------------------------
+
+    const bonusRoll =
+      Math.random();
+
+
+    let multiplier = 1;
+
+    let bonusName = "";
+
+
+    /*
+      1%で ×3
+    */
+
+    if(
+      bonusRoll < .01
+    ){
+
+      multiplier = 3;
+
+      bonusName =
+        "💰 SUPER GOLD BONUS ×3";
+
+    }
+
+
+    /*
+      次の5%で ×2
+    */
+
+    else if(
+      bonusRoll < .06
+    ){
+
+      multiplier = 2;
+
+      bonusName =
+        "✨ GOLD BONUS ×2";
+
+    }
+
+
+    gold *= multiplier;
+
+
+    return {
+
+      amount:
+        Math.floor(gold),
+
+      multiplier,
+
+      bonusName,
+
+      stageNumber
+
+    };
+
+  }
+
+
+  // =====================================================
+  // GOLD獲得演出
+  // =====================================================
+
+  function showGoldGain(
+    reward
+  ){
+
+    const popup =
+      document.createElement(
+        "div"
+      );
+
+
+    popup.className =
+      "goldGainPopup";
+
+
+    popup.innerHTML = `
+
+      ${
+        reward.bonusName
+        ? `
+          <span class="goldBonusText">
+            ${reward.bonusName}
+          </span>
+        `
+        : ""
+      }
+
+      +${reward.amount.toLocaleString(
+        "ja-JP"
+      )}G
+
+    `;
+
+
+    document.body.appendChild(
+      popup
+    );
+
+
+    /*
+      軽いコイン音
+    */
+
+    if(
+      typeof tone ===
+      "function"
+    ){
+
+      tone(
+        700,
+        .07,
+        "sine",
+        .045
+      );
+
+
+      tone(
+        920,
+        .08,
+        "sine",
+        .05,
+        .07
+      );
+
+
+      tone(
+        1180,
+        .12,
+        "sine",
+        .05,
+        .15
+      );
+
+    }
+
+
+    if(
+      reward.multiplier >= 2
+    ){
+
+      if(
+        typeof vibrate ===
+        "function"
+      ){
+
+        vibrate(
+          reward.multiplier === 3
+          ? [45,25,75]
+          : 40
+        );
+
+      }
+
+
+      if(
+        typeof superFlash ===
+        "function"
+      ){
+
+        superFlash(
+          "#ffe45a",
+          110
+        );
+
+      }
+
+    }
+
+
+    setTimeout(()=>{
+
+      popup.remove();
+
+    },1250);
+
+  }
+
+
+  // =====================================================
+  // GOLD追加
+  // =====================================================
+
+  function addGold(
+    amount,
+    showEffect=false,
+    rewardData=null
+  ){
+
+    const value =
+      Math.max(
+        0,
+        Math.floor(
+          Number(amount) || 0
+        )
+      );
+
+
+    if(value <= 0){
+
+      return false;
+
+    }
+
+
+    playerGold +=
+      value;
+
+
+    saveGold();
+
+    updateGoldDisplay();
+
+
+    if(showEffect){
+
+      showGoldGain(
+        rewardData || {
+          amount:value,
+          multiplier:1,
+          bonusName:""
+        }
+      );
+
+    }
+
+
+    return true;
+
+  }
+
+
+  // =====================================================
+  // GOLD消費
+  // SHOP用
+  // =====================================================
+
+  function spendGold(
+    amount
+  ){
+
+    const value =
+      Math.max(
+        0,
+        Math.floor(
+          Number(amount) || 0
+        )
+      );
+
+
+    if(
+      value <= 0 ||
+      playerGold < value
+    ){
+
+      return false;
+
+    }
+
+
+    playerGold -=
+      value;
+
+
+    saveGold();
+
+    updateGoldDisplay();
+
+
+    return true;
+
+  }
+
+
+  // =====================================================
+  // 敵撃破時にGOLD獲得
+  //
+  // DROP表示が始まる瞬間を利用。
+  // 同じ撃破で二重取得しないように
+  // killsでガード。
+  // =====================================================
+
+  if(
+    typeof showDrop ===
+    "function"
+  ){
+
+    const oldShowDropGold =
+      showDrop;
+
+
+    let lastGoldKill =
+      typeof kills !== "undefined"
+      ? Number(kills)
+      : 0;
+
+
+    showDrop =
+    function(item){
+
+      /*
+        実際の撃破数が増えていた場合だけ
+        GOLDを追加
+      */
+
+      const currentKills =
+        typeof kills !== "undefined"
+        ? Number(kills)
+        : lastGoldKill + 1;
+
+
+      if(
+        currentKills >
+        lastGoldKill
+      ){
+
+        const defeatedCount =
+          currentKills -
+          lastGoldKill;
+
+
+        /*
+          万一一気に複数増えても対応
+        */
+
+        for(
+          let i=0;
+          i<defeatedCount;
+          i++
+        ){
+
+          const reward =
+            calculateGoldReward();
+
+
+          addGold(
+            reward.amount,
+            true,
+            reward
+          );
+
+        }
+
+
+        lastGoldKill =
+          currentKills;
+
+      }
+
+
+      /*
+        元のDROP処理へ
+      */
+
+      return oldShowDropGold(
+        item
+      );
+
+    };
+
+  }
+
+
+  // =====================================================
+  // SHOPなどから使えるAPI
+  // =====================================================
+
+  window.ONE_PERCENT_GOLD = {
+
+    get(){
+
+      return playerGold;
+
+    },
+
+
+    add(
+      amount
+    ){
+
+      return addGold(
+        amount,
+        false
+      );
+
+    },
+
+
+    spend(
+      amount
+    ){
+
+      return spendGold(
+        amount
+      );
+
+    },
+
+
+    canAfford(
+      amount
+    ){
+
+      return (
+        playerGold >=
+        Number(amount || 0)
+      );
+
+    },
+
+
+    refresh(){
+
+      updateGoldDisplay();
+
+    },
+
+
+    /*
+      開発テスト用
+    */
+
+    testAdd(
+      amount=1000
+    ){
+
+      addGold(
+        amount,
+        true,
+        {
+          amount,
+          multiplier:1,
+          bonusName:
+            "🛠️ DEV GOLD"
+        }
+      );
+
+    }
+
+  };
+
+
+  console.log(
+    "GOLD SYSTEM V1 READY"
+  );
+
+})();
