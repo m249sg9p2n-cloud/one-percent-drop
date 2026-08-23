@@ -20820,6 +20820,1025 @@ function(item){
 
 };
 
+	/* =====================================================
+   BRAIN JUICE OVERDRIVE START
+   Ver.1.13 SAFE ASCENSION IMPACT
+
+   ・昇格文字追加
+   ・復活昇格文字追加
+   ・PUSH成功の溜め強化
+   ・LEGEND第二波
+   ・GODは直行ルート維持
+   ・iPhone軽量
+   ・二重貼り防止
+===================================================== */
+
+(function(){
+
+  /* =========================================
+     二重追加防止
+  ========================================= */
+
+  if(
+    window.__BRAIN_JUICE_OVERDRIVE_V113__
+  ){
+    console.log(
+      "BRAIN JUICE OVERDRIVE V1.13 already loaded"
+    );
+    return;
+  }
+
+  window.__BRAIN_JUICE_OVERDRIVE_V113__ =
+    true;
+
+
+  /* =========================================
+     CSS
+  ========================================= */
+
+  const style =
+    document.createElement("style");
+
+  style.textContent = `
+
+    .brainImpactWord{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      z-index:999;
+
+      transform:
+        translate(-50%,-50%)
+        scale(3.2)
+        rotate(-5deg);
+
+      opacity:0;
+
+      pointer-events:none;
+
+      white-space:nowrap;
+
+      font-weight:1000;
+
+      font-size:74px;
+
+      letter-spacing:8px;
+
+      animation:
+        brainImpactSlam
+        .50s
+        cubic-bezier(.08,1.55,.22,1)
+        forwards;
+    }
+
+
+    @keyframes brainImpactSlam{
+
+      0%{
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(3.2)
+          rotate(-7deg);
+      }
+
+      35%{
+        opacity:1;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.83)
+          rotate(2deg);
+      }
+
+      58%{
+
+        transform:
+          translate(-50%,-50%)
+          scale(1.16)
+          rotate(-1deg);
+
+      }
+
+      100%{
+
+        opacity:1;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1)
+          rotate(0);
+
+      }
+
+    }
+
+
+    .brainImpactEpic{
+
+      color:#ffffff;
+
+      text-shadow:
+        0 0 8px white,
+        0 0 20px #d64cff,
+        0 0 42px #8c25ff;
+
+    }
+
+
+    .brainImpactLegend{
+
+      color:#fff7b0;
+
+      text-shadow:
+        0 0 8px white,
+        0 0 20px #ffe000,
+        0 0 45px #ff8900;
+
+    }
+
+
+    .brainImpactRevival{
+
+      color:#ffffff;
+
+      font-size:58px;
+
+      line-height:1.05;
+
+      text-align:center;
+
+      text-shadow:
+        0 0 10px white,
+        0 0 25px #ffec55,
+        0 0 50px #d348ff;
+
+    }
+
+
+    .brainGodRelease{
+
+      color:white;
+
+      font-size:55px;
+
+      line-height:1;
+
+      text-align:center;
+
+      text-shadow:
+        0 0 10px white,
+        0 0 30px #ffe900,
+        0 0 55px #ff3bd8,
+        0 0 75px #00eaff;
+
+    }
+
+
+    .brainImpactLine{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      z-index:995;
+
+      width:12px;
+      height:4px;
+
+      transform:
+        translate(-50%,-50%);
+
+      background:white;
+
+      box-shadow:
+        0 0 15px white,
+        0 0 35px currentColor;
+
+      animation:
+        brainImpactLine
+        .45s
+        ease-out
+        forwards;
+
+      pointer-events:none;
+
+    }
+
+
+    @keyframes brainImpactLine{
+
+      0%{
+
+        width:8px;
+        opacity:0;
+
+      }
+
+      25%{
+
+        opacity:1;
+
+      }
+
+      100%{
+
+        width:90%;
+        opacity:0;
+
+      }
+
+    }
+
+
+    .brainLegendDrop{
+
+      position:absolute;
+
+      inset:0;
+
+      z-index:998;
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+      pointer-events:none;
+
+      animation:
+        brainLegendDropPop
+        .48s
+        cubic-bezier(.15,1.5,.3,1)
+        forwards;
+
+    }
+
+
+    @keyframes brainLegendDropPop{
+
+      from{
+        opacity:0;
+        transform:scale(.45);
+      }
+
+      to{
+        opacity:1;
+        transform:scale(1);
+      }
+
+    }
+
+  `;
+
+  document.head.appendChild(style);
+
+
+  /* =========================================
+     文字を叩きつける
+  ========================================= */
+
+  function brainImpactWord(
+    html,
+    className,
+    duration=600
+  ){
+
+    const word =
+      document.createElement("div");
+
+    word.className =
+      "brainImpactWord "+
+      className;
+
+    word.innerHTML =
+      html;
+
+    ascensionOverlay.appendChild(
+      word
+    );
+
+
+    setTimeout(()=>{
+
+      if(word.isConnected){
+        word.remove();
+      }
+
+    },duration);
+
+
+    return word;
+  }
+
+
+  /* =========================================
+     軽量な光線一本
+  ========================================= */
+
+  function brainImpactLine(
+    color
+  ){
+
+    const line =
+      document.createElement("div");
+
+    line.className =
+      "brainImpactLine";
+
+    line.style.color =
+      color;
+
+    ascensionOverlay.appendChild(
+      line
+    );
+
+
+    setTimeout(()=>{
+
+      if(line.isConnected){
+        line.remove();
+      }
+
+    },500);
+
+  }
+
+
+  /* =========================================
+     昇格前の専用リズム
+
+     ドン
+        ドン
+          ドドン
+            → キュイン
+  ========================================= */
+
+  function brainRankUpRhythm(
+    rarity
+  ){
+
+    initAudio();
+
+
+    sfxKick(
+      0,
+      rarity==="LEGEND"
+        ? .18
+        : .15
+    );
+
+
+    sfxHat(
+      .10
+    );
+
+
+    sfxKick(
+      .22,
+      rarity==="LEGEND"
+        ? .19
+        : .16
+    );
+
+
+    sfxSnare(
+      .36
+    );
+
+
+    sfxKick(
+      .48,
+      .18
+    );
+
+
+    sfxKick(
+      .60,
+      rarity==="LEGEND"
+        ? .21
+        : .18
+    );
+
+
+    sfxRiser(
+      .08,
+      .58
+    );
+
+
+    sfxKyuiin(
+      .52,
+      rarity==="LEGEND"
+        ? 1
+        : .82
+    );
+
+  }
+
+
+  /* =========================================
+     成功爆発音
+  ========================================= */
+
+  function brainSuccessBoom(
+    rarity
+  ){
+
+    initAudio();
+
+
+    sfxHeavyImpact(0);
+
+
+    sfxKick(
+      .06,
+      rarity==="LEGEND"
+        ? .21
+        : .18
+    );
+
+
+    sfxKyuiin(
+      .10,
+      rarity==="LEGEND"
+        ? 1.12
+        : .92
+    );
+
+
+    if(
+      rarity==="LEGEND"
+    ){
+
+      tone(
+        523,
+        .15,
+        "sine",
+        .065,
+        .30
+      );
+
+      tone(
+        659,
+        .16,
+        "sine",
+        .07,
+        .40
+      );
+
+      tone(
+        784,
+        .20,
+        "sine",
+        .075,
+        .51
+      );
+
+      tone(
+        1046,
+        .30,
+        "sine",
+        .08,
+        .64
+      );
+
+    }
+
+  }
+
+
+  /* =========================================
+     現在の成功処理を保存
+
+     今のVer.1.12の演出自体は残す
+  ========================================= */
+
+  const previousSuccess =
+    playAscensionSuccess;
+
+
+  /* =========================================
+     昇格成功
+  ========================================= */
+
+  playAscensionSuccess =
+  function(
+    fromRarity,
+    toRarity,
+    premium=false
+  ){
+
+    /*
+      PUSHを押した直後。
+
+      すぐEPIC/LEGENDを
+      見せない。
+    */
+
+    const impactColor =
+
+      toRarity==="LEGEND"
+      ? "#ffd600"
+      : "#c148ff";
+
+
+    /*
+      カチッ
+    */
+
+    tone(
+      520,
+      .035,
+      "square",
+      .035
+    );
+
+
+    /*
+      小さな振動だけ
+    */
+
+    vibrate(25);
+
+
+    /*
+      まずリズム
+    */
+
+    brainRankUpRhythm(
+      toRarity
+    );
+
+
+    /*
+      ほんの少し溜め
+    */
+
+    setTimeout(()=>{
+
+      brainImpactLine(
+        impactColor
+      );
+
+
+      /*
+        白飛び
+      */
+
+      superFlash(
+        "#ffffff",
+        145
+      );
+
+
+    },180);
+
+
+    /*
+      昇格！！
+    */
+
+    setTimeout(()=>{
+
+      brainImpactWord(
+        premium
+          ? "超<br>昇格"
+          : "昇 格",
+
+        toRarity==="LEGEND"
+          ? "brainImpactLegend"
+          : "brainImpactEpic",
+
+        620
+      );
+
+
+      screenShake(
+        toRarity==="LEGEND"
+          ? 14
+          : 10,
+
+        450
+      );
+
+
+      vibrate(
+        toRarity==="LEGEND"
+        ? [70,30,110]
+        : [50,25,80]
+      );
+
+
+      brainSuccessBoom(
+        toRarity
+      );
+
+
+      /*
+        ここで既存Ver.1.12の
+        本来の昇格演出へつなぐ
+      */
+
+      setTimeout(()=>{
+
+        previousSuccess(
+          fromRarity,
+          toRarity,
+          premium
+        );
+
+      },350);
+
+
+    },310);
+
+  };
+
+
+  /* =========================================
+     現在の復活処理を保存
+  ========================================= */
+
+  const previousRevival =
+    playAscensionRevival;
+
+
+  /* =========================================
+     FAILED → 復活昇格
+  ========================================= */
+
+  playAscensionRevival =
+  function(
+    fromRarity,
+    toRarity
+  ){
+
+    /*
+      まず既存のFAILED処理を
+      そのまま開始
+    */
+
+    previousRevival(
+      fromRarity,
+      toRarity
+    );
+
+
+    /*
+      本当に失敗したように
+      少し待つ
+    */
+
+    setTimeout(()=>{
+
+      /*
+        ドクン
+      */
+
+      sfxKick(
+        0,
+        .16
+      );
+
+
+      vibrate(
+        35
+      );
+
+
+      brainImpactLine(
+        toRarity==="LEGEND"
+        ? "#ffd600"
+        : "#c846ff"
+      );
+
+
+    },760);
+
+
+    /*
+      復活！
+      昇格！
+    */
+
+    setTimeout(()=>{
+
+      superFlash(
+        "#ffffff",
+        155
+      );
+
+
+      brainImpactWord(
+        "復 活<br>昇 格",
+
+        "brainImpactRevival",
+
+        730
+      );
+
+
+      sfxHeavyImpact(0);
+
+
+      sfxKyuiin(
+        .06,
+        toRarity==="LEGEND"
+          ? 1.08
+          : .92
+      );
+
+
+      screenShake(
+        15,
+        550
+      );
+
+
+      vibrate([
+        80,
+        30,
+        125
+      ]);
+
+
+    },930);
+
+  };
+
+
+  /* =========================================
+     LEGEND第二波
+
+     LEGEND表示後に
+     「まだ終わらない」
+  ========================================= */
+
+  const legendWatcher =
+    new MutationObserver(()=>{
+
+      const title =
+        ascensionOverlay
+        .querySelector(
+          ".ascensionTitle"
+        );
+
+
+      if(
+        !title ||
+        title.textContent.trim()
+        !== "LEGEND"
+      ){
+        return;
+      }
+
+
+      if(
+        title.dataset
+        .brainLegendDone === "1"
+      ){
+        return;
+      }
+
+
+      title.dataset
+      .brainLegendDone =
+        "1";
+
+
+      setTimeout(()=>{
+
+        /*
+          第二波
+        */
+
+        superFlash(
+          "#ffd900",
+          115
+        );
+
+
+        ascensionPartyRays(
+          "LEGEND"
+        );
+
+
+        /*
+          上限20の既存関数を使用。
+          ここでは12個だけ。
+        */
+
+        ascensionStampParty(
+          "LEGEND",
+          12
+        );
+
+
+        sfxKick(
+          0,
+          .19
+        );
+
+
+        sfxKick(
+          .16,
+          .20
+        );
+
+
+        sfxKyuiin(
+          .18,
+          .90
+        );
+
+
+        const second =
+          document.createElement(
+            "div"
+          );
+
+
+        second.className =
+          "brainLegendDrop";
+
+
+        second.innerHTML = `
+
+          <div
+            style="
+              color:#fff5a0;
+
+              font-size:48px;
+
+              font-weight:1000;
+
+              line-height:1;
+
+              text-shadow:
+                0 0 10px white,
+                0 0 25px #ffd600,
+                0 0 45px #ff7200;
+            "
+          >
+
+            LEGEND
+
+            <div
+              style="
+                margin-top:8px;
+
+                font-size:55px;
+
+                color:white;
+              "
+            >
+              DROP!!
+            </div>
+
+          </div>
+
+        `;
+
+
+        ascensionOverlay.appendChild(
+          second
+        );
+
+
+        setTimeout(()=>{
+
+          if(second.isConnected){
+            second.remove();
+          }
+
+        },650);
+
+
+      },520);
+
+    });
+
+
+  legendWatcher.observe(
+    ascensionOverlay,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+
+  /* =========================================
+     GOD PUSH成功も強化
+
+     GODはステップアップしない。
+     RARE→プチュン→GOD CHANCEを維持。
+  ========================================= */
+
+  const previousGodReveal =
+    revealDirectGod;
+
+
+  revealDirectGod =
+  function(item){
+
+    /*
+      PUSH
+
+      まずカチッ。
+    */
+
+    tone(
+      500,
+      .035,
+      "square",
+      .035
+    );
+
+
+    /*
+      あえて0.16秒
+      大爆発させない
+    */
+
+    setTimeout(()=>{
+
+      /*
+        神域解放
+      */
+
+      brainImpactWord(
+        "神 域<br>解 放",
+
+        "brainGodRelease",
+
+        650
+      );
+
+
+      superFlash(
+        "#ffffff",
+        150
+      );
+
+
+      sfxHeavyImpact(0);
+
+
+      sfxKyuiin(
+        .08,
+        1.10
+      );
+
+
+      screenShake(
+        15,
+        550
+      );
+
+
+      vibrate([
+        90,
+        30,
+        135
+      ]);
+
+
+      /*
+        既存GODの
+        虹・スタンプ・リズム演出へ
+      */
+
+      setTimeout(()=>{
+
+        previousGodReveal(
+          item
+        );
+
+      },330);
+
+
+    },160);
+
+  };
+
+
+  console.log(
+    "BRAIN JUICE OVERDRIVE V1.13 READY"
+  );
+
+})();
+
+/* =====================================================
+   BRAIN JUICE OVERDRIVE END
+===================================================== */
 </script>
 
 </body>
