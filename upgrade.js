@@ -288,3 +288,270 @@
   );
 
 })();
+// =====================================================
+// UPGRADE SYSTEM Ver.2
+// 合成処理そのものを新倍率へ変更
+//
+// 無印 → ★1 = 元攻撃力 ×2.5
+// ★1   → ★2 = 元攻撃力 ×6.25 + 固有スキル
+// =====================================================
+
+(() => {
+
+  if(window.__UPGRADE_SYSTEM_V2__) return;
+  window.__UPGRADE_SYSTEM_V2__ = true;
+
+
+  function upgradeBaseAtk(item){
+
+    return Number(
+      item.originalAtk ||
+      item.atk ||
+      0
+    );
+
+  }
+
+
+  // =====================================================
+  // 合成本体を上書き
+  // =====================================================
+
+  synthesizeItem =
+  function(item){
+
+    const stars =
+      getStars(item);
+
+
+    // ★2より上は現在作らない
+    if(stars >= 2){
+      return;
+    }
+
+
+    const count =
+      synthesisCount(item);
+
+
+    // 同段階を10個必要
+    if(count < 10){
+      return;
+    }
+
+
+    // ===================================================
+    // 現在装備中か確認
+    // ===================================================
+
+    const wasEquipped =
+
+      getBaseName(weapon) ===
+      getBaseName(item)
+
+      &&
+
+      getStars(weapon) ===
+      stars;
+
+
+    // ===================================================
+    // 同じ装備10個消費
+    // ===================================================
+
+    let removed = 0;
+
+
+    inventory =
+      inventory.filter(x=>{
+
+        if(
+          removed < 10 &&
+          sameSynthesisItem(
+            x,
+            item
+          )
+        ){
+
+          removed++;
+
+          return false;
+
+        }
+
+
+        return true;
+
+      });
+
+
+    let evolved;
+
+
+    // ===================================================
+    // 無印 → ★1
+    //
+    // 元攻撃力 ×2.5
+    // ===================================================
+
+    if(stars === 0){
+
+      const originalAtk =
+        upgradeBaseAtk(item);
+
+
+      const newAtk =
+        Math.ceil(
+          originalAtk * 2.5
+        );
+
+
+      evolved = {
+
+        ...item,
+
+        baseName:
+          getBaseName(item),
+
+        originalAtk:
+          originalAtk,
+
+        stars:1,
+
+        atk:
+          newAtk
+
+      };
+
+
+      delete evolved.count;
+
+
+      inventory.push(
+        evolved
+      );
+
+
+      if(wasEquipped){
+
+        weapon =
+          evolved;
+
+      }
+
+
+      saveGame();
+
+
+      /*
+        今までの★1演出は
+        そのまま利用
+      */
+
+      showLimitBreak(
+        evolved
+      );
+
+    }
+
+
+    // ===================================================
+    // ★1 → ★2
+    //
+    // 元攻撃力 ×6.25
+    // + 固有覚醒スキル
+    // ===================================================
+
+    else{
+
+      const originalAtk =
+        Number(
+          item.originalAtk ||
+          (
+            Number(item.atk || 0)
+            / 2.5
+          )
+        );
+
+
+      const newAtk =
+        Math.ceil(
+          originalAtk * 6.25
+        );
+
+
+      const ability =
+        getAwakeningAbility(
+          item
+        );
+
+
+      evolved = {
+
+        ...item,
+
+        baseName:
+          getBaseName(item),
+
+        originalAtk:
+          originalAtk,
+
+        stars:2,
+
+        awakened:true,
+
+        atk:
+          newAtk,
+
+        awakeningType:
+          ability.type,
+
+        awakeningName:
+          ability.name,
+
+        awakeningText:
+          ability.text
+
+      };
+
+
+      delete evolved.count;
+
+
+      inventory.push(
+        evolved
+      );
+
+
+      if(wasEquipped){
+
+        weapon =
+          evolved;
+
+      }
+
+
+      saveGame();
+
+
+      /*
+        今までの★2覚醒演出
+      */
+
+      showAwakening(
+        evolved
+      );
+
+    }
+
+
+    update();
+
+  };
+
+
+  console.log(
+    "UPGRADE SYSTEM V2 ACTIVE"
+  );
+
+})();
