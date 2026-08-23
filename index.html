@@ -2686,7 +2686,257 @@ renderEquipment = function(){
 
 /* 今の画面を即更新 */
 renderInventory();
-  
+  /* =========================================
+   Ver.0.4
+   STAGE 6〜10 + STAGE固有1%DROP
+========================================= */
+
+
+/* ===============================
+   STAGE 6〜10追加
+================================ */
+
+enemies.push(
+
+  {
+    name:"オーガ",
+    emoji:"👹",
+    hp:230,
+    min:10,
+    max:18
+  },
+
+  {
+    name:"リザードナイト",
+    emoji:"🦎",
+    hp:310,
+    min:12,
+    max:21
+  },
+
+  {
+    name:"グリフォン",
+    emoji:"🦅",
+    hp:400,
+    min:14,
+    max:24
+  },
+
+  {
+    name:"デュラハン",
+    emoji:"🗡️",
+    hp:510,
+    min:16,
+    max:28
+  },
+
+  {
+    name:"キマイラ",
+    emoji:"🦁",
+    hp:650,
+    min:18,
+    max:32
+  }
+
+);
+
+
+/* ===============================
+   各STAGE限定 1% DROP
+================================ */
+
+const stageUniqueDrops = {
+
+  6:{
+    name:"巨人の戦斧",
+    icon:"🪓",
+    atk:30,
+    rarity:"LEGEND",
+    unique:true,
+    stage:6
+  },
+
+  7:{
+    name:"鱗騎士の槍",
+    icon:"🔱",
+    atk:35,
+    rarity:"LEGEND",
+    unique:true,
+    stage:7
+  },
+
+  8:{
+    name:"天翔の双剣",
+    icon:"⚔️",
+    atk:41,
+    rarity:"LEGEND",
+    unique:true,
+    stage:8
+  },
+
+  9:{
+    name:"首無し騎士の大剣",
+    icon:"🗡️",
+    atk:48,
+    rarity:"LEGEND",
+    unique:true,
+    stage:9
+  },
+
+  10:{
+    name:"魔獣王の爪",
+    icon:"🐾",
+    atk:56,
+    rarity:"LEGEND",
+    unique:true,
+    stage:10
+  }
+
+};
+
+
+/* ===============================
+   元のDROP抽選を保存
+================================ */
+
+const originalRollDropV04 = rollDrop;
+
+
+/* ===============================
+   STAGE固有1%抽選を追加
+================================ */
+
+rollDrop = function(){
+
+  const stageNumber = stage + 1;
+
+  const uniqueItem =
+    stageUniqueDrops[stageNumber];
+
+
+  /*
+    STAGE 6〜10の場合のみ
+    最初に1%の固有DROP抽選
+  */
+
+  if(
+    uniqueItem &&
+    Math.random() < 0.01
+  ){
+
+    currentDrop = {
+      ...uniqueItem
+    };
+
+
+    showDrop(currentDrop);
+
+
+    /*
+      ドロップ画面の確率表示を
+      固有DROP専用に変更
+    */
+
+    setTimeout(()=>{
+
+      const chance =
+        document.getElementById(
+          "dropChance"
+        );
+
+      if(chance){
+
+        chance.innerHTML =
+        "🔥 STAGE "
+        +stageNumber+
+        " 限定DROP<br>"
+        +"出現率 1%";
+
+        chance.style.color =
+        "#ffd84a";
+
+        chance.style.fontWeight =
+        "1000";
+
+      }
+
+    },50);
+
+
+    /*
+      固有DROP専用の
+      追加演出
+    */
+
+    setTimeout(()=>{
+
+      initAudio();
+
+      tone(
+        180,
+        .20,
+        "sawtooth",
+        .10
+      );
+
+      tone(
+        420,
+        .18,
+        "sine",
+        .10,
+        .15
+      );
+
+      tone(
+        720,
+        .25,
+        "sine",
+        .12,
+        .30
+      );
+
+      screenShake(
+        10,
+        550
+      );
+
+      bigFlash(
+        "#ffd83d"
+      );
+
+      spawnParticles(
+        "🔥",
+        16
+      );
+
+      spawnParticles(
+        "⭐",
+        16
+      );
+
+    },250);
+
+
+    return;
+
+  }
+
+
+  /*
+    1%を外した場合は
+    今までの通常DROP抽選
+  */
+
+  originalRollDropV04();
+
+};
+
+
+/* ===============================
+   STAGE SELECTを再生成
+================================ */
+
+renderStageSelect();
 </script>
 
 </body>
