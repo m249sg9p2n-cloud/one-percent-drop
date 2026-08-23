@@ -14957,6 +14957,1770 @@ function revealGodOverdrive(
   },3200);
 
 }
+	/* =====================================================
+   Ver.1.01
+   SAFE PERFORMANCE OVERDRIVE
+
+   iPhone安定性最優先
+   大量DOM生成を廃止
+===================================================== */
+
+
+/* =====================================================
+   軽量DROP CSS
+===================================================== */
+
+const safeDropStyle =
+document.createElement("style");
+
+safeDropStyle.textContent = `
+
+.safeFxStage{
+
+  position:absolute;
+  inset:0;
+
+  overflow:hidden;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:#000;
+
+}
+
+
+/* =========================
+   放射線
+
+   DOMを大量生成せず、
+   conic-gradient 1枚で
+   大量の光線に見せる
+========================= */
+
+.safeRays{
+
+  position:absolute;
+
+  left:-35%;
+  top:-35%;
+
+  width:170%;
+  height:170%;
+
+  border-radius:50%;
+
+  opacity:.9;
+
+  transform:scale(.45);
+
+  animation:
+  safeRayBlast
+  .8s ease-out forwards;
+
+  will-change:
+  transform,
+  opacity;
+
+}
+
+
+.safeEpicRays{
+
+  background:
+
+  repeating-conic-gradient(
+
+    from 0deg,
+
+    #ffffff 0deg 1deg,
+
+    #c442ff 1deg 3deg,
+
+    transparent 3deg 7deg,
+
+    #714cff 7deg 9deg,
+
+    transparent 9deg 14deg
+
+  );
+
+}
+
+
+.safeLegendRays{
+
+  background:
+
+  repeating-conic-gradient(
+
+    from 0deg,
+
+    #ffffff 0deg 1deg,
+
+    #ffe000 1deg 3deg,
+
+    transparent 3deg 7deg,
+
+    #ff7800 7deg 9deg,
+
+    transparent 9deg 14deg
+
+  );
+
+}
+
+
+.safeGodRays{
+
+  background:
+
+  repeating-conic-gradient(
+
+    from 0deg,
+
+    #ffffff 0deg 1deg,
+
+    #ff1744 1deg 2deg,
+
+    #ffe600 2deg 3deg,
+
+    #00e676 3deg 4deg,
+
+    #00e5ff 4deg 5deg,
+
+    #764cff 5deg 6deg,
+
+    #e040fb 6deg 7deg,
+
+    transparent 7deg 11deg
+
+  );
+
+}
+
+
+@keyframes safeRayBlast{
+
+  0%{
+
+    transform:
+    scale(.35)
+    rotate(0deg);
+
+    opacity:0;
+
+  }
+
+  18%{
+
+    opacity:1;
+
+  }
+
+  100%{
+
+    transform:
+    scale(1.45)
+    rotate(18deg);
+
+    opacity:.8;
+
+  }
+
+}
+
+
+/* =========================
+   中央白色爆発
+========================= */
+
+.safeCore{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:25px;
+  height:25px;
+
+  transform:
+  translate(-50%,-50%);
+
+  border-radius:50%;
+
+  background:#fff;
+
+  opacity:0;
+
+  animation:
+  safeCoreBlast
+  .75s ease-out forwards;
+
+  will-change:
+  transform,
+  opacity;
+
+}
+
+
+@keyframes safeCoreBlast{
+
+  0%{
+
+    opacity:0;
+
+    transform:
+    translate(-50%,-50%)
+    scale(.1);
+
+  }
+
+  22%{
+
+    opacity:1;
+
+  }
+
+  55%{
+
+    opacity:1;
+
+    transform:
+    translate(-50%,-50%)
+    scale(7);
+
+  }
+
+  100%{
+
+    opacity:.25;
+
+    transform:
+    translate(-50%,-50%)
+    scale(16);
+
+  }
+
+}
+
+
+/* =========================
+   虹・金・紫の光
+========================= */
+
+.safeGlow{
+
+  position:absolute;
+
+  inset:-20%;
+
+  opacity:.9;
+
+  animation:
+  safeGlowPulse
+  .6s ease-in-out infinite alternate;
+
+  will-change:
+  opacity,
+  transform;
+
+}
+
+
+.safeEpicGlow{
+
+  background:
+
+  radial-gradient(
+
+    circle,
+
+    #ffffff 0%,
+
+    #e292ff 8%,
+
+    #a43cff 23%,
+
+    #46248b 48%,
+
+    transparent 72%
+
+  );
+
+}
+
+
+.safeLegendGlow{
+
+  background:
+
+  radial-gradient(
+
+    circle,
+
+    #ffffff 0%,
+
+    #fff19a 8%,
+
+    #ffd000 22%,
+
+    #ff7200 48%,
+
+    transparent 72%
+
+  );
+
+}
+
+
+.safeGodGlow{
+
+  background:
+
+  radial-gradient(
+
+    circle,
+
+    #ffffff 0%,
+
+    #fff 7%,
+
+    #ffe600 15%,
+
+    #ff2f80 25%,
+
+    #914cff 37%,
+
+    #00dfff 49%,
+
+    #1aff91 60%,
+
+    transparent 76%
+
+  );
+
+}
+
+
+@keyframes safeGlowPulse{
+
+  from{
+
+    transform:scale(.92);
+
+    opacity:.65;
+
+  }
+
+  to{
+
+    transform:scale(1.08);
+
+    opacity:1;
+
+  }
+
+}
+
+
+/* =========================
+   衝撃リング
+
+   1つだけ
+========================= */
+
+.safeRing{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:80px;
+  height:80px;
+
+  transform:
+  translate(-50%,-50%);
+
+  border-radius:50%;
+
+  border:6px solid white;
+
+  opacity:0;
+
+  animation:
+  safeRingExpand
+  .75s ease-out forwards;
+
+  will-change:
+  transform,
+  opacity;
+
+}
+
+
+@keyframes safeRingExpand{
+
+  0%{
+
+    opacity:1;
+
+    transform:
+    translate(-50%,-50%)
+    scale(.15);
+
+  }
+
+  100%{
+
+    opacity:0;
+
+    transform:
+    translate(-50%,-50%)
+    scale(8);
+
+  }
+
+}
+
+
+/* =========================
+   メイン文字
+========================= */
+
+.safeDropText{
+
+  position:relative;
+
+  z-index:10;
+
+  text-align:center;
+
+  font-weight:1000;
+
+  transform:scale(.5);
+
+  opacity:0;
+
+  animation:
+  safeTextImpact
+  .48s
+  cubic-bezier(.2,1.5,.4,1)
+  forwards;
+
+  will-change:
+  transform,
+  opacity;
+
+}
+
+
+@keyframes safeTextImpact{
+
+  to{
+
+    transform:scale(1);
+
+    opacity:1;
+
+  }
+
+}
+
+
+/* =========================
+   PUSH
+========================= */
+
+.safePush{
+
+  position:relative;
+
+  z-index:20;
+
+  width:190px;
+  height:190px;
+
+  margin-top:32px;
+
+  border-radius:50%;
+
+  border:8px solid white;
+
+  font-size:34px;
+
+  font-weight:1000;
+
+  animation:
+  safePushPulse
+  .45s ease-in-out infinite alternate;
+
+  will-change:transform;
+
+}
+
+
+@keyframes safePushPulse{
+
+  from{
+
+    transform:scale(.95);
+
+  }
+
+  to{
+
+    transform:scale(1.05);
+
+  }
+
+}
+
+
+.safeLegendPush{
+
+  background:
+
+  radial-gradient(
+    circle,
+    #fff,
+    #ffe45b 35%,
+    #ff9300 70%
+  );
+
+  color:#2a1400;
+
+}
+
+
+.safeGodPush{
+
+  background:
+
+  conic-gradient(
+    #ff1744,
+    #ffe600,
+    #00e676,
+    #00e5ff,
+    #764cff,
+    #e040fb,
+    #ff1744
+  );
+
+  color:white;
+
+  text-shadow:
+  0 2px 5px #000;
+
+}
+
+
+/* =========================
+   GOD背景
+
+   これ1枚で
+   添付画像の虹爆発感
+========================= */
+
+.safeGodBackground{
+
+  background:
+
+  radial-gradient(
+    circle at center,
+
+    #ffffff 0%,
+
+    #fff 5%,
+
+    #ffed00 12%,
+
+    #ff376e 22%,
+
+    #bd38ff 32%,
+
+    #168dff 44%,
+
+    #00e5ff 54%,
+
+    #20e78a 65%,
+
+    #ffee00 76%,
+
+    #ff315c 88%,
+
+    #14001c 100%
+
+  );
+
+}
+
+
+/* =========================
+   紫背景
+========================= */
+
+.safeEpicBackground{
+
+  background:
+
+  radial-gradient(
+    circle,
+
+    #ffffff 0%,
+
+    #e8bdff 8%,
+
+    #b347ff 26%,
+
+    #572099 50%,
+
+    #080012 82%
+
+  );
+
+}
+
+
+/* =========================
+   金背景
+========================= */
+
+.safeLegendBackground{
+
+  background:
+
+  radial-gradient(
+    circle,
+
+    #ffffff 0%,
+
+    #fff2a2 8%,
+
+    #ffd200 23%,
+
+    #ff8100 45%,
+
+    #4c0c00 72%,
+
+    #080000 90%
+
+  );
+
+}
+
+`;
+
+document.head.appendChild(
+  safeDropStyle
+);
+
+
+
+/* =====================================================
+   FX画面を完全クリア
+
+   演出終了後の要素を残さない
+===================================================== */
+
+function safeClearDropFX(){
+
+  superDropOverlay.innerHTML =
+  "";
+
+  superDropOverlay.className =
+  "";
+
+  superDropOverlay.removeAttribute(
+    "style"
+  );
+
+}
+
+
+
+/* =====================================================
+   軽量画面生成
+===================================================== */
+
+function safeFXScreen(
+  type
+){
+
+  safeClearDropFX();
+
+
+  superDropOverlay.className =
+  "show";
+
+
+  const stage =
+  document.createElement(
+    "div"
+  );
+
+
+  stage.className =
+  "safeFxStage";
+
+
+  if(type==="EPIC"){
+
+    stage.classList.add(
+      "safeEpicBackground"
+    );
+
+  }
+
+
+  else if(
+    type==="LEGEND"
+  ){
+
+    stage.classList.add(
+      "safeLegendBackground"
+    );
+
+  }
+
+
+  else{
+
+    stage.classList.add(
+      "safeGodBackground"
+    );
+
+  }
+
+
+  const glow =
+  document.createElement(
+    "div"
+  );
+
+
+  glow.className =
+  "safeGlow";
+
+
+  glow.classList.add(
+
+    type==="EPIC"
+    ? "safeEpicGlow"
+
+    : type==="LEGEND"
+    ? "safeLegendGlow"
+
+    : "safeGodGlow"
+
+  );
+
+
+  const rays =
+  document.createElement(
+    "div"
+  );
+
+
+  rays.className =
+  "safeRays";
+
+
+  rays.classList.add(
+
+    type==="EPIC"
+    ? "safeEpicRays"
+
+    : type==="LEGEND"
+    ? "safeLegendRays"
+
+    : "safeGodRays"
+
+  );
+
+
+  const core =
+  document.createElement(
+    "div"
+  );
+
+
+  core.className =
+  "safeCore";
+
+
+  const ring =
+  document.createElement(
+    "div"
+  );
+
+
+  ring.className =
+  "safeRing";
+
+
+  stage.appendChild(
+    glow
+  );
+
+
+  stage.appendChild(
+    rays
+  );
+
+
+  stage.appendChild(
+    core
+  );
+
+
+  stage.appendChild(
+    ring
+  );
+
+
+  superDropOverlay.appendChild(
+    stage
+  );
+
+
+  return stage;
+
+}
+
+
+
+/* =====================================================
+   EPIC
+===================================================== */
+
+superEpicSequence =
+function(item){
+
+  initAudio();
+
+
+  const stage =
+  safeFXScreen(
+    "EPIC"
+  );
+
+
+  const text =
+  document.createElement(
+    "div"
+  );
+
+
+  text.className =
+  "safeDropText";
+
+
+  text.innerHTML = `
+
+    <div
+      style="
+        font-size:16px;
+
+        letter-spacing:7px;
+
+        color:#ffffff;
+      "
+    >
+      ULTRA CHANCE
+    </div>
+
+
+    <div
+      style="
+        margin-top:7px;
+
+        font-size:78px;
+
+        color:#ed9cff;
+
+        text-shadow:
+        0 0 15px #fff,
+        0 0 30px #c440ff;
+      "
+    >
+      EPIC
+    </div>
+
+  `;
+
+
+  stage.appendChild(
+    text
+  );
+
+
+  superFlash(
+    "#b840ff",
+    180
+  );
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ffffff",
+      160
+    );
+
+  },220);
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#d84cff",
+      160
+    );
+
+  },440);
+
+
+  screenShake(
+    8,
+    550
+  );
+
+
+  vibrate([
+    45,
+    35,
+    70
+  ]);
+
+
+  tone(
+    280,
+    .12,
+    "sine",
+    .07
+  );
+
+
+  tone(
+    620,
+    .15,
+    "sine",
+    .09,
+    .15
+  );
+
+
+  tone(
+    980,
+    .22,
+    "sine",
+    .10,
+    .32
+  );
+
+
+  setTimeout(()=>{
+
+    text.innerHTML = `
+
+      <div
+        style="
+          font-size:78px;
+
+          color:white;
+
+          text-shadow:
+          0 0 20px #fff,
+          0 0 40px #c640ff;
+        "
+      >
+        EPIC
+      </div>
+
+
+      <div
+        style="
+          font-size:82px;
+
+          color:#e26cff;
+
+          text-shadow:
+          0 0 25px white;
+        "
+      >
+        DROP!!
+      </div>
+
+    `;
+
+
+  },700);
+
+
+  setTimeout(()=>{
+
+    safeClearDropFX();
+
+    revealSuperDropCard(
+      item
+    );
+
+  },1650);
+
+};
+
+
+
+/* =====================================================
+   LEGEND
+===================================================== */
+
+superLegendSequence =
+function(item){
+
+  initAudio();
+
+
+  const stage =
+  safeFXScreen(
+    "LEGEND"
+  );
+
+
+  const box =
+  document.createElement(
+    "div"
+  );
+
+
+  box.className =
+  "safeDropText";
+
+
+  box.innerHTML = `
+
+    <div
+      style="
+        color:#ff542f;
+
+        font-size:18px;
+
+        letter-spacing:6px;
+      "
+    >
+      SUPER HEAT!!
+    </div>
+
+
+    <div
+      style="
+        margin-top:7px;
+
+        color:#fff194;
+
+        font-size:76px;
+
+        text-shadow:
+        0 0 20px white,
+        0 0 40px #ffb900;
+      "
+    >
+      LEGEND
+    </div>
+
+
+    <button
+      id="safeLegendPush"
+
+      class="
+      safePush
+      safeLegendPush
+      "
+    >
+      PUSH
+    </button>
+
+  `;
+
+
+  stage.appendChild(
+    box
+  );
+
+
+  superFlash(
+    "#ff2400",
+    170
+  );
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ffffff",
+      160
+    );
+
+  },180);
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ffd600",
+      180
+    );
+
+  },360);
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ffffff",
+      160
+    );
+
+  },540);
+
+
+  screenShake(
+    10,
+    650
+  );
+
+
+  vibrate([
+    65,
+    35,
+    90,
+    35,
+    120
+  ]);
+
+
+  tone(
+    180,
+    .18,
+    "sawtooth",
+    .08
+  );
+
+
+  tone(
+    550,
+    .15,
+    "sine",
+    .09,
+    .18
+  );
+
+
+  tone(
+    900,
+    .20,
+    "sine",
+    .11,
+    .38
+  );
+
+
+  document
+  .getElementById(
+    "safeLegendPush"
+  )
+  .onclick = ()=>{
+
+    safeLegendReveal(
+      item
+    );
+
+  };
+
+};
+
+
+
+/* =====================================================
+   LEGEND PUSH後
+===================================================== */
+
+function safeLegendReveal(
+  item
+){
+
+  const stage =
+  safeFXScreen(
+    "LEGEND"
+  );
+
+
+  const text =
+  document.createElement(
+    "div"
+  );
+
+
+  text.className =
+  "safeDropText";
+
+
+  text.innerHTML = `
+
+    <div
+      style="
+        font-size:90px;
+
+        color:white;
+
+        text-shadow:
+        0 0 18px #fff,
+        0 0 42px #ffce00;
+      "
+    >
+      LEGEND
+    </div>
+
+
+    <div
+      style="
+        font-size:96px;
+
+        color:#ffe641;
+
+        text-shadow:
+        0 0 20px white,
+        0 0 45px #ff8c00;
+      "
+    >
+      DROP!!
+    </div>
+
+  `;
+
+
+  stage.appendChild(
+    text
+  );
+
+
+  superFlash(
+    "#ffffff",
+    180
+  );
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ffd700",
+      190
+    );
+
+  },180);
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ffffff",
+      170
+    );
+
+  },380);
+
+
+  screenShake(
+    15,
+    700
+  );
+
+
+  vibrate([
+    100,
+    40,
+    120,
+    40,
+    170
+  ]);
+
+
+  tone(
+    80,
+    .35,
+    "sawtooth",
+    .10
+  );
+
+
+  tone(
+    500,
+    .15,
+    "sine",
+    .09,
+    .10
+  );
+
+
+  tone(
+    880,
+    .23,
+    "sine",
+    .11,
+    .25
+  );
+
+
+  setTimeout(()=>{
+
+    safeClearDropFX();
+
+    revealSuperDropCard(
+      item
+    );
+
+  },1550);
+
+}
+
+
+
+/* =====================================================
+   GOD
+
+   要素数はわずか数個
+===================================================== */
+
+superGodSequence =
+function(item){
+
+  initAudio();
+
+
+  /*
+    プチュン暗転
+  */
+
+  safeClearDropFX();
+
+
+  superDropOverlay.className =
+  "show";
+
+
+  superDropOverlay.style.background =
+  "#000";
+
+
+  tone(
+    120,
+    .06,
+    "square",
+    .08
+  );
+
+
+  vibrate(
+    80
+  );
+
+
+  setTimeout(()=>{
+
+
+    const stage =
+    safeFXScreen(
+      "GOD"
+    );
+
+
+    const box =
+    document.createElement(
+      "div"
+    );
+
+
+    box.className =
+    "safeDropText";
+
+
+    box.innerHTML = `
+
+      <div
+        style="
+          color:white;
+
+          font-size:18px;
+
+          letter-spacing:9px;
+
+          text-shadow:
+          0 0 10px #000;
+        "
+      >
+        0.1%
+      </div>
+
+
+      <div
+        style="
+          margin-top:7px;
+
+          color:white;
+
+          font-size:105px;
+
+          text-shadow:
+          0 0 15px white,
+          0 0 35px #ffe600,
+          0 0 60px #ff38df,
+          0 0 85px #00dfff;
+        "
+      >
+        GOD
+      </div>
+
+
+      <button
+        id="safeGodPush"
+
+        class="
+        safePush
+        safeGodPush
+        "
+      >
+        PUSH
+      </button>
+
+    `;
+
+
+    stage.appendChild(
+      box
+    );
+
+
+    /*
+      数回だけでも
+      背景自体が虹なので十分派手
+    */
+
+    superFlash(
+      "#ffffff",
+      170
+    );
+
+
+    setTimeout(()=>{
+
+      superFlash(
+        "#ffeb00",
+        160
+      );
+
+    },180);
+
+
+    setTimeout(()=>{
+
+      superFlash(
+        "#00e5ff",
+        160
+      );
+
+    },360);
+
+
+    setTimeout(()=>{
+
+      superFlash(
+        "#ec40ff",
+        160
+      );
+
+    },540);
+
+
+    screenShake(
+      12,
+      750
+    );
+
+
+    vibrate([
+      70,
+      30,
+      90,
+      30,
+      120
+    ]);
+
+
+    tone(
+      220,
+      .12,
+      "sine",
+      .07
+    );
+
+
+    tone(
+      550,
+      .14,
+      "sine",
+      .08,
+      .15
+    );
+
+
+    tone(
+      900,
+      .18,
+      "sine",
+      .10,
+      .32
+    );
+
+
+    document
+    .getElementById(
+      "safeGodPush"
+    )
+    .onclick = ()=>{
+
+      safeGodReveal(
+        item
+      );
+
+    };
+
+
+  },450);
+
+};
+
+
+
+/* =====================================================
+   GOD PUSH後
+
+   超派手だけど軽い
+===================================================== */
+
+function safeGodReveal(
+  item
+){
+
+  const stage =
+  safeFXScreen(
+    "GOD"
+  );
+
+
+  const text =
+  document.createElement(
+    "div"
+  );
+
+
+  text.className =
+  "safeDropText";
+
+
+  text.innerHTML = `
+
+    <div
+      style="
+        color:white;
+
+        font-size:122px;
+
+        line-height:.9;
+
+        text-shadow:
+        0 0 15px white,
+        0 0 35px #ffe600,
+        0 0 65px #ff38df,
+        0 0 90px #00dfff;
+      "
+    >
+      GOD
+    </div>
+
+  `;
+
+
+  stage.appendChild(
+    text
+  );
+
+
+  /*
+    最大でも5フラッシュ
+  */
+
+  superFlash(
+    "#ffffff",
+    180
+  );
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ffea00",
+      170
+    );
+
+  },170);
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ff36d8",
+      170
+    );
+
+  },340);
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#00e5ff",
+      170
+    );
+
+  },510);
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ffffff",
+      190
+    );
+
+  },680);
+
+
+  screenShake(
+    17,
+    850
+  );
+
+
+  vibrate([
+    110,
+    35,
+    130,
+    35,
+    180
+  ]);
+
+
+  tone(
+    70,
+    .38,
+    "sawtooth",
+    .10
+  );
+
+
+  tone(
+    392,
+    .18,
+    "sine",
+    .08,
+    .12
+  );
+
+
+  tone(
+    659,
+    .20,
+    "sine",
+    .09,
+    .27
+  );
+
+
+  tone(
+    1046,
+    .30,
+    "sine",
+    .11,
+    .45
+  );
+
+
+  /*
+    2段階目
+  */
+
+  setTimeout(()=>{
+
+    text.innerHTML = `
+
+      <div
+        style="
+          color:white;
+
+          font-size:84px;
+
+          line-height:.9;
+
+          text-shadow:
+          0 0 15px white,
+          0 0 40px #ffdc00,
+          0 0 70px #ff3bdf,
+          0 0 95px #00dfff;
+        "
+      >
+        GOD
+      </div>
+
+
+      <div
+        style="
+          margin-top:10px;
+
+          color:#fff85f;
+
+          font-size:105px;
+
+          line-height:.9;
+
+          text-shadow:
+          0 0 18px white,
+          0 0 45px #ffbe00,
+          0 0 75px #ff30d9;
+        "
+      >
+        DROP!!!!
+      </div>
+
+    `;
+
+  },800);
+
+
+  setTimeout(()=>{
+
+    safeClearDropFX();
+
+    revealSuperDropCard(
+      item
+    );
+
+  },2050);
+
+}
 </script>
 
 </body>
