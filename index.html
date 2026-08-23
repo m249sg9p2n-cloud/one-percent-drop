@@ -17690,6 +17690,1856 @@ function(item){
   );
 
 };
+	/* =====================================================
+   Ver.1.10
+   RARITY ASCENSION SYSTEM
+   RARE → EPIC → LEGEND → GOD
+===================================================== */
+
+
+/* =====================================================
+   ASCENSION CSS
+===================================================== */
+
+const ascensionStyle =
+document.createElement("style");
+
+ascensionStyle.textContent = `
+
+#ascensionOverlay{
+
+  position:fixed;
+  inset:0;
+  z-index:700000;
+
+  display:none;
+
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+
+  background:#03050b;
+
+  color:white;
+
+  text-align:center;
+
+}
+
+
+#ascensionOverlay.show{
+
+  display:flex;
+
+}
+
+
+.ascensionStage{
+
+  position:absolute;
+  inset:0;
+
+  display:flex;
+  flex-direction:column;
+
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+
+}
+
+
+.ascensionRare{
+
+  background:
+  radial-gradient(
+    circle,
+    #d8f1ff 0%,
+    #318cff 18%,
+    #123b8d 44%,
+    #071326 78%
+  );
+
+}
+
+
+.ascensionEpic{
+
+  background:
+  radial-gradient(
+    circle,
+    #ffffff 0%,
+    #e6a8ff 10%,
+    #b83cff 27%,
+    #5d1da1 52%,
+    #090014 84%
+  );
+
+}
+
+
+.ascensionLegend{
+
+  background:
+  radial-gradient(
+    circle,
+    #ffffff 0%,
+    #fff3a3 10%,
+    #ffd000 25%,
+    #ff8600 46%,
+    #4d0d00 77%,
+    #080000 92%
+  );
+
+}
+
+
+.ascensionGod{
+
+  background:
+  radial-gradient(
+    circle,
+    #ffffff 0%,
+    #fff 5%,
+    #ffe600 12%,
+    #ff3a72 23%,
+    #c83cff 34%,
+    #2784ff 47%,
+    #00e8ff 58%,
+    #17e88a 69%,
+    #ffeb00 79%,
+    #ff2f67 90%
+  );
+
+}
+
+
+.ascensionTitle{
+
+  position:relative;
+
+  z-index:5;
+
+  font-size:76px;
+
+  line-height:.95;
+
+  font-weight:1000;
+
+  letter-spacing:2px;
+
+  text-shadow:
+  0 0 15px currentColor,
+  0 0 35px currentColor;
+
+}
+
+
+.ascensionSub{
+
+  position:relative;
+
+  z-index:5;
+
+  margin-bottom:10px;
+
+  font-size:14px;
+
+  font-weight:1000;
+
+  letter-spacing:6px;
+
+}
+
+
+.ascensionPush{
+
+  position:relative;
+
+  z-index:10;
+
+  width:190px;
+  height:190px;
+
+  margin-top:38px;
+
+  border-radius:50%;
+
+  border:8px solid white;
+
+  font-size:33px;
+
+  font-weight:1000;
+
+  animation:
+  ascensionPushPulse
+  .48s ease-in-out
+  infinite alternate;
+
+}
+
+
+@keyframes ascensionPushPulse{
+
+  from{
+    transform:scale(.95);
+  }
+
+  to{
+    transform:scale(1.06);
+  }
+
+}
+
+
+.ascensionNormalPush{
+
+  color:white;
+
+  background:
+  radial-gradient(
+    circle,
+    #baddff,
+    #328cff 48%,
+    #143c9d
+  );
+
+  box-shadow:
+  0 0 18px #65aaff,
+  0 0 42px #147cff;
+
+}
+
+
+.ascensionGoldPush{
+
+  color:#291700;
+
+  background:
+  radial-gradient(
+    circle,
+    white,
+    #ffe968 35%,
+    #ffa500 70%
+  );
+
+  box-shadow:
+  0 0 20px white,
+  0 0 45px #ffd600,
+  0 0 75px #ff8600;
+
+}
+
+
+.ascensionRainbowPush{
+
+  color:white;
+
+  background:
+  conic-gradient(
+    #ff1744,
+    #ffe600,
+    #00e676,
+    #00e5ff,
+    #644cff,
+    #df40fb,
+    #ff1744
+  );
+
+  text-shadow:
+  0 2px 5px #000;
+
+  box-shadow:
+  0 0 22px white,
+  0 0 50px #00e5ff,
+  0 0 85px #ef40ff;
+
+}
+
+
+.ascensionCrack{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:3px;
+  height:48%;
+
+  background:
+  linear-gradient(
+    white,
+    transparent
+  );
+
+  transform-origin:
+  50% 0%;
+
+  opacity:.95;
+
+  filter:
+  drop-shadow(
+    0 0 8px white
+  );
+
+}
+
+
+.ascensionFail{
+
+  color:#777f93;
+
+  text-shadow:none;
+
+}
+
+
+.ascensionSuccess{
+
+  animation:
+  ascensionSuccessPop
+  .38s cubic-bezier(.2,1.6,.4,1)
+  forwards;
+
+}
+
+
+@keyframes ascensionSuccessPop{
+
+  from{
+    transform:scale(.25);
+    opacity:0;
+  }
+
+  to{
+    transform:scale(1);
+    opacity:1;
+  }
+
+}
+
+
+.ascensionDim{
+
+  animation:
+  ascensionDimOut
+  .55s forwards;
+
+}
+
+
+@keyframes ascensionDimOut{
+
+  to{
+    filter:brightness(.16)
+            saturate(.25);
+
+    opacity:.58;
+  }
+
+}
+
+`;
+
+document.head.appendChild(
+  ascensionStyle
+);
+
+
+
+/* =====================================================
+   OVERLAY
+===================================================== */
+
+const ascensionOverlay =
+document.createElement("div");
+
+ascensionOverlay.id =
+"ascensionOverlay";
+
+document.body.appendChild(
+  ascensionOverlay
+);
+
+
+
+/* =====================================================
+   ASCENSION STATE
+===================================================== */
+
+let ascensionItem = null;
+
+let ascensionFinalRarity =
+null;
+
+let ascensionCurrentIndex =
+0;
+
+
+const ASCENSION_ORDER = [
+  "RARE",
+  "EPIC",
+  "LEGEND",
+  "GOD"
+];
+
+
+
+/* =====================================================
+   BASIC HELPERS
+===================================================== */
+
+function ascensionClear(){
+
+  ascensionOverlay.innerHTML =
+  "";
+
+  ascensionOverlay.className =
+  "";
+
+  ascensionOverlay.removeAttribute(
+    "style"
+  );
+
+}
+
+
+function ascensionClass(
+  rarity
+){
+
+  if(rarity==="RARE"){
+    return "ascensionRare";
+  }
+
+  if(rarity==="EPIC"){
+    return "ascensionEpic";
+  }
+
+  if(rarity==="LEGEND"){
+    return "ascensionLegend";
+  }
+
+  return "ascensionGod";
+
+}
+
+
+function ascensionColor(
+  rarity
+){
+
+  if(rarity==="RARE"){
+    return "#66aaff";
+  }
+
+  if(rarity==="EPIC"){
+    return "#d768ff";
+  }
+
+  if(rarity==="LEGEND"){
+    return "#ffe144";
+  }
+
+  return "#ffffff";
+
+}
+
+
+
+/* =====================================================
+   軽量ヒビ
+===================================================== */
+
+function createAscensionCracks(
+  count=6
+){
+
+  for(
+    let i=0;
+    i<count;
+    i++
+  ){
+
+    const crack =
+    document.createElement(
+      "div"
+    );
+
+
+    crack.className =
+    "ascensionCrack";
+
+
+    crack.style.transform =
+    `
+      rotate(
+        ${i*(360/count) +
+        Math.random()*18}
+        deg
+      )
+    `;
+
+
+    ascensionOverlay
+    .appendChild(
+      crack
+    );
+
+  }
+
+}
+
+
+
+/* =====================================================
+   レアリティ表示
+===================================================== */
+
+function showAscensionRarity(
+  rarity,
+  subtitle=""
+){
+
+  ascensionClear();
+
+
+  ascensionOverlay.className =
+  "show";
+
+
+  const stage =
+  document.createElement(
+    "div"
+  );
+
+
+  stage.className =
+  "ascensionStage "+
+  ascensionClass(
+    rarity
+  );
+
+
+  stage.innerHTML = `
+
+    <div
+      class="ascensionSub"
+    >
+      ${subtitle}
+    </div>
+
+
+    <div
+      class="ascensionTitle"
+
+      style="
+        color:
+        ${ascensionColor(rarity)};
+      "
+    >
+      ${rarity}
+    </div>
+
+  `;
+
+
+  ascensionOverlay.appendChild(
+    stage
+  );
+
+
+  return stage;
+
+}
+
+
+
+/* =====================================================
+   PUSH種類抽選
+===================================================== */
+
+function chooseAscensionButton(){
+
+  const r =
+  Math.random();
+
+
+  /*
+    虹 4%
+  */
+
+  if(r < .04){
+
+    return "RAINBOW";
+
+  }
+
+
+  /*
+    金 18%
+  */
+
+  if(r < .22){
+
+    return "GOLD";
+
+  }
+
+
+  return "NORMAL";
+
+}
+
+
+
+/* =====================================================
+   本当に昇格する場面の
+   演出パターン抽選
+===================================================== */
+
+function chooseSuccessPattern(){
+
+  const r =
+  Math.random();
+
+
+  /*
+    復活成功 25%
+  */
+
+  if(r < .25){
+
+    return "REVIVAL";
+
+  }
+
+
+  /*
+    普通に成功 75%
+  */
+
+  return "SUCCESS";
+
+}
+
+
+
+/* =====================================================
+   PUSH表示
+===================================================== */
+
+function showAscensionPush(
+  currentRarity,
+  nextRarity,
+  willPromote
+){
+
+  const stage =
+  showAscensionRarity(
+    currentRarity,
+    "RARITY CHALLENGE"
+  );
+
+
+  const buttonType =
+  willPromote
+  ? chooseAscensionButton()
+  : "NORMAL";
+
+
+  const button =
+  document.createElement(
+    "button"
+  );
+
+
+  button.className =
+  "ascensionPush";
+
+
+  if(
+    buttonType ===
+    "RAINBOW"
+  ){
+
+    button.classList.add(
+      "ascensionRainbowPush"
+    );
+
+
+    button.innerHTML =
+    "🌈<br>PUSH";
+
+
+  }else if(
+    buttonType ===
+    "GOLD"
+  ){
+
+    button.classList.add(
+      "ascensionGoldPush"
+    );
+
+
+    button.textContent =
+    "PUSH";
+
+
+  }else{
+
+    button.classList.add(
+      "ascensionNormalPush"
+    );
+
+
+    button.textContent =
+    "PUSH";
+
+  }
+
+
+  stage.appendChild(
+    button
+  );
+
+
+  /*
+    PUSH待機音
+  */
+
+  tone(
+    240,
+    .10,
+    "sine",
+    .05
+  );
+
+
+  if(
+    buttonType ===
+    "RAINBOW"
+  ){
+
+    sfxKyuiin(
+      .05,
+      .75
+    );
+
+  }
+
+
+  button.onclick = ()=>{
+
+    button.disabled =
+    true;
+
+
+    if(!willPromote){
+
+      playAscensionFail(
+        currentRarity
+      );
+
+      return;
+
+    }
+
+
+    /*
+      虹は復活失敗を挟まない
+    */
+
+    if(
+      buttonType ===
+      "RAINBOW"
+    ){
+
+      playAscensionSuccess(
+        currentRarity,
+        nextRarity,
+        true
+      );
+
+      return;
+
+    }
+
+
+    const pattern =
+    chooseSuccessPattern();
+
+
+    if(
+      pattern ===
+      "REVIVAL"
+    ){
+
+      playAscensionRevival(
+        currentRarity,
+        nextRarity
+      );
+
+    }else{
+
+      playAscensionSuccess(
+        currentRarity,
+        nextRarity,
+        buttonType==="GOLD"
+      );
+
+    }
+
+  };
+
+}
+
+
+
+/* =====================================================
+   昇格失敗
+
+   あえて地味・静か
+===================================================== */
+
+function playAscensionFail(
+  rarity
+){
+
+  const stage =
+  ascensionOverlay
+  .querySelector(
+    ".ascensionStage"
+  );
+
+
+  createAscensionCracks(
+    4
+  );
+
+
+  superFlash(
+    "#d8e5ff",
+    110
+  );
+
+
+  tone(
+    170,
+    .10,
+    "square",
+    .035
+  );
+
+
+  vibrate(
+    25
+  );
+
+
+  setTimeout(()=>{
+
+    if(stage){
+
+      stage.classList.add(
+        "ascensionDim"
+      );
+
+    }
+
+
+    ascensionOverlay
+    .innerHTML = `
+
+      <div
+        class="
+        ascensionStage
+        ascensionRare
+        ascensionDim
+        "
+      >
+
+        <div
+          class="
+          ascensionTitle
+          ascensionFail
+          "
+
+          style="
+            font-size:55px;
+          "
+        >
+
+          FAILED
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:15px;
+
+            color:#7b8498;
+
+            font-size:14px;
+
+            font-weight:900;
+          "
+        >
+
+          RARE
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    /*
+      「スン…」という
+      落差を作る低い音
+    */
+
+    tone(
+      95,
+      .25,
+      "sine",
+      .035
+    );
+
+
+  },260);
+
+
+  setTimeout(()=>{
+
+    finishAscension();
+
+  },1100);
+
+}
+
+
+
+/* =====================================================
+   通常昇格成功
+
+   FAILEDとの差を極端に
+===================================================== */
+
+function playAscensionSuccess(
+  fromRarity,
+  toRarity,
+  premium=false
+){
+
+  createAscensionCracks(
+    7
+  );
+
+
+  /*
+    ヒビ→爆発
+  */
+
+  tone(
+    240,
+    .07,
+    "square",
+    .07
+  );
+
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ffffff",
+      190
+    );
+
+
+    screenShake(
+      premium ? 16 : 12,
+      600
+    );
+
+
+    vibrate(
+      premium
+      ? [90,30,130]
+      : [60,30,95]
+    );
+
+
+    sfxHeavyImpact(
+      0
+    );
+
+
+    sfxKyuiin(
+      .08,
+      premium
+      ? 1.15
+      : .9
+    );
+
+
+    const stage =
+    showAscensionRarity(
+      toRarity,
+      "RANK UP!!"
+    );
+
+
+    stage
+    .querySelector(
+      ".ascensionTitle"
+    )
+    .classList.add(
+      "ascensionSuccess"
+    );
+
+
+    /*
+      レア色フラッシュ
+    */
+
+    const flashColor =
+
+      toRarity==="EPIC"
+      ? "#c33cff"
+
+      : toRarity==="LEGEND"
+      ? "#ffd600"
+
+      : "#ffffff";
+
+
+    setTimeout(()=>{
+
+      superFlash(
+        flashColor,
+        170
+      );
+
+    },130);
+
+
+  },220);
+
+
+  setTimeout(()=>{
+
+    ascensionCurrentIndex++;
+
+    continueAscension();
+
+  },1200);
+
+}
+
+
+
+/* =====================================================
+   偽失敗 → 復活昇格
+===================================================== */
+
+function playAscensionRevival(
+  fromRarity,
+  toRarity
+){
+
+  /*
+    まず本物と同じ失敗を見せる
+  */
+
+  createAscensionCracks(
+    4
+  );
+
+
+  superFlash(
+    "#dce8ff",
+    110
+  );
+
+
+  vibrate(
+    25
+  );
+
+
+  tone(
+    150,
+    .08,
+    "square",
+    .03
+  );
+
+
+  setTimeout(()=>{
+
+    ascensionOverlay
+    .innerHTML = `
+
+      <div
+        class="
+        ascensionStage
+        ${ascensionClass(fromRarity)}
+        ascensionDim
+        "
+      >
+
+        <div
+          class="
+          ascensionTitle
+          ascensionFail
+          "
+          style="
+            font-size:55px;
+          "
+        >
+          FAILED
+        </div>
+
+      </div>
+
+    `;
+
+
+    tone(
+      90,
+      .25,
+      "sine",
+      .03
+    );
+
+
+  },250);
+
+
+  /*
+    一度完全に
+    「終わった」と思わせる
+  */
+
+  setTimeout(()=>{
+
+    /*
+      突然ヒビ再点灯
+    */
+
+    createAscensionCracks(
+      8
+    );
+
+
+    tone(
+      420,
+      .09,
+      "sine",
+      .08
+    );
+
+
+    tone(
+      750,
+      .12,
+      "sine",
+      .09,
+      .08
+    );
+
+
+    vibrate([
+      50,
+      35,
+      100
+    ]);
+
+
+  },780);
+
+
+  /*
+    復活大爆発
+  */
+
+  setTimeout(()=>{
+
+    superFlash(
+      "#ffffff",
+      220
+    );
+
+
+    screenShake(
+      17,
+      700
+    );
+
+
+    vibrate([
+      100,
+      35,
+      150
+    ]);
+
+
+    sfxHeavyImpact(
+      0
+    );
+
+
+    sfxKyuiin(
+      .05,
+      1.1
+    );
+
+
+    const stage =
+    showAscensionRarity(
+      toRarity,
+      "REVIVAL!!"
+    );
+
+
+    stage
+    .querySelector(
+      ".ascensionTitle"
+    )
+    .classList.add(
+      "ascensionSuccess"
+    );
+
+
+  },1050);
+
+
+  setTimeout(()=>{
+
+    ascensionCurrentIndex++;
+
+    continueAscension();
+
+  },2050);
+
+}
+
+
+
+/* =====================================================
+   GOD専用
+   LEGEND → プチュン → 虹PUSH
+===================================================== */
+
+function startGodAscension(){
+
+  /*
+    LEGENDを一瞬見せる
+  */
+
+  showAscensionRarity(
+    "LEGEND",
+    "LEGEND DROP"
+  );
+
+
+  tone(
+    520,
+    .16,
+    "sine",
+    .06
+  );
+
+
+  setTimeout(()=>{
+
+    /*
+      プチュン
+    */
+
+    ascensionClear();
+
+
+    ascensionOverlay.className =
+    "show";
+
+
+    ascensionOverlay.style
+    .background =
+    "#000";
+
+
+    tone(
+      120,
+      .05,
+      "square",
+      .08
+    );
+
+
+    vibrate(
+      70
+    );
+
+
+  },650);
+
+
+  setTimeout(()=>{
+
+    const stage =
+    document.createElement(
+      "div"
+    );
+
+
+    stage.className =
+    "ascensionStage ascensionGod";
+
+
+    stage.innerHTML = `
+
+      <div
+        class="ascensionSub"
+      >
+        0.1%
+      </div>
+
+
+      <div
+        style="
+          font-size:25px;
+
+          font-weight:1000;
+
+          letter-spacing:5px;
+
+          color:white;
+        "
+      >
+        ????
+      </div>
+
+
+      <button
+        id="godAscensionPush"
+
+        class="
+        ascensionPush
+        ascensionRainbowPush
+        "
+      >
+        🌈<br>PUSH
+      </button>
+
+    `;
+
+
+    ascensionOverlay
+    .appendChild(
+      stage
+    );
+
+
+    sfxKyuiin(
+      .1,
+      .7
+    );
+
+
+    document
+    .getElementById(
+      "godAscensionPush"
+    )
+    .onclick = ()=>{
+
+      playGodAscensionSuccess();
+
+    };
+
+
+  },1150);
+
+}
+
+
+
+/* =====================================================
+   GOD昇格成功
+===================================================== */
+
+function playGodAscensionSuccess(){
+
+  ascensionClear();
+
+
+  ascensionOverlay.className =
+  "show";
+
+
+  superFlash(
+    "#ffffff",
+    230
+  );
+
+
+  screenShake(
+    18,
+    800
+  );
+
+
+  vibrate([
+    120,
+    35,
+    150,
+    35,
+    210
+  ]);
+
+
+  playGodPushSound();
+
+
+  /*
+    既存の軽量GOD演出を再利用
+  */
+
+  setTimeout(()=>{
+
+    safeGodReveal(
+      ascensionItem
+    );
+
+  },180);
+
+}
+
+
+
+/* =====================================================
+   次の昇格判定へ
+===================================================== */
+
+function continueAscension(){
+
+  const finalIndex =
+  ASCENSION_ORDER.indexOf(
+    ascensionFinalRarity
+  );
+
+
+  /*
+    GODまで到達する場合
+  */
+
+  if(
+    ascensionCurrentIndex ===
+    2 &&
+
+    finalIndex === 3
+  ){
+
+    startGodAscension();
+
+    return;
+
+  }
+
+
+  /*
+    最終地点に到達
+  */
+
+  if(
+    ascensionCurrentIndex >=
+    finalIndex
+  ){
+
+    setTimeout(()=>{
+
+      finishAscension();
+
+    },450);
+
+    return;
+
+  }
+
+
+  const current =
+  ASCENSION_ORDER[
+    ascensionCurrentIndex
+  ];
+
+
+  const next =
+  ASCENSION_ORDER[
+    ascensionCurrentIndex+1
+  ];
+
+
+  setTimeout(()=>{
+
+    showAscensionPush(
+      current,
+      next,
+      true
+    );
+
+  },350);
+
+}
+
+
+
+/* =====================================================
+   ASCENSION開始
+===================================================== */
+
+function startRarityAscension(
+  item
+){
+
+  ascensionItem =
+  item;
+
+
+  ascensionFinalRarity =
+  item.rarity;
+
+
+  ascensionCurrentIndex =
+  0;
+
+
+  /*
+    最初は必ずRARE
+  */
+
+  showAscensionRarity(
+    "RARE",
+    "ITEM DROP"
+  );
+
+
+  superFlash(
+    "#448cff",
+    150
+  );
+
+
+  tone(
+    420,
+    .12,
+    "sine",
+    .05
+  );
+
+
+  /*
+    本当の最終結果がRARE
+  */
+
+  if(
+    ascensionFinalRarity ===
+    "RARE"
+  ){
+
+    /*
+      55%で偽PUSHを出す
+    */
+
+    if(
+      Math.random() < .55
+    ){
+
+      setTimeout(()=>{
+
+        showAscensionPush(
+          "RARE",
+          "EPIC",
+          false
+        );
+
+      },600);
+
+    }
+
+
+    /*
+      45%はそのままRARE確定
+    */
+
+    else{
+
+      setTimeout(()=>{
+
+        finishAscension();
+
+      },850);
+
+    }
+
+
+    return;
+
+  }
+
+
+  /*
+    EPIC以上なら
+    RARE→EPIC挑戦
+  */
+
+  setTimeout(()=>{
+
+    showAscensionPush(
+      "RARE",
+      "EPIC",
+      true
+    );
+
+  },600);
+
+}
+
+
+
+/* =====================================================
+   最終アイテム公開
+===================================================== */
+
+function finishAscension(){
+
+  ascensionClear();
+
+
+  revealSuperDropCard(
+    ascensionItem
+  );
+
+
+  ascensionItem =
+  null;
+
+
+  ascensionFinalRarity =
+  null;
+
+
+  ascensionCurrentIndex =
+  0;
+
+}
+
+
+
+/* =====================================================
+   showDropをASCENSION版へ変更
+===================================================== */
+
+const ascensionOldShowDrop =
+showDrop;
+
+
+showDrop =
+function(item){
+
+  /*
+    NORMALは今まで通り
+  */
+
+  if(
+    !item ||
+    item.rarity ===
+    "NORMAL"
+  ){
+
+    ascensionOldShowDrop(
+      item
+    );
+
+    return;
+
+  }
+
+
+  /*
+    武器/防具をここで最終確定
+
+    これ以降は絶対に
+    レアリティ抽選し直さない
+  */
+
+  if(
+    typeof prepareSuperDropItem ===
+    "function"
+  ){
+
+    item =
+    prepareSuperDropItem(
+      item
+    );
+
+  }
+
+
+  currentDrop =
+  item;
+
+
+  startRarityAscension(
+    item
+  );
+
+};
+
+
+
+/* =====================================================
+   DEV MODEもASCENSION版へ
+===================================================== */
+
+runDevDropTest =
+function(rarity){
+
+  devPreviewMode =
+  true;
+
+
+  closeDevPanel();
+
+
+  const item =
+  makeDevTestItem(
+    rarity
+  );
+
+
+  startRarityAscension(
+    item
+  );
+
+};
+
+
+
+/* =====================================================
+   RARE TESTもDEV MODEへ追加
+===================================================== */
+
+const epicDevButton =
+document.getElementById(
+  "devEpicBtn"
+);
+
+
+if(
+  epicDevButton &&
+  !document.getElementById(
+    "devRareBtn"
+  )
+){
+
+  const rareButton =
+  document.createElement(
+    "button"
+  );
+
+
+  rareButton.id =
+  "devRareBtn";
+
+
+  rareButton.textContent =
+  "🔵 RARE TEST";
+
+
+  rareButton.style.cssText = `
+
+    width:100%;
+
+    margin-top:23px;
+
+    padding:17px;
+
+    border:0;
+
+    border-radius:15px;
+
+    background:
+    linear-gradient(
+      #63b6ff,
+      #226cca
+    );
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:1000;
+
+  `;
+
+
+  rareButton.onclick = ()=>{
+
+    const item = {
+
+      name:
+      "DEV・蒼試験剣",
+
+      icon:"🔷",
+
+      atk:999,
+
+      rarity:"RARE",
+
+      type:"weapon",
+
+      devTest:true
+
+    };
+
+
+    devPreviewMode =
+    true;
+
+
+    closeDevPanel();
+
+
+    startRarityAscension(
+      item
+    );
+
+  };
+
+
+  epicDevButton
+  .parentNode
+  .insertBefore(
+    rareButton,
+    epicDevButton
+  );
+
+
+  /*
+    EPICの上marginを小さく
+  */
+
+  epicDevButton.style
+  .marginTop =
+  "11px";
+
+}
 </script>
 
 </body>
