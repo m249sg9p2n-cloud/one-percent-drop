@@ -13184,6 +13184,1779 @@ function(item){
   };
 
 };
+	/* =====================================================
+   Ver.1.0
+   OVERDRIVE DROP EFFECT
+   EPIC / LEGEND / GOD 超光量強化
+===================================================== */
+
+
+/* =====================================================
+   OVERDRIVE CSS
+===================================================== */
+
+const overdriveStyle =
+document.createElement("style");
+
+overdriveStyle.textContent = `
+
+.overdriveCore{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:110px;
+  height:110px;
+
+  transform:
+  translate(-50%,-50%);
+
+  border-radius:50%;
+
+  background:white;
+
+  filter:
+  blur(2px);
+
+  box-shadow:
+  0 0 25px white,
+  0 0 60px white,
+  0 0 120px currentColor,
+  0 0 200px currentColor;
+
+  animation:
+  overdriveCorePulse
+  .28s infinite alternate;
+
+}
+
+
+@keyframes overdriveCorePulse{
+
+  from{
+
+    transform:
+    translate(-50%,-50%)
+    scale(.7);
+
+  }
+
+  to{
+
+    transform:
+    translate(-50%,-50%)
+    scale(1.35);
+
+  }
+
+}
+
+
+/* 放射光線本体 */
+.overdriveRay{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:4px;
+  height:180%;
+
+  transform-origin:
+  50% 0%;
+
+  pointer-events:none;
+
+  opacity:.95;
+
+  mix-blend-mode:screen;
+
+  filter:
+  drop-shadow(
+    0 0 7px currentColor
+  );
+
+  animation:
+  overdriveRayBlast
+  .75s forwards;
+
+}
+
+
+@keyframes overdriveRayBlast{
+
+  0%{
+
+    opacity:0;
+
+    transform:
+    rotate(var(--rot))
+    translateY(-10%)
+    scaleY(.15);
+
+  }
+
+  20%{
+
+    opacity:1;
+
+  }
+
+  100%{
+
+    opacity:0;
+
+    transform:
+    rotate(var(--rot))
+    translateY(-35%)
+    scaleY(1.5);
+
+  }
+
+}
+
+
+/* 太い光線 */
+.overdriveBeam{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:16px;
+  height:150%;
+
+  transform-origin:
+  50% 0%;
+
+  pointer-events:none;
+
+  opacity:.85;
+
+  mix-blend-mode:screen;
+
+  filter:
+  blur(1px)
+  drop-shadow(
+    0 0 15px currentColor
+  );
+
+  animation:
+  overdriveBeamBlast
+  .85s forwards;
+
+}
+
+
+@keyframes overdriveBeamBlast{
+
+  from{
+
+    opacity:0;
+
+    transform:
+    rotate(var(--rot))
+    scaleY(.1);
+
+  }
+
+  20%{
+
+    opacity:1;
+
+  }
+
+  to{
+
+    opacity:0;
+
+    transform:
+    rotate(var(--rot))
+    scaleY(1.8);
+
+  }
+
+}
+
+
+/* 虹リング */
+.overdriveRing{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:80px;
+  height:80px;
+
+  border-radius:50%;
+
+  transform:
+  translate(-50%,-50%);
+
+  border:
+  6px solid white;
+
+  box-shadow:
+  0 0 20px currentColor,
+  inset 0 0 20px currentColor;
+
+  animation:
+  overdriveRingExpand
+  .85s forwards;
+
+  pointer-events:none;
+
+}
+
+
+@keyframes overdriveRingExpand{
+
+  from{
+
+    opacity:1;
+
+    transform:
+    translate(-50%,-50%)
+    scale(.2);
+
+  }
+
+  to{
+
+    opacity:0;
+
+    transform:
+    translate(-50%,-50%)
+    scale(9);
+
+  }
+
+}
+
+
+/* 画面ズーム */
+.overdriveZoom{
+
+  animation:
+  overdriveZoomShake
+  .45s 2;
+
+}
+
+
+@keyframes overdriveZoomShake{
+
+  0%{
+    transform:scale(1);
+  }
+
+  35%{
+    transform:scale(1.12);
+  }
+
+  55%{
+    transform:scale(.96);
+  }
+
+  100%{
+    transform:scale(1.05);
+  }
+
+}
+
+
+/* GOD用虹背景 */
+.overdriveRainbow{
+
+  background:
+
+  radial-gradient(
+    circle at center,
+    white 0%,
+    #fff 7%,
+    #ffeb3b 13%,
+    #ff1744 23%,
+    #e040fb 33%,
+    #536dfe 43%,
+    #00e5ff 53%,
+    #00e676 63%,
+    #ffea00 73%,
+    #ff1744 83%,
+    #15001f 100%
+  );
+
+}
+
+
+/* LEGEND用金爆発 */
+.overdriveGold{
+
+  background:
+
+  radial-gradient(
+    circle at center,
+    #ffffff 0%,
+    #fff8b5 10%,
+    #ffe000 23%,
+    #ff9d00 40%,
+    #ff3d00 58%,
+    #5c1000 77%,
+    #090000 100%
+  );
+
+}
+
+
+/* EPIC用紫爆発 */
+.overdrivePurple{
+
+  background:
+
+  radial-gradient(
+    circle at center,
+    #ffffff 0%,
+    #f5c9ff 12%,
+    #d450ff 25%,
+    #7c2cff 43%,
+    #3a0b7a 65%,
+    #090014 100%
+  );
+
+}
+
+`;
+
+document.head.appendChild(
+  overdriveStyle
+);
+
+
+
+/* =====================================================
+   放射光線生成
+===================================================== */
+
+function createOverdriveRays(
+  colors,
+  thinCount=60,
+  thickCount=16
+){
+
+  /*
+    細い光線
+  */
+
+  for(
+    let i=0;
+    i<thinCount;
+    i++
+  ){
+
+    const ray =
+    document.createElement(
+      "div"
+    );
+
+
+    ray.className =
+    "overdriveRay";
+
+
+    const color =
+    colors[
+      i %
+      colors.length
+    ];
+
+
+    ray.style.color =
+    color;
+
+
+    ray.style.background =
+    `linear-gradient(
+      to bottom,
+      ${color},
+      transparent
+    )`;
+
+
+    ray.style.setProperty(
+      "--rot",
+      (
+        Math.random()*360
+      )+
+      "deg"
+    );
+
+
+    ray.style.width =
+    (
+      2 +
+      Math.random()*4
+    )+
+    "px";
+
+
+    superDropOverlay
+    .appendChild(ray);
+
+
+    setTimeout(()=>{
+
+      ray.remove();
+
+    },900);
+
+  }
+
+
+  /*
+    太い光線
+  */
+
+  for(
+    let i=0;
+    i<thickCount;
+    i++
+  ){
+
+    const beam =
+    document.createElement(
+      "div"
+    );
+
+
+    beam.className =
+    "overdriveBeam";
+
+
+    const color =
+    colors[
+      i %
+      colors.length
+    ];
+
+
+    beam.style.color =
+    color;
+
+
+    beam.style.background =
+    `linear-gradient(
+      to bottom,
+      white,
+      ${color},
+      transparent
+    )`;
+
+
+    beam.style.setProperty(
+      "--rot",
+      (
+        Math.random()*360
+      )+
+      "deg"
+    );
+
+
+    superDropOverlay
+    .appendChild(
+      beam
+    );
+
+
+    setTimeout(()=>{
+
+      beam.remove();
+
+    },1000);
+
+  }
+
+}
+
+
+
+/* =====================================================
+   中央発光
+===================================================== */
+
+function createOverdriveCore(
+  color
+){
+
+  const core =
+  document.createElement(
+    "div"
+  );
+
+
+  core.className =
+  "overdriveCore";
+
+
+  core.style.color =
+  color;
+
+
+  superDropOverlay
+  .appendChild(
+    core
+  );
+
+
+  setTimeout(()=>{
+
+    core.remove();
+
+  },1200);
+
+}
+
+
+
+/* =====================================================
+   リング爆発
+===================================================== */
+
+function createOverdriveRings(
+  colors,
+  count=5
+){
+
+  for(
+    let i=0;
+    i<count;
+    i++
+  ){
+
+    setTimeout(()=>{
+
+      const ring =
+      document.createElement(
+        "div"
+      );
+
+
+      ring.className =
+      "overdriveRing";
+
+
+      ring.style.color =
+      colors[
+        i %
+        colors.length
+      ];
+
+
+      superDropOverlay
+      .appendChild(
+        ring
+      );
+
+
+      setTimeout(()=>{
+
+        ring.remove();
+
+      },950);
+
+
+    },i*90);
+
+  }
+
+}
+
+
+
+/* =====================================================
+   超高速フラッシュ乱射
+===================================================== */
+
+function overdriveFlashStorm(
+  colors,
+  times=12
+){
+
+  for(
+    let i=0;
+    i<times;
+    i++
+  ){
+
+    setTimeout(()=>{
+
+      superFlash(
+        colors[
+          i %
+          colors.length
+        ],
+        110
+      );
+
+    },i*65);
+
+  }
+
+}
+
+
+
+/* =====================================================
+   EPIC OVERDRIVE
+===================================================== */
+
+const oldEpicSequence =
+superEpicSequence;
+
+
+superEpicSequence =
+function(item){
+
+  initAudio();
+
+
+  superDropOverlay
+  .className =
+  "show overdrivePurple";
+
+
+  superDropOverlay
+  .innerHTML = `
+
+    <div
+      class="
+      superDropInner
+      overdriveZoom
+      "
+    >
+
+      <div
+        style="
+          font-size:16px;
+          font-weight:1000;
+          letter-spacing:7px;
+          color:#ffffff;
+          text-shadow:
+          0 0 15px #db66ff;
+        "
+      >
+        ULTRA CHANCE
+      </div>
+
+
+      <div
+        class="superDropHuge"
+
+        style="
+          margin-top:10px;
+          font-size:82px;
+          color:#ee9bff;
+        "
+      >
+        EPIC
+      </div>
+
+    </div>
+
+  `;
+
+
+  createOverdriveCore(
+    "#d450ff"
+  );
+
+
+  createOverdriveRays(
+    [
+      "#ffffff",
+      "#d450ff",
+      "#8e44ff",
+      "#4b6cff"
+    ],
+    70,
+    18
+  );
+
+
+  createOverdriveRings(
+    [
+      "#ffffff",
+      "#d450ff",
+      "#8e44ff"
+    ],
+    5
+  );
+
+
+  overdriveFlashStorm(
+    [
+      "#a020ff",
+      "#ffffff",
+      "#e454ff",
+      "#ffffff"
+    ],
+    10
+  );
+
+
+  superLightningBurst(
+    [
+      "⚡",
+      "💜",
+      "✨",
+      "💥"
+    ],
+    35
+  );
+
+
+  screenShake(
+    16,
+    1000
+  );
+
+
+  vibrate([
+    60,
+    25,
+    80,
+    25,
+    100,
+    25,
+    130
+  ]);
+
+
+  superRise();
+
+  superBoom(.9);
+
+
+  setTimeout(()=>{
+
+    superShockwave();
+
+
+    createOverdriveRays(
+      [
+        "#ffffff",
+        "#ff72ff",
+        "#9450ff"
+      ],
+      50,
+      14
+    );
+
+
+    overdriveFlashStorm(
+      [
+        "#ffffff",
+        "#d94cff",
+        "#ffffff"
+      ],
+      7
+    );
+
+
+    superDropOverlay
+    .innerHTML += `
+
+      <div
+        style="
+          position:absolute;
+          inset:0;
+
+          display:flex;
+          align-items:center;
+          justify-content:center;
+
+          pointer-events:none;
+        "
+      >
+
+        <div
+          class="superDropHuge"
+
+          style="
+            color:white;
+            font-size:88px;
+          "
+        >
+          DROP!!
+        </div>
+
+      </div>
+
+    `;
+
+  },850);
+
+
+  setTimeout(()=>{
+
+    revealSuperDropCard(
+      item
+    );
+
+  },2000);
+
+};
+
+
+
+/* =====================================================
+   LEGEND OVERDRIVE
+===================================================== */
+
+const oldLegendSequence =
+superLegendSequence;
+
+
+superLegendSequence =
+function(item){
+
+  initAudio();
+
+
+  superDropOverlay
+  .className =
+  "show overdriveGold";
+
+
+  superDropOverlay
+  .innerHTML = `
+
+    <div
+      class="
+      superDropInner
+      overdriveZoom
+      "
+    >
+
+      <div
+        style="
+          color:#ff4b2b;
+
+          font-size:22px;
+
+          font-weight:1000;
+
+          letter-spacing:6px;
+
+          text-shadow:
+          0 0 18px #ff0000;
+        "
+      >
+
+        SUPER HEAT!!
+
+      </div>
+
+
+      <div
+        class="superDropHuge"
+
+        style="
+          color:#fff6a2;
+
+          font-size:88px;
+
+          margin-top:10px;
+        "
+      >
+
+        LEGEND
+
+      </div>
+
+
+      <button
+        class="
+        superPush
+        legendPush
+        "
+
+        id="legendOverdrivePush"
+
+        style="
+          margin-top:38px;
+
+          width:210px;
+          height:210px;
+
+          font-size:38px;
+        "
+      >
+
+        PUSH
+
+      </button>
+
+    </div>
+
+  `;
+
+
+  createOverdriveCore(
+    "#ffd000"
+  );
+
+
+  createOverdriveRays(
+    [
+      "#ffffff",
+      "#fff000",
+      "#ffb000",
+      "#ff3d00",
+      "#ff0000"
+    ],
+    90,
+    24
+  );
+
+
+  createOverdriveRings(
+    [
+      "#ffffff",
+      "#ffd500",
+      "#ff8800"
+    ],
+    7
+  );
+
+
+  overdriveFlashStorm(
+    [
+      "#ff0000",
+      "#ffffff",
+      "#ffd000",
+      "#ffffff",
+      "#ff8c00"
+    ],
+    14
+  );
+
+
+  superLightningBurst(
+    [
+      "⚡",
+      "🔥",
+      "⭐",
+      "💥",
+      "✨"
+    ],
+    50
+  );
+
+
+  screenShake(
+    20,
+    1300
+  );
+
+
+  vibrate([
+    80,
+    25,
+    100,
+    25,
+    130,
+    25,
+    170
+  ]);
+
+
+  superBoom(1);
+
+  superRise();
+
+
+  document
+  .getElementById(
+    "legendOverdrivePush"
+  )
+  .onclick = ()=>{
+
+    revealLegendOverdrive(
+      item
+    );
+
+  };
+
+};
+
+
+
+/* =====================================================
+   LEGEND PUSH後
+===================================================== */
+
+function revealLegendOverdrive(
+  item
+){
+
+  superDropOverlay
+  .innerHTML =
+  "";
+
+
+  superDropOverlay
+  .className =
+  "show overdriveGold";
+
+
+  /*
+    画面が見えないレベル
+  */
+
+  overdriveFlashStorm(
+    [
+      "#ffffff",
+      "#ffd500",
+      "#ffffff",
+      "#ff7b00",
+      "#ffffff"
+    ],
+    18
+  );
+
+
+  createOverdriveCore(
+    "#fff000"
+  );
+
+
+  createOverdriveRays(
+    [
+      "#ffffff",
+      "#fff000",
+      "#ffad00",
+      "#ff3c00"
+    ],
+    120,
+    35
+  );
+
+
+  createOverdriveRings(
+    [
+      "#ffffff",
+      "#ffe200",
+      "#ff6d00"
+    ],
+    9
+  );
+
+
+  superLightningBurst(
+    [
+      "⚡",
+      "🔥",
+      "💥",
+      "⭐",
+      "✨"
+    ],
+    70
+  );
+
+
+  spawnParticles(
+    "⭐",
+    45
+  );
+
+
+  spawnParticles(
+    "🔥",
+    35
+  );
+
+
+  screenShake(
+    32,
+    1400
+  );
+
+
+  vibrate([
+    140,
+    30,
+    140,
+    30,
+    180,
+    30,
+    260
+  ]);
+
+
+  superBoom(1.25);
+
+  superRise();
+
+
+  setTimeout(()=>{
+
+    superDropOverlay
+    .innerHTML = `
+
+      <div
+        class="
+        superDropInner
+        overdriveZoom
+        "
+      >
+
+        <div
+          class="superDropHuge"
+
+          style="
+            color:white;
+            font-size:100px;
+          "
+        >
+
+          LEGEND
+
+        </div>
+
+
+        <div
+          class="superDropHuge"
+
+          style="
+            color:#fff048;
+            font-size:112px;
+            margin-top:10px;
+          "
+        >
+
+          DROP!!
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    createOverdriveRays(
+      [
+        "#ffffff",
+        "#ffe600",
+        "#ff8200"
+      ],
+      75,
+      20
+    );
+
+
+  },500);
+
+
+  setTimeout(()=>{
+
+    revealSuperDropCard(
+      item
+    );
+
+  },2100);
+
+}
+
+
+
+/* =====================================================
+   GOD OVERDRIVE
+===================================================== */
+
+const oldGodSequence =
+superGodSequence;
+
+
+superGodSequence =
+function(item){
+
+  initAudio();
+
+
+  /*
+    プチュン
+  */
+
+  superDropOverlay
+  .className =
+  "show";
+
+
+  superDropOverlay
+  .style.background =
+  "#000";
+
+
+  superDropOverlay
+  .innerHTML =
+  "";
+
+
+  tone(
+    140,
+    .08,
+    "square",
+    .14
+  );
+
+
+  vibrate(
+    110
+  );
+
+
+  /*
+    0.45秒後
+    虹宇宙爆発
+  */
+
+  setTimeout(()=>{
+
+    superDropOverlay
+    .className =
+    "show overdriveRainbow";
+
+
+    createOverdriveCore(
+      "#ffffff"
+    );
+
+
+    createOverdriveRays(
+      [
+        "#ff1744",
+        "#ff9100",
+        "#fff000",
+        "#00e676",
+        "#00e5ff",
+        "#536dfe",
+        "#e040fb",
+        "#ffffff"
+      ],
+      140,
+      45
+    );
+
+
+    createOverdriveRings(
+      [
+        "#ff1744",
+        "#fff000",
+        "#00e5ff",
+        "#e040fb",
+        "#ffffff"
+      ],
+      11
+    );
+
+
+    overdriveFlashStorm(
+      [
+        "#ffffff",
+        "#ff1744",
+        "#fff000",
+        "#00e5ff",
+        "#e040fb",
+        "#ffffff"
+      ],
+      20
+    );
+
+
+    superLightningBurst(
+      [
+        "🌈",
+        "⚡",
+        "💥",
+        "⭐",
+        "✨",
+        "🔥"
+      ],
+      75
+    );
+
+
+    screenShake(
+      26,
+      1500
+    );
+
+
+    vibrate([
+      100,
+      20,
+      110,
+      20,
+      130,
+      20,
+      160,
+      20,
+      220
+    ]);
+
+
+    superBoom(1.2);
+
+    superRise();
+
+
+    superDropOverlay
+    .innerHTML += `
+
+      <div
+        class="
+        superDropInner
+        overdriveZoom
+        "
+
+        style="
+          position:absolute;
+          inset:0;
+        "
+      >
+
+        <div
+          style="
+            color:white;
+
+            font-size:20px;
+
+            font-weight:1000;
+
+            letter-spacing:10px;
+
+            text-shadow:
+            0 0 15px black;
+        "
+        >
+
+          0.1%
+
+        </div>
+
+
+        <div
+          class="superDropHuge"
+
+          style="
+            color:white;
+
+            font-size:120px;
+
+            margin-top:8px;
+
+            text-shadow:
+            0 0 20px white,
+            0 0 45px #fff000,
+            0 0 80px #ff36df,
+            0 0 120px #00eaff;
+          "
+        >
+
+          GOD
+
+        </div>
+
+      </div>
+
+    `;
+
+
+  },450);
+
+
+  /*
+    超巨大PUSH
+  */
+
+  setTimeout(()=>{
+
+    superDropOverlay
+    .innerHTML = `
+
+      <div
+        class="superDropInner"
+      >
+
+        <div
+          class="superDropHuge"
+
+          style="
+            color:white;
+
+            font-size:62px;
+
+            text-shadow:
+            0 0 20px white,
+            0 0 55px #ff3ce1;
+          "
+        >
+
+          GOD CHANCE
+
+        </div>
+
+
+        <button
+          class="
+          superPush
+          godPush
+          "
+
+          id="godOverdrivePush"
+
+          style="
+            width:230px;
+            height:230px;
+
+            margin-top:38px;
+
+            font-size:42px;
+
+            border-width:11px;
+          "
+        >
+
+          PUSH
+
+        </button>
+
+      </div>
+
+    `;
+
+
+    createOverdriveRays(
+      [
+        "#ffffff",
+        "#ff1744",
+        "#fff000",
+        "#00e5ff",
+        "#e040fb"
+      ],
+      70,
+      20
+    );
+
+
+    document
+    .getElementById(
+      "godOverdrivePush"
+    )
+    .onclick = ()=>{
+
+      revealGodOverdrive(
+        item
+      );
+
+    };
+
+
+  },1900);
+
+};
+
+
+
+/* =====================================================
+   GOD PUSH後
+===================================================== */
+
+function revealGodOverdrive(
+  item
+){
+
+  superDropOverlay
+  .innerHTML =
+  "";
+
+
+  superDropOverlay
+  .className =
+  "show overdriveRainbow";
+
+
+  /*
+    完全にやりすぎゾーン
+  */
+
+  overdriveFlashStorm(
+    [
+      "#ffffff",
+      "#ff1744",
+      "#ffffff",
+      "#ffea00",
+      "#ffffff",
+      "#00e5ff",
+      "#ffffff",
+      "#e040fb",
+      "#ffffff"
+    ],
+    28
+  );
+
+
+  createOverdriveCore(
+    "#ffffff"
+  );
+
+
+  createOverdriveRays(
+    [
+      "#ff1744",
+      "#ff9100",
+      "#fff000",
+      "#00e676",
+      "#00e5ff",
+      "#536dfe",
+      "#e040fb",
+      "#ffffff"
+    ],
+    200,
+    60
+  );
+
+
+  createOverdriveRings(
+    [
+      "#ffffff",
+      "#ff1744",
+      "#fff000",
+      "#00e5ff",
+      "#e040fb"
+    ],
+    15
+  );
+
+
+  superLightningBurst(
+    [
+      "🌈",
+      "⚡",
+      "💥",
+      "⭐",
+      "✨",
+      "🔥"
+    ],
+    110
+  );
+
+
+  spawnParticles(
+    "🌈",
+    55
+  );
+
+
+  spawnParticles(
+    "✨",
+    60
+  );
+
+
+  spawnParticles(
+    "⭐",
+    45
+  );
+
+
+  screenShake(
+    42,
+    1800
+  );
+
+
+  vibrate([
+    180,
+    25,
+    180,
+    25,
+    180,
+    25,
+    220,
+    25,
+    320
+  ]);
+
+
+  superBoom(1.4);
+
+  superRise();
+
+
+  /*
+    GOD巨大文字
+  */
+
+  setTimeout(()=>{
+
+    superDropOverlay
+    .innerHTML = `
+
+      <div
+        class="
+        superDropInner
+        overdriveZoom
+        "
+      >
+
+        <div
+          class="superDropHuge"
+
+          style="
+            color:white;
+
+            font-size:145px;
+
+            text-shadow:
+            0 0 20px white,
+            0 0 50px #ffe600,
+            0 0 90px #ff2ddb,
+            0 0 130px #00eaff;
+          "
+        >
+
+          GOD
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    createOverdriveRays(
+      [
+        "#ffffff",
+        "#fff000",
+        "#00e5ff",
+        "#e040fb"
+      ],
+      110,
+      30
+    );
+
+
+  },450);
+
+
+  /*
+    さらにDROP
+  */
+
+  setTimeout(()=>{
+
+    superDropOverlay
+    .innerHTML = `
+
+      <div
+        class="
+        superDropInner
+        overdriveZoom
+        "
+      >
+
+        <div
+          class="superDropHuge"
+
+          style="
+            color:white;
+
+            font-size:96px;
+          "
+        >
+
+          GOD
+
+        </div>
+
+
+        <div
+          class="superDropHuge"
+
+          style="
+            color:#fff85b;
+
+            font-size:125px;
+
+            margin-top:8px;
+
+            text-shadow:
+            0 0 20px white,
+            0 0 60px #ffb900,
+            0 0 100px #ff28da,
+            0 0 140px #00eaff;
+          "
+        >
+
+          DROP!!!!
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    overdriveFlashStorm(
+      [
+        "#ff1744",
+        "#fff000",
+        "#00e5ff",
+        "#e040fb",
+        "#ffffff"
+      ],
+      14
+    );
+
+
+    createOverdriveRays(
+      [
+        "#ffffff",
+        "#ff1744",
+        "#fff000",
+        "#00e5ff",
+        "#e040fb"
+      ],
+      120,
+      35
+    );
+
+
+    superBoom(1.3);
+
+
+  },1500);
+
+
+  /*
+    最終装備公開
+  */
+
+  setTimeout(()=>{
+
+    revealSuperDropCard(
+      item
+    );
+
+  },3200);
+
+}
 </script>
 
 </body>
