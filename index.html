@@ -2937,6 +2937,826 @@ rollDrop = function(){
 ================================ */
 
 renderStageSelect();
+  /* =========================================
+   Ver.0.41
+   STAGE限定1% DROP 専用演出
+========================================= */
+
+
+/* 専用オーバーレイ */
+const uniqueDropOverlay =
+document.createElement("div");
+
+uniqueDropOverlay.id =
+"uniqueDropOverlay";
+
+uniqueDropOverlay.style.cssText = `
+  position:fixed;
+  inset:0;
+  z-index:99999;
+
+  display:none;
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+
+  background:#050509;
+
+  color:white;
+
+  font-family:
+  -apple-system,
+  BlinkMacSystemFont,
+  "Segoe UI",
+  sans-serif;
+`;
+
+document.body.appendChild(
+  uniqueDropOverlay
+);
+
+
+/* =========================================
+   STAGE限定演出スタート
+========================================= */
+
+function uniqueStageDropSequence(
+  item,
+  stageNumber
+){
+
+  initAudio();
+
+  uniqueDropOverlay.style.display =
+  "flex";
+
+  uniqueDropOverlay.innerHTML = `
+
+    <div
+      id="uniqueDropContent"
+      style="
+        width:100%;
+        height:100%;
+
+        display:flex;
+        flex-direction:column;
+
+        align-items:center;
+        justify-content:center;
+
+        text-align:center;
+
+        position:relative;
+      "
+    >
+
+      <div
+        id="uniqueFirstText"
+        style="
+          font-size:20px;
+          font-weight:1000;
+          letter-spacing:4px;
+
+          opacity:0;
+
+          transform:scale(.7);
+
+          transition:.25s;
+        "
+      >
+        WARNING
+      </div>
+
+    </div>
+
+  `;
+
+
+  /* 最初の低音 */
+  tone(
+    70,
+    .35,
+    "sawtooth",
+    .12
+  );
+
+
+  /* 赤フラッシュ */
+  setTimeout(()=>{
+
+    bigFlash(
+      "#ff183f"
+    );
+
+    screenShake(
+      6,
+      250
+    );
+
+    vibrate([
+      50,
+      40,
+      80
+    ]);
+
+
+    const text =
+      document.getElementById(
+        "uniqueFirstText"
+      );
+
+    text.style.opacity =
+      "1";
+
+    text.style.transform =
+      "scale(1.1)";
+
+    text.style.color =
+      "#ff3152";
+
+  },250);
+
+
+
+  /* WARNING連続煽り */
+  setTimeout(()=>{
+
+    tone(
+      130,
+      .15,
+      "square",
+      .11
+    );
+
+    screenShake(
+      8,
+      180
+    );
+
+
+    const text =
+      document.getElementById(
+        "uniqueFirstText"
+      );
+
+    text.innerHTML =
+      "DROP CHANCE";
+
+    text.style.fontSize =
+      "26px";
+
+  },700);
+
+
+
+  /* 一瞬暗転 */
+  setTimeout(()=>{
+
+    uniqueDropOverlay
+      .style.background =
+      "#000";
+
+    const text =
+      document.getElementById(
+        "uniqueFirstText"
+      );
+
+    text.style.opacity =
+      "0";
+
+  },1150);
+
+
+
+  /* 無音の間 */
+  setTimeout(()=>{
+
+    tone(
+      180,
+      .15,
+      "sine",
+      .06
+    );
+
+  },1500);
+
+
+
+  /* 金昇格 */
+  setTimeout(()=>{
+
+    uniqueDropOverlay
+    .style.background =
+    `
+      radial-gradient(
+        circle,
+        #8c6500 0%,
+        #241800 38%,
+        #050400 75%
+      )
+    `;
+
+
+    bigFlash(
+      "#ffd83d"
+    );
+
+    screenShake(
+      11,
+      400
+    );
+
+
+    tone(
+      330,
+      .15,
+      "sine",
+      .10
+    );
+
+    tone(
+      520,
+      .18,
+      "sine",
+      .11,
+      .09
+    );
+
+    tone(
+      780,
+      .28,
+      "sine",
+      .13,
+      .18
+    );
+
+
+    spawnParticles(
+      "✨",
+      20
+    );
+
+
+    const content =
+      document.getElementById(
+        "uniqueDropContent"
+      );
+
+
+    content.innerHTML = `
+
+      <div
+        style="
+          color:#ffd83d;
+
+          font-size:15px;
+          font-weight:1000;
+
+          letter-spacing:5px;
+        "
+      >
+        SPECIAL
+      </div>
+
+
+      <div
+        style="
+          margin-top:8px;
+
+          font-size:42px;
+          line-height:1;
+
+          font-weight:1000;
+
+          color:#fff4a0;
+
+          text-shadow:
+          0 0 10px #ffb300,
+          0 0 25px #ff8200;
+        "
+      >
+        STAGE DROP
+      </div>
+
+
+      <div
+        style="
+          margin-top:16px;
+
+          font-size:15px;
+
+          color:#ffeab2;
+
+          font-weight:900;
+        "
+      >
+        STAGE ${stageNumber}
+      </div>
+
+    `;
+
+  },1850);
+
+
+
+  /* PUSH出現 */
+  setTimeout(()=>{
+
+    const content =
+      document.getElementById(
+        "uniqueDropContent"
+      );
+
+
+    const push =
+      document.createElement(
+        "button"
+      );
+
+
+    push.innerHTML =
+      "PUSH";
+
+
+    push.style.cssText = `
+
+      width:180px;
+      height:180px;
+
+      margin-top:35px;
+
+      border-radius:50%;
+
+      border:
+      8px solid #fff2a8;
+
+      background:
+      radial-gradient(
+        circle,
+        #fff8bd,
+        #ffc400 45%,
+        #b96700 75%
+      );
+
+      color:#311700;
+
+      font-size:32px;
+
+      font-weight:1000;
+
+      letter-spacing:2px;
+
+      box-shadow:
+      0 0 20px #ffd400,
+      0 0 50px #ff9d00,
+      inset 0 -12px 15px
+      rgba(80,30,0,.35);
+
+      animation:
+      uniquePushPulse
+      .55s infinite alternate;
+
+    `;
+
+
+    push.onclick = ()=>{
+
+      revealUniqueDrop(
+        item,
+        stageNumber
+      );
+
+    };
+
+
+    content.appendChild(
+      push
+    );
+
+
+    tone(
+      520,
+      .12,
+      "square",
+      .10
+    );
+
+
+    vibrate([
+      40,
+      40,
+      80
+    ]);
+
+  },2550);
+
+}
+
+
+/* PUSHアニメーション */
+const uniqueStyle =
+document.createElement("style");
+
+uniqueStyle.textContent = `
+
+@keyframes uniquePushPulse{
+
+  from{
+    transform:scale(.92);
+
+    box-shadow:
+    0 0 15px #ffd400,
+    0 0 30px #ff9d00;
+  }
+
+  to{
+    transform:scale(1.06);
+
+    box-shadow:
+    0 0 35px #fff4a5,
+    0 0 80px #ff9d00;
+  }
+
+}
+
+`;
+
+document.head.appendChild(
+  uniqueStyle
+);
+
+
+
+/* =========================================
+   PUSH後の武器公開
+========================================= */
+
+function revealUniqueDrop(
+  item,
+  stageNumber
+){
+
+  /* 一瞬全部消す */
+  uniqueDropOverlay
+    .innerHTML = "";
+
+
+  uniqueDropOverlay
+    .style.background =
+    "#fff";
+
+
+  screenShake(
+    20,
+    750
+  );
+
+
+  vibrate([
+    100,
+    40,
+    100,
+    40,
+    180
+  ]);
+
+
+  /* 爆発音 */
+  tone(
+    90,
+    .40,
+    "sawtooth",
+    .18
+  );
+
+  tone(
+    55,
+    .55,
+    "square",
+    .17,
+    .05
+  );
+
+  tone(
+    420,
+    .18,
+    "sine",
+    .10,
+    .12
+  );
+
+  tone(
+    660,
+    .20,
+    "sine",
+    .12,
+    .23
+  );
+
+  tone(
+    880,
+    .40,
+    "sine",
+    .15,
+    .35
+  );
+
+
+  setTimeout(()=>{
+
+    uniqueDropOverlay
+      .style.background =
+      `
+      radial-gradient(
+        circle at center,
+        #fff7b2 0%,
+        #ffc400 22%,
+        #6b3400 55%,
+        #080500 83%
+      )
+      `;
+
+
+    uniqueDropOverlay
+      .innerHTML = `
+
+      <div
+        style="
+          width:min(92vw,420px);
+
+          text-align:center;
+
+          padding:25px 15px;
+        "
+      >
+
+        <div
+          style="
+            font-size:13px;
+
+            letter-spacing:5px;
+
+            color:#fff1a6;
+
+            font-weight:1000;
+          "
+        >
+          STAGE ${stageNumber}
+          LIMITED
+        </div>
+
+
+        <div
+          style="
+            margin-top:7px;
+
+            font-size:34px;
+
+            font-weight:1000;
+
+            color:#fff;
+
+            text-shadow:
+            0 0 8px #ffdc00,
+            0 0 20px #ff8a00;
+          "
+        >
+          SPECIAL DROP
+        </div>
+
+
+        <div
+          style="
+            font-size:100px;
+
+            margin-top:20px;
+
+            filter:
+            drop-shadow(
+              0 0 20px #fff2a0
+            );
+          "
+        >
+          ${item.icon}
+        </div>
+
+
+        <div
+          style="
+            margin-top:8px;
+
+            font-size:27px;
+
+            font-weight:1000;
+
+            color:white;
+          "
+        >
+          ${item.name}
+        </div>
+
+
+        <div
+          style="
+            margin-top:10px;
+
+            color:#ffe77d;
+
+            font-size:18px;
+
+            font-weight:1000;
+          "
+        >
+          攻撃力 +${item.atk}
+        </div>
+
+
+        <div
+          style="
+            margin-top:9px;
+
+            color:#ffc937;
+
+            font-size:13px;
+
+            font-weight:900;
+          "
+        >
+          🔥 STAGE限定
+          出現率 1%
+        </div>
+
+
+        <div
+          style="
+            display:flex;
+
+            gap:10px;
+
+            margin-top:30px;
+          "
+        >
+
+          <button
+            onclick="
+              finishUniqueDrop(false)
+            "
+
+            style="
+              flex:1;
+
+              padding:15px;
+
+              border:0;
+
+              border-radius:14px;
+
+              background:#30364c;
+
+              color:white;
+
+              font-weight:1000;
+            "
+          >
+            保管する
+          </button>
+
+
+          <button
+            onclick="
+              finishUniqueDrop(true)
+            "
+
+            style="
+              flex:1;
+
+              padding:15px;
+
+              border:0;
+
+              border-radius:14px;
+
+              background:#ffe04c;
+
+              color:#201300;
+
+              font-weight:1000;
+            "
+          >
+            装備する
+          </button>
+
+        </div>
+
+      </div>
+
+      `;
+
+
+    spawnParticles(
+      "⭐",
+      30
+    );
+
+    spawnParticles(
+      "🔥",
+      20
+    );
+
+    spawnParticles(
+      "✨",
+      25
+    );
+
+  },180);
+
+}
+
+
+
+/* =========================================
+   固有DROP終了
+========================================= */
+
+function finishUniqueDrop(
+  equip
+){
+
+  uniqueDropOverlay
+    .style.display =
+    "none";
+
+
+  uniqueDropOverlay
+    .innerHTML =
+    "";
+
+
+  /*
+    currentDropは
+    既存システムを利用
+  */
+
+  closeDrop(
+    equip
+  );
+
+}
+
+
+
+/* =========================================
+   Ver.0.4のDROP抽選を
+   専用演出版へ変更
+========================================= */
+
+rollDrop = function(){
+
+  const stageNumber =
+    stage + 1;
+
+
+  const uniqueItem =
+    stageUniqueDrops[
+      stageNumber
+    ];
+
+
+  /*
+    STAGE固有装備
+    1%抽選
+  */
+
+  if(
+    uniqueItem &&
+    Math.random() < 0.01
+  ){
+
+    currentDrop = {
+      ...uniqueItem
+    };
+
+
+    uniqueStageDropSequence(
+      currentDrop,
+      stageNumber
+    );
+
+
+    return;
+
+  }
+
+
+  /*
+    固有1%を外した場合は
+    元々の通常DROPへ
+  */
+
+  originalRollDropV04();
+
+};
 </script>
 
 </body>
