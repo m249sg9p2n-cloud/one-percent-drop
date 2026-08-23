@@ -4821,6 +4821,1727 @@ if(dangerOldStartFromCheckpoint){
 ========================================= */
 
 updateDangerSystem();
+/* =========================================
+   Ver.0.6
+   SYNTHESIS / LIMIT BREAK / AWAKENING
+========================================= */
+
+
+/* =========================================
+   武器の進化段階
+========================================= */
+
+function getStars(item){
+
+  return Number(item.stars || 0);
+
+}
+
+
+function getBaseName(item){
+
+  return item.baseName || item.name;
+
+}
+
+
+/* =========================================
+   同一装備判定
+========================================= */
+
+function sameSynthesisItem(a,b){
+
+  return (
+    getBaseName(a) === getBaseName(b) &&
+    a.rarity === b.rarity &&
+    getStars(a) === getStars(b)
+  );
+
+}
+
+
+/* =========================================
+   ★1 攻撃力
+========================================= */
+
+function makeStar1Atk(item){
+
+  const base = Number(item.atk || 0);
+
+  return Math.max(
+    base + 4,
+    Math.ceil(base * 1.35)
+  );
+
+}
+
+
+/* =========================================
+   ★2 攻撃力
+
+   NORMALでも100個集めれば
+   EPIC級まで成長
+========================================= */
+
+function makeStar2Atk(item){
+
+  const original =
+    Number(
+      item.originalAtk ||
+      item.atk ||
+      0
+    );
+
+
+  switch(item.rarity){
+
+    case "NORMAL":
+
+      return Math.max(
+        18,
+        Math.ceil(original * 5)
+      );
+
+
+    case "RARE":
+
+      return Math.max(
+        30,
+        Math.ceil(original * 4)
+      );
+
+
+    case "EPIC":
+
+      return Math.max(
+        48,
+        Math.ceil(original * 3.5)
+      );
+
+
+    case "LEGEND":
+
+      return Math.max(
+        75,
+        Math.ceil(original * 3)
+      );
+
+
+    case "GOD":
+
+      return Math.max(
+        120,
+        Math.ceil(original * 2.2)
+      );
+
+
+    default:
+
+      return Math.max(
+        18,
+        original * 5
+      );
+  }
+
+}
+
+
+/* =========================================
+   ★2 覚醒能力
+
+   元レア度によって能力が変化
+========================================= */
+
+function getAwakeningAbility(item){
+
+  switch(item.rarity){
+
+    case "NORMAL":
+
+      return {
+        type:"sixBonus",
+        name:"六閃",
+        text:"🎲 6が出るたび追加ダメージ +8"
+      };
+
+
+    case "RARE":
+
+      return {
+        type:"pairBonus",
+        name:"共鳴",
+        text:"🎲 ゾロ目成立で追加ダメージ +15"
+      };
+
+
+    case "EPIC":
+
+      return {
+        type:"oneConvert",
+        name:"運命改変",
+        text:"🎲 出目1を1個だけ6へ変換"
+      };
+
+
+    case "LEGEND":
+
+      return {
+        type:"criticalBoost",
+        name:"覇王",
+        text:"⚡ 6ゾロクリティカル時 追加 +30"
+      };
+
+
+    case "GOD":
+
+      return {
+        type:"godPower",
+        name:"神域",
+        text:"🌈 毎攻撃 ダイス合計の50%を追加"
+      };
+
+
+    default:
+
+      return {
+        type:"sixBonus",
+        name:"六閃",
+        text:"🎲 6が出るたび追加ダメージ +8"
+      };
+  }
+
+}
+
+
+/* =========================================
+   図鑑グループ処理を更新
+
+   無印 / ★1 / ★2 は別扱い
+========================================= */
+
+getGroupedInventory = function(){
+
+  const map =
+    new Map();
+
+
+  inventory.forEach(item=>{
+
+    const stars =
+      getStars(item);
+
+
+    const key =
+      item.rarity + "|" +
+      getBaseName(item) + "|" +
+      stars;
+
+
+    if(!map.has(key)){
+
+      map.set(
+        key,
+        {
+          ...item,
+          count:1
+        }
+      );
+
+    }else{
+
+      map.get(key).count++;
+
+    }
+
+  });
+
+
+  const rank = {
+
+    GOD:5,
+    LEGEND:4,
+    EPIC:3,
+    RARE:2,
+    NORMAL:1
+
+  };
+
+
+  return [...map.values()]
+  .sort((a,b)=>{
+
+    /*
+      ★2を最優先
+    */
+
+    const starDiff =
+      getStars(b) -
+      getStars(a);
+
+    if(starDiff !== 0){
+
+      return starDiff;
+
+    }
+
+
+    const rarityDiff =
+      rank[b.rarity] -
+      rank[a.rarity];
+
+
+    if(rarityDiff !== 0){
+
+      return rarityDiff;
+
+    }
+
+
+    return b.atk - a.atk;
+
+  });
+
+};
+
+
+/* =========================================
+   ★表示
+========================================= */
+
+function starLabel(item){
+
+  const stars =
+    getStars(item);
+
+
+  if(stars === 0){
+
+    return "";
+
+  }
+
+
+  if(stars === 1){
+
+    return " ★";
+
+  }
+
+
+  return " ★★";
+
+}
+
+
+/* =========================================
+   合成可能数
+========================================= */
+
+function synthesisCount(item){
+
+  return inventory.filter(x=>
+
+    sameSynthesisItem(
+      x,
+      item
+    )
+
+  ).length;
+
+}
+
+
+/* =========================================
+   合成開始
+========================================= */
+
+function synthesizeItem(item){
+
+  const stars =
+    getStars(item);
+
+
+  if(stars >= 2){
+
+    return;
+
+  }
+
+
+  const count =
+    synthesisCount(item);
+
+
+  if(count < 10){
+
+    return;
+
+  }
+
+
+  /*
+    現在装備している武器か
+  */
+
+  const wasEquipped =
+
+    getBaseName(weapon) ===
+    getBaseName(item) &&
+
+    getStars(weapon) ===
+    stars;
+
+
+  /*
+    同じ武器を10個消費
+  */
+
+  let removed = 0;
+
+
+  inventory =
+    inventory.filter(x=>{
+
+      if(
+        removed < 10 &&
+        sameSynthesisItem(
+          x,
+          item
+        )
+      ){
+
+        removed++;
+
+        return false;
+
+      }
+
+
+      return true;
+
+    });
+
+
+  /*
+    進化武器生成
+  */
+
+  let evolved;
+
+
+  /* ==========================
+     無印 → ★1
+  ========================== */
+
+  if(stars === 0){
+
+    evolved = {
+
+      ...item,
+
+      baseName:
+        getBaseName(item),
+
+      originalAtk:
+        Number(
+          item.originalAtk ||
+          item.atk
+        ),
+
+      stars:1,
+
+      atk:
+        makeStar1Atk(item)
+
+    };
+
+
+    delete evolved.count;
+
+
+    inventory.push(
+      evolved
+    );
+
+
+    if(wasEquipped){
+
+      weapon =
+        evolved;
+
+    }
+
+
+    saveGame();
+
+
+    showLimitBreak(
+      evolved
+    );
+
+  }
+
+
+  /* ==========================
+     ★1 → ★2
+  ========================== */
+
+  else{
+
+    const ability =
+      getAwakeningAbility(item);
+
+
+    evolved = {
+
+      ...item,
+
+      baseName:
+        getBaseName(item),
+
+      stars:2,
+
+      awakened:true,
+
+      atk:
+        makeStar2Atk(item),
+
+      awakeningType:
+        ability.type,
+
+      awakeningName:
+        ability.name,
+
+      awakeningText:
+        ability.text
+
+    };
+
+
+    delete evolved.count;
+
+
+    inventory.push(
+      evolved
+    );
+
+
+    if(wasEquipped){
+
+      weapon =
+        evolved;
+
+    }
+
+
+    saveGame();
+
+
+    showAwakening(
+      evolved
+    );
+
+  }
+
+
+  update();
+
+}
+
+
+/* =========================================
+   合成演出OVERLAY
+========================================= */
+
+const synthesisOverlay =
+document.createElement("div");
+
+
+synthesisOverlay.id =
+"synthesisOverlay";
+
+
+synthesisOverlay.style.cssText = `
+
+  position:fixed;
+
+  inset:0;
+
+  z-index:200000;
+
+  display:none;
+
+  align-items:center;
+
+  justify-content:center;
+
+  text-align:center;
+
+  background:#05060c;
+
+  color:white;
+
+  overflow:hidden;
+
+`;
+
+
+document.body.appendChild(
+  synthesisOverlay
+);
+
+
+/* =========================================
+   ★1 LIMIT BREAK演出
+========================================= */
+
+function showLimitBreak(item){
+
+  initAudio();
+
+
+  synthesisOverlay.style.display =
+    "flex";
+
+
+  synthesisOverlay.style.background =
+    "#08090f";
+
+
+  synthesisOverlay.innerHTML = `
+
+    <div>
+
+      <div
+        id="synthesisIcons"
+        style="
+          font-size:42px;
+          letter-spacing:4px;
+          line-height:1.7;
+        "
+      >
+        ${item.icon} ${item.icon} ${item.icon}
+        <br>
+        ${item.icon} ${item.icon} ${item.icon} ${item.icon}
+        <br>
+        ${item.icon} ${item.icon} ${item.icon}
+      </div>
+
+      <div
+        style="
+          margin-top:20px;
+          color:#ffd84a;
+          font-weight:1000;
+          letter-spacing:4px;
+        "
+      >
+        COMBINE
+      </div>
+
+    </div>
+
+  `;
+
+
+  tone(
+    120,
+    .5,
+    "sawtooth",
+    .08
+  );
+
+
+  setTimeout(()=>{
+
+    screenShake(
+      6,
+      450
+    );
+
+    bigFlash(
+      "#ffd83d"
+    );
+
+
+    tone(
+      330,
+      .14,
+      "sine",
+      .10
+    );
+
+    tone(
+      550,
+      .18,
+      "sine",
+      .11,
+      .12
+    );
+
+    tone(
+      880,
+      .30,
+      "sine",
+      .14,
+      .25
+    );
+
+
+    synthesisOverlay.innerHTML = `
+
+      <div>
+
+        <div
+          style="
+            color:#ffe55c;
+            font-size:38px;
+            font-weight:1000;
+            text-shadow:
+            0 0 25px #ff9d00;
+          "
+        >
+          LIMIT BREAK!!
+        </div>
+
+
+        <div
+          style="
+            font-size:92px;
+            margin-top:25px;
+          "
+        >
+          ${item.icon}
+        </div>
+
+
+        <div
+          style="
+            margin-top:12px;
+            font-size:25px;
+            font-weight:1000;
+          "
+        >
+          ${getBaseName(item)} ★
+        </div>
+
+
+        <div
+          style="
+            color:#ffe371;
+            margin-top:10px;
+            font-size:18px;
+            font-weight:900;
+          "
+        >
+          攻撃力 +${item.atk}
+        </div>
+
+
+        <button
+          onclick="finishSynthesis()"
+
+          style="
+            margin-top:35px;
+            width:180px;
+            padding:15px;
+            border:0;
+            border-radius:14px;
+            background:#ffe04c;
+            color:#171100;
+            font-size:16px;
+            font-weight:1000;
+          "
+        >
+          OK
+        </button>
+
+      </div>
+
+    `;
+
+
+  },1100);
+
+}
+
+
+/* =========================================
+   ★2 AWAKENING演出
+========================================= */
+
+function showAwakening(item){
+
+  initAudio();
+
+
+  synthesisOverlay.style.display =
+    "flex";
+
+
+  synthesisOverlay.style.background =
+    "#000";
+
+
+  synthesisOverlay.innerHTML = `
+
+    <div
+      style="
+        font-size:18px;
+        letter-spacing:5px;
+        font-weight:1000;
+        opacity:.8;
+      "
+    >
+      EVOLUTION
+    </div>
+
+  `;
+
+
+  /*
+    暗転の「間」
+  */
+
+  tone(
+    55,
+    .7,
+    "sine",
+    .12
+  );
+
+
+  vibrate(
+    80
+  );
+
+
+  setTimeout(()=>{
+
+    synthesisOverlay.innerHTML = `
+
+      <div>
+
+        <div
+          style="
+            color:#bd63ff;
+            font-size:14px;
+            font-weight:1000;
+            letter-spacing:5px;
+          "
+        >
+          AWAKENING READY
+        </div>
+
+
+        <div
+          style="
+            font-size:80px;
+            margin-top:25px;
+          "
+        >
+          ${item.icon}
+        </div>
+
+
+        <button
+          onclick="
+            revealAwakening()
+          "
+
+          id="awakeningPush"
+
+          style="
+            width:180px;
+            height:180px;
+
+            margin-top:30px;
+
+            border-radius:50%;
+
+            border:
+            7px solid #fff3a0;
+
+            background:
+            radial-gradient(
+              circle,
+              #fffac4,
+              #ffc400 48%,
+              #943d00
+            );
+
+            box-shadow:
+            0 0 30px #ffd400,
+            0 0 80px #a833ff;
+
+            color:#241200;
+
+            font-size:30px;
+
+            font-weight:1000;
+          "
+        >
+          PUSH
+        </button>
+
+      </div>
+
+    `;
+
+
+    window.currentAwakeningItem =
+      item;
+
+
+    tone(
+      440,
+      .18,
+      "sine",
+      .09
+    );
+
+
+  },1300);
+
+}
+
+
+/* =========================================
+   ★2 PUSH後
+========================================= */
+
+function revealAwakening(){
+
+  const item =
+    window.currentAwakeningItem;
+
+
+  if(!item){
+
+    return;
+
+  }
+
+
+  synthesisOverlay.innerHTML =
+    "";
+
+
+  synthesisOverlay.style.background =
+    "#fff";
+
+
+  vibrate([
+    100,
+    50,
+    100,
+    50,
+    180
+  ]);
+
+
+  screenShake(
+    20,
+    800
+  );
+
+
+  tone(
+    65,
+    .55,
+    "sawtooth",
+    .18
+  );
+
+
+  tone(
+    392,
+    .20,
+    "sine",
+    .10,
+    .15
+  );
+
+
+  tone(
+    659,
+    .25,
+    "sine",
+    .13,
+    .30
+  );
+
+
+  tone(
+    1046,
+    .55,
+    "sine",
+    .17,
+    .50
+  );
+
+
+  setTimeout(()=>{
+
+    synthesisOverlay.style.background = `
+
+      radial-gradient(
+        circle,
+        #fff4a5 0%,
+        #813cff 25%,
+        #29104e 52%,
+        #05030a 82%
+      )
+
+    `;
+
+
+    synthesisOverlay.innerHTML = `
+
+      <div
+        style="
+          padding:25px;
+          width:min(94vw,430px);
+        "
+      >
+
+        <div
+          style="
+            color:#ffe457;
+            font-size:13px;
+            letter-spacing:5px;
+            font-weight:1000;
+          "
+        >
+          AWAKENED
+        </div>
+
+
+        <div
+          style="
+            margin-top:6px;
+            font-size:39px;
+            font-weight:1000;
+            color:white;
+            text-shadow:
+            0 0 14px #b642ff,
+            0 0 35px #ffb400;
+          "
+        >
+          ★★ AWAKENING
+        </div>
+
+
+        <div
+          style="
+            font-size:100px;
+            margin-top:20px;
+          "
+        >
+          ${item.icon}
+        </div>
+
+
+        <div
+          style="
+            margin-top:10px;
+            font-size:27px;
+            font-weight:1000;
+          "
+        >
+          ${getBaseName(item)} ★★
+        </div>
+
+
+        <div
+          style="
+            margin-top:8px;
+            color:#ffe36b;
+            font-size:19px;
+            font-weight:1000;
+          "
+        >
+          攻撃力 +${item.atk}
+        </div>
+
+
+        <div
+          style="
+            margin-top:25px;
+            padding:17px;
+
+            border-radius:17px;
+
+            border:
+            1px solid #d783ff;
+
+            background:
+            rgba(75,20,110,.55);
+
+            box-shadow:
+            0 0 24px rgba(196,71,255,.3);
+          "
+        >
+
+          <div
+            style="
+              color:#ffd856;
+              font-size:12px;
+              font-weight:1000;
+              letter-spacing:3px;
+            "
+          >
+            AWAKENING ABILITY
+          </div>
+
+
+          <div
+            style="
+              margin-top:8px;
+              font-size:21px;
+              font-weight:1000;
+            "
+          >
+            ${item.awakeningName}
+          </div>
+
+
+          <div
+            style="
+              margin-top:7px;
+              color:#e8dcff;
+              font-size:14px;
+            "
+          >
+            ${item.awakeningText}
+          </div>
+
+        </div>
+
+
+        <button
+          onclick="finishSynthesis()"
+
+          style="
+            margin-top:28px;
+            width:180px;
+            padding:15px;
+            border:0;
+            border-radius:14px;
+            background:#ffe04c;
+            color:#171100;
+            font-size:16px;
+            font-weight:1000;
+          "
+        >
+          OK
+        </button>
+
+      </div>
+
+    `;
+
+
+    spawnParticles(
+      "✨",
+      35
+    );
+
+
+    spawnParticles(
+      "⭐",
+      20
+    );
+
+
+  },180);
+
+}
+
+
+/* =========================================
+   演出終了
+========================================= */
+
+function finishSynthesis(){
+
+  synthesisOverlay.style.display =
+    "none";
+
+
+  synthesisOverlay.innerHTML =
+    "";
+
+
+  window.currentAwakeningItem =
+    null;
+
+
+  renderEquipment();
+
+  renderInventory();
+
+  update();
+
+}
+
+
+/* =========================================
+   EQUIPMENT画面を合成対応へ更新
+========================================= */
+
+renderEquipment = function(){
+
+  const list =
+    document.getElementById(
+      "equipList"
+    );
+
+
+  if(!list){
+
+    return;
+
+  }
+
+
+  const grouped =
+    getGroupedInventory();
+
+
+  if(grouped.length === 0){
+
+    list.innerHTML = `
+
+      <div class="emptyEquipment">
+
+        まだ装備を持っていません。<br><br>
+
+        敵を倒して<br>
+        DROPを狙いましょう。
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    "";
+
+
+  grouped.forEach(item=>{
+
+    const stars =
+      getStars(item);
+
+
+    const count =
+      synthesisCount(item);
+
+
+    const isEquipped =
+
+      getBaseName(weapon) ===
+      getBaseName(item) &&
+
+      getStars(weapon) ===
+      stars;
+
+
+    const card =
+      document.createElement(
+        "div"
+      );
+
+
+    card.className =
+      "equipCard " +
+      item.rarity;
+
+
+    /*
+      ★2専用表示
+    */
+
+    if(stars === 2){
+
+      card.style.border =
+        "2px solid #d96aff";
+
+
+      card.style.boxShadow =
+        "0 0 15px #a63cff55, 0 0 25px #ffd83d33";
+
+    }
+
+
+    card.innerHTML = `
+
+      <div class="equipIcon">
+
+        ${item.icon}
+
+      </div>
+
+
+      <div class="equipInfo">
+
+        <div class="equipRarity">
+
+          ${
+            stars === 2
+            ? "AWAKENED"
+            : item.rarity
+          }
+
+        </div>
+
+
+        <strong>
+
+          ${getBaseName(item)}
+          ${starLabel(item)}
+
+        </strong>
+
+
+        <div class="equipAtk">
+
+          攻撃力 +${item.atk}
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:5px;
+            color:#ffe15c;
+            font-size:11px;
+            font-weight:900;
+          "
+        >
+
+          所持 ×${count}
+
+        </div>
+
+
+        ${
+          stars === 2
+          ? `
+
+            <div
+              style="
+                margin-top:6px;
+                color:#dca4ff;
+                font-size:11px;
+                font-weight:900;
+              "
+            >
+              ✨ ${item.awakeningName}
+            </div>
+
+          `
+          : ""
+        }
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          flex-direction:column;
+          gap:7px;
+        "
+      >
+
+
+        <button
+          class="
+            equipButton
+            ${
+              isEquipped
+              ? "equipped"
+              : ""
+            }
+          "
+        >
+
+          ${
+            isEquipped
+            ? "EQUIPPED"
+            : "装備"
+          }
+
+        </button>
+
+
+        ${
+          stars < 2
+
+          ? `
+
+            <button
+
+              class="synthesisButton"
+
+              style="
+                border:0;
+                border-radius:10px;
+                padding:9px 7px;
+
+                ${
+                  count >= 10
+
+                  ? `
+                    background:#ffe04c;
+                    color:#171100;
+                  `
+
+                  : `
+                    background:#242b43;
+                    color:#747e9d;
+                  `
+                }
+
+                font-size:10px;
+                font-weight:1000;
+              "
+            >
+
+              ${
+                count >= 10
+
+                ? (
+                  stars === 0
+                  ? "🔥 合成可能"
+                  : "✨ 覚醒可能"
+                )
+
+                : count + " / 10"
+              }
+
+            </button>
+
+          `
+
+          : `
+
+            <div
+              style="
+                padding:7px;
+                text-align:center;
+                color:#d76cff;
+                font-size:10px;
+                font-weight:1000;
+              "
+            >
+              ★★ MAX
+            </div>
+
+          `
+        }
+
+
+      </div>
+
+    `;
+
+
+    /*
+      装備ボタン
+    */
+
+    const equipButton =
+      card.querySelector(
+        ".equipButton"
+      );
+
+
+    if(!isEquipped){
+
+      equipButton.onclick =
+        ()=>{
+
+          equipFromInventory(
+            item
+          );
+
+        };
+
+    }
+
+
+    /*
+      合成ボタン
+    */
+
+    const synthesisButton =
+      card.querySelector(
+        ".synthesisButton"
+      );
+
+
+    if(
+      synthesisButton &&
+      count >= 10
+    ){
+
+      synthesisButton.onclick =
+        ()=>{
+
+          synthesizeItem(
+            item
+          );
+
+        };
+
+    }
+
+
+    list.appendChild(
+      card
+    );
+
+  });
+
+};
+
+
+/* =========================================
+   ★2 覚醒能力を戦闘へ接続
+========================================= */
+
+const awakeningOldResolveAttack =
+  resolveAttack;
+
+
+resolveAttack = function(rolls){
+
+  /*
+    ★2以外は普通に処理
+  */
+
+  if(
+    !weapon ||
+    getStars(weapon) < 2 ||
+    !weapon.awakeningType
+  ){
+
+    awakeningOldResolveAttack(
+      rolls
+    );
+
+    return;
+
+  }
+
+
+  let newRolls =
+    [...rolls];
+
+
+  let bonus =
+    0;
+
+
+  /* =========================
+     NORMAL覚醒
+     6 × +8
+  ========================= */
+
+  if(
+    weapon.awakeningType ===
+    "sixBonus"
+  ){
+
+    const sixes =
+      newRolls.filter(
+        x=>x===6
+      ).length;
+
+
+    bonus =
+      sixes * 8;
+
+  }
+
+
+  /* =========================
+     RARE覚醒
+     ゾロ目 +15
+  ========================= */
+
+  else if(
+    weapon.awakeningType ===
+    "pairBonus"
+  ){
+
+    const counts =
+      {};
+
+
+    newRolls.forEach(x=>{
+
+      counts[x] =
+        (counts[x] || 0) + 1;
+
+    });
+
+
+    const hasPair =
+      Object.values(counts)
+      .some(x=>x>=2);
+
+
+    if(hasPair){
+
+      bonus = 15;
+
+    }
+
+  }
+
+
+  /* =========================
+     EPIC覚醒
+     1を1個だけ6へ
+  ========================= */
+
+  else if(
+    weapon.awakeningType ===
+    "oneConvert"
+  ){
+
+    const index =
+      newRolls.indexOf(1);
+
+
+    if(index !== -1){
+
+      newRolls[index] =
+        6;
+
+
+      bigFlash(
+        "#b95cff"
+      );
+
+
+      tone(
+        780,
+        .14,
+        "sine",
+        .10
+      );
+
+    }
+
+  }
+
+
+  /* =========================
+     LEGEND覚醒
+     クリティカル +30
+  ========================= */
+
+  else if(
+    weapon.awakeningType ===
+    "criticalBoost"
+  ){
+
+    const sixes =
+      newRolls.filter(
+        x=>x===6
+      ).length;
+
+
+    if(sixes >= 2){
+
+      bonus = 30;
+
+    }
+
+  }
+
+
+  /* =========================
+     GOD覚醒
+     ダイス合計の50%
+  ========================= */
+
+  else if(
+    weapon.awakeningType ===
+    "godPower"
+  ){
+
+    const total =
+      newRolls.reduce(
+        (a,b)=>a+b,
+        0
+      );
+
+
+    bonus =
+      Math.ceil(
+        total * .5
+      );
+
+  }
+
+
+  /*
+    bonusを一時的に
+    武器攻撃力へ加算
+  */
+
+  const originalAtk =
+    weapon.atk;
+
+
+  weapon.atk +=
+    bonus;
+
+
+  if(bonus > 0){
+
+    spawnParticles(
+      "✨",
+      8
+    );
+
+
+    vibrate(
+      50
+    );
+
+  }
+
+
+  awakeningOldResolveAttack(
+    newRolls
+  );
+
+
+  /*
+    次ターンには戻す
+  */
+
+  weapon.atk =
+    originalAtk;
+
+};
+
+
+/* =========================================
+   初期更新
+========================================= */
+
+renderInventory();
 </script>
 
 </body>
