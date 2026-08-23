@@ -12160,6 +12160,1030 @@ function(item){
   );
 
 };
+
+	/* =====================================================
+   Ver.0.91
+   PASSWORD PROTECTED DEV MODE
+===================================================== */
+
+
+/* =====================================================
+   DEV設定
+
+   初期パスワード：
+   dropdev2026
+
+   ※コード内にはパスワードそのものではなく
+     SHA-256ハッシュだけ保存
+===================================================== */
+
+const DEV_PASSWORD_HASH =
+"741e85925c42135c5dbc03e55e47fde3ee16dfbf76738f96d838b27456406359";
+
+
+let devTitleTapCount = 0;
+let devTitleTapTimer = null;
+
+let devPreviewMode = false;
+
+
+/* =====================================================
+   SHA-256
+===================================================== */
+
+async function sha256(text){
+
+  const data =
+    new TextEncoder()
+    .encode(text);
+
+
+  const hashBuffer =
+    await crypto.subtle.digest(
+      "SHA-256",
+      data
+    );
+
+
+  const hashArray =
+    Array.from(
+      new Uint8Array(hashBuffer)
+    );
+
+
+  return hashArray
+  .map(
+    b=>
+    b.toString(16)
+    .padStart(2,"0")
+  )
+  .join("");
+
+}
+
+
+/* =====================================================
+   タイトル7回タップで入口
+===================================================== */
+
+const devTitle =
+document.querySelector(
+  ".title"
+);
+
+
+if(devTitle){
+
+  devTitle.addEventListener(
+    "click",
+    ()=>{
+
+      devTitleTapCount++;
+
+
+      clearTimeout(
+        devTitleTapTimer
+      );
+
+
+      devTitleTapTimer =
+      setTimeout(()=>{
+
+        devTitleTapCount = 0;
+
+      },2500);
+
+
+      if(
+        devTitleTapCount >= 7
+      ){
+
+        devTitleTapCount = 0;
+
+        openDevLogin();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   LOGIN画面
+===================================================== */
+
+const devLoginOverlay =
+document.createElement(
+  "div"
+);
+
+
+devLoginOverlay.id =
+"devLoginOverlay";
+
+
+devLoginOverlay.style.cssText = `
+
+  position:fixed;
+
+  inset:0;
+
+  z-index:900000;
+
+  display:none;
+
+  align-items:center;
+
+  justify-content:center;
+
+  padding:20px;
+
+  background:
+  rgba(2,4,10,.96);
+
+`;
+
+
+devLoginOverlay.innerHTML = `
+
+  <div
+    style="
+      width:min(92vw,380px);
+
+      padding:25px;
+
+      border-radius:22px;
+
+      background:#10162b;
+
+      border:
+      1px solid #465070;
+
+      text-align:center;
+
+      color:white;
+
+      box-shadow:
+      0 20px 60px
+      rgba(0,0,0,.6);
+    "
+  >
+
+    <div
+      style="
+        font-size:13px;
+
+        color:#8490b0;
+
+        font-weight:1000;
+
+        letter-spacing:4px;
+      "
+    >
+      DEVELOPER
+    </div>
+
+
+    <div
+      style="
+        margin-top:6px;
+
+        font-size:26px;
+
+        font-weight:1000;
+      "
+    >
+      🔐 DEV MODE
+    </div>
+
+
+    <input
+      id="devPasswordInput"
+
+      type="password"
+
+      placeholder="PASSWORD"
+
+      autocomplete="off"
+
+      style="
+        width:100%;
+
+        margin-top:22px;
+
+        padding:15px;
+
+        border-radius:13px;
+
+        border:
+        1px solid #485476;
+
+        outline:none;
+
+        background:#080d1d;
+
+        color:white;
+
+        font-size:16px;
+
+        text-align:center;
+      "
+    >
+
+
+    <div
+      id="devLoginError"
+
+      style="
+        min-height:20px;
+
+        margin-top:10px;
+
+        color:#ff5268;
+
+        font-size:12px;
+
+        font-weight:900;
+      "
+    >
+    </div>
+
+
+    <div
+      style="
+        display:flex;
+
+        gap:10px;
+
+        margin-top:10px;
+      "
+    >
+
+      <button
+        id="devCancelBtn"
+
+        style="
+          flex:1;
+
+          padding:13px;
+
+          border:0;
+
+          border-radius:12px;
+
+          background:#293047;
+
+          color:white;
+
+          font-weight:1000;
+        "
+      >
+        CANCEL
+      </button>
+
+
+      <button
+        id="devLoginBtn"
+
+        style="
+          flex:1;
+
+          padding:13px;
+
+          border:0;
+
+          border-radius:12px;
+
+          background:#ffe04c;
+
+          color:#161100;
+
+          font-weight:1000;
+        "
+      >
+        LOGIN
+      </button>
+
+    </div>
+
+  </div>
+
+`;
+
+
+document.body.appendChild(
+  devLoginOverlay
+);
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+function openDevLogin(){
+
+  devLoginOverlay.style.display =
+  "flex";
+
+
+  const input =
+  document.getElementById(
+    "devPasswordInput"
+  );
+
+
+  input.value = "";
+
+
+  document.getElementById(
+    "devLoginError"
+  ).textContent = "";
+
+
+  setTimeout(()=>{
+
+    input.focus();
+
+  },100);
+
+}
+
+
+function closeDevLogin(){
+
+  devLoginOverlay.style.display =
+  "none";
+
+}
+
+
+document.getElementById(
+  "devCancelBtn"
+)
+.onclick =
+closeDevLogin;
+
+
+document.getElementById(
+  "devLoginBtn"
+)
+.onclick =
+async ()=>{
+
+  const password =
+  document.getElementById(
+    "devPasswordInput"
+  ).value;
+
+
+  const hash =
+  await sha256(password);
+
+
+  if(
+    hash !==
+    DEV_PASSWORD_HASH
+  ){
+
+    document.getElementById(
+      "devLoginError"
+    ).textContent =
+    "PASSWORD ERROR";
+
+
+    vibrate([
+      50,
+      30,
+      50
+    ]);
+
+
+    return;
+
+  }
+
+
+  closeDevLogin();
+
+  openDevPanel();
+
+};
+
+
+/* EnterでもLOGIN */
+document.getElementById(
+  "devPasswordInput"
+)
+.addEventListener(
+  "keydown",
+  e=>{
+
+    if(e.key==="Enter"){
+
+      document.getElementById(
+        "devLoginBtn"
+      ).click();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   DEV PANEL
+===================================================== */
+
+const devPanel =
+document.createElement(
+  "div"
+);
+
+
+devPanel.id =
+"devPanel";
+
+
+devPanel.style.cssText = `
+
+  position:fixed;
+
+  inset:0;
+
+  z-index:850000;
+
+  display:none;
+
+  align-items:center;
+
+  justify-content:center;
+
+  padding:18px;
+
+  background:
+  rgba(3,5,12,.97);
+
+`;
+
+
+devPanel.innerHTML = `
+
+  <div
+    style="
+      width:min(94vw,410px);
+
+      padding:23px;
+
+      border-radius:23px;
+
+      background:
+      linear-gradient(
+        145deg,
+        #171e37,
+        #090d1c
+      );
+
+      border:
+      1px solid #4c587b;
+
+      color:white;
+
+      text-align:center;
+    "
+  >
+
+    <div
+      style="
+        color:#8591b5;
+
+        font-size:11px;
+
+        font-weight:1000;
+
+        letter-spacing:5px;
+      "
+    >
+      1% DROP
+    </div>
+
+
+    <div
+      style="
+        margin-top:6px;
+
+        font-size:28px;
+
+        font-weight:1000;
+      "
+    >
+      🛠️ DEV MODE
+    </div>
+
+
+    <div
+      style="
+        margin-top:5px;
+
+        color:#8b96b4;
+
+        font-size:12px;
+      "
+    >
+      DROP演出テスト
+    </div>
+
+
+    <button
+      id="devEpicBtn"
+
+      style="
+        width:100%;
+
+        margin-top:23px;
+
+        padding:17px;
+
+        border:0;
+
+        border-radius:15px;
+
+        background:
+        linear-gradient(
+          #d76cff,
+          #7d24bd
+        );
+
+        color:white;
+
+        font-size:18px;
+
+        font-weight:1000;
+      "
+    >
+      🟣 EPIC TEST
+    </button>
+
+
+    <button
+      id="devLegendBtn"
+
+      style="
+        width:100%;
+
+        margin-top:11px;
+
+        padding:17px;
+
+        border:0;
+
+        border-radius:15px;
+
+        background:
+        linear-gradient(
+          #fff16b,
+          #e98900
+        );
+
+        color:#271500;
+
+        font-size:18px;
+
+        font-weight:1000;
+      "
+    >
+      🟡 LEGEND TEST
+    </button>
+
+
+    <button
+      id="devGodBtn"
+
+      style="
+        width:100%;
+
+        margin-top:11px;
+
+        padding:18px;
+
+        border:2px solid white;
+
+        border-radius:15px;
+
+        background:
+        linear-gradient(
+          90deg,
+          #ff2d78,
+          #ffcf00,
+          #25eaff,
+          #ba44ff
+        );
+
+        color:white;
+
+        text-shadow:
+        0 2px 5px #000;
+
+        font-size:20px;
+
+        font-weight:1000;
+      "
+    >
+      🌈 GOD TEST
+    </button>
+
+
+    <button
+      id="devCloseBtn"
+
+      style="
+        width:100%;
+
+        margin-top:22px;
+
+        padding:13px;
+
+        border:
+        1px solid #485272;
+
+        border-radius:13px;
+
+        background:#20273c;
+
+        color:white;
+
+        font-weight:1000;
+      "
+    >
+      CLOSE
+    </button>
+
+
+    <div
+      style="
+        margin-top:14px;
+
+        color:#68738f;
+
+        font-size:10px;
+
+        line-height:1.5;
+      "
+    >
+      TEST DROPは所持品・図鑑には追加されません
+    </div>
+
+  </div>
+
+`;
+
+
+document.body.appendChild(
+  devPanel
+);
+
+
+function openDevPanel(){
+
+  devPanel.style.display =
+  "flex";
+
+}
+
+
+function closeDevPanel(){
+
+  devPanel.style.display =
+  "none";
+
+}
+
+
+document.getElementById(
+  "devCloseBtn"
+)
+.onclick =
+closeDevPanel;
+
+
+/* =====================================================
+   TEST ITEM生成
+===================================================== */
+
+function makeDevTestItem(
+  rarity
+){
+
+  const testItems = {
+
+    EPIC:{
+
+      name:"DEV・紫電試験剣",
+
+      icon:"⚡",
+
+      atk:999,
+
+      rarity:"EPIC",
+
+      type:"weapon"
+
+    },
+
+
+    LEGEND:{
+
+      name:"DEV・黄金試験剣",
+
+      icon:"👑",
+
+      atk:999,
+
+      rarity:"LEGEND",
+
+      type:"weapon"
+
+    },
+
+
+    GOD:{
+
+      name:"DEV・神域試験剣",
+
+      icon:"🌈",
+
+      atk:999,
+
+      rarity:"GOD",
+
+      type:"weapon"
+
+    }
+
+  };
+
+
+  return {
+    ...testItems[
+      rarity
+    ],
+
+    devTest:true
+  };
+
+}
+
+
+/* =====================================================
+   TEST開始
+===================================================== */
+
+function runDevDropTest(
+  rarity
+){
+
+  devPreviewMode = true;
+
+
+  closeDevPanel();
+
+
+  const item =
+  makeDevTestItem(
+    rarity
+  );
+
+
+  if(rarity==="EPIC"){
+
+    superEpicSequence(
+      item
+    );
+
+  }
+
+
+  else if(
+    rarity==="LEGEND"
+  ){
+
+    superLegendSequence(
+      item
+    );
+
+  }
+
+
+  else if(
+    rarity==="GOD"
+  ){
+
+    superGodSequence(
+      item
+    );
+
+  }
+
+}
+
+
+document.getElementById(
+  "devEpicBtn"
+)
+.onclick =
+()=>runDevDropTest(
+  "EPIC"
+);
+
+
+document.getElementById(
+  "devLegendBtn"
+)
+.onclick =
+()=>runDevDropTest(
+  "LEGEND"
+);
+
+
+document.getElementById(
+  "devGodBtn"
+)
+.onclick =
+()=>runDevDropTest(
+  "GOD"
+);
+
+
+/* =====================================================
+   TEST時はDROPを取得できないようにする
+===================================================== */
+
+const devOldRevealSuperDropCard =
+revealSuperDropCard;
+
+
+revealSuperDropCard =
+function(item){
+
+  devOldRevealSuperDropCard(
+    item
+  );
+
+
+  if(!devPreviewMode){
+
+    return;
+
+  }
+
+
+  const buttons =
+  document.querySelector(
+    ".dropButtons"
+  );
+
+
+  if(!buttons){
+
+    return;
+
+  }
+
+
+  const keep =
+  buttons.querySelector(
+    ".keepBtn"
+  );
+
+
+  const equip =
+  buttons.querySelector(
+    ".equipBtn"
+  );
+
+
+  if(keep){
+
+    keep.style.display =
+    "none";
+
+  }
+
+
+  if(equip){
+
+    equip.style.display =
+    "none";
+
+  }
+
+
+  /*
+    TEST終了ボタン
+  */
+
+  let exit =
+  document.getElementById(
+    "devTestExitBtn"
+  );
+
+
+  if(!exit){
+
+    exit =
+    document.createElement(
+      "button"
+    );
+
+
+    exit.id =
+    "devTestExitBtn";
+
+
+    exit.textContent =
+    "🛠️ TEST終了";
+
+
+    exit.style.cssText = `
+
+      width:100%;
+
+      padding:15px;
+
+      border:0;
+
+      border-radius:13px;
+
+      background:#ffe04c;
+
+      color:#171100;
+
+      font-size:15px;
+
+      font-weight:1000;
+
+    `;
+
+
+    buttons.appendChild(
+      exit
+    );
+
+  }
+
+
+  exit.onclick = ()=>{
+
+    document.getElementById(
+      "dropOverlay"
+    )
+    .classList.remove(
+      "show"
+    );
+
+
+    exit.remove();
+
+
+    if(keep){
+
+      keep.style.display =
+      "";
+
+    }
+
+
+    if(equip){
+
+      equip.style.display =
+      "";
+
+    }
+
+
+    currentDrop =
+    null;
+
+
+    devPreviewMode =
+    false;
+
+
+    /*
+      テスト終了後
+      DEV PANELへ戻る
+    */
+
+    setTimeout(()=>{
+
+      openDevPanel();
+
+    },150);
+
+  };
+
+};
 </script>
 
 </body>
