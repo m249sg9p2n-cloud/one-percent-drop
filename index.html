@@ -6890,6 +6890,1181 @@ saveGame = function(){
 ========================================= */
 
 updateArmorDisplay();
+  /* =========================================
+   Ver.0.72
+   ARMOR DROP + EQUIP + DAMAGE REDUCTION
+========================================= */
+
+
+/* =========================================
+   防具がDROPになる割合
+   0.30 = 30%
+========================================= */
+
+const ARMOR_DROP_SHARE = 0.30;
+
+
+/* =========================================
+   防具DROPテーブル
+========================================= */
+
+const armorLoot = {
+
+  NORMAL:[
+
+    {
+      name:"布の服",
+      icon:"👕",
+      defense:1,
+      reduction:0,
+      atk:0,
+      type:"armor"
+    },
+
+    {
+      name:"革の鎧",
+      icon:"🥋",
+      defense:2,
+      reduction:0,
+      atk:0,
+      type:"armor"
+    }
+
+  ],
+
+
+  RARE:[
+
+    {
+      name:"鉄の鎧",
+      icon:"🛡️",
+      defense:3,
+      reduction:0,
+      atk:0,
+      type:"armor"
+    },
+
+    {
+      name:"魔法のローブ",
+      icon:"🧥",
+      defense:4,
+      reduction:0,
+      atk:0,
+      type:"armor"
+    }
+
+  ],
+
+
+  EPIC:[
+
+    {
+      name:"守護騎士の鎧",
+      icon:"🛡️",
+      defense:6,
+      reduction:0,
+      atk:0,
+      type:"armor"
+    },
+
+    {
+      name:"精霊の外套",
+      icon:"🧥",
+      defense:7,
+      reduction:0,
+      atk:0,
+      type:"armor"
+    }
+
+  ],
+
+
+  LEGEND:[
+
+    {
+      name:"竜鱗の鎧",
+      icon:"🐲",
+      defense:0,
+      reduction:15,
+      atk:0,
+      type:"armor"
+    }
+
+  ],
+
+
+  GOD:[
+
+    {
+      name:"神衣・アダマス",
+      icon:"✨",
+      defense:0,
+      reduction:25,
+      atk:0,
+      type:"armor"
+    }
+
+  ]
+
+};
+
+
+/* =========================================
+   防具所持品
+========================================= */
+
+let armorInventory = [];
+
+
+/* =========================================
+   防具所持品 SAVE / LOAD
+========================================= */
+
+function saveArmorInventory(){
+
+  try{
+
+    localStorage.setItem(
+      "onePercentDropArmorInventory",
+      JSON.stringify(armorInventory)
+    );
+
+  }catch(e){}
+
+}
+
+
+function loadArmorInventory(){
+
+  try{
+
+    const raw =
+      localStorage.getItem(
+        "onePercentDropArmorInventory"
+      );
+
+
+    if(!raw){
+
+      return;
+
+    }
+
+
+    const data =
+      JSON.parse(raw);
+
+
+    if(Array.isArray(data)){
+
+      armorInventory = data;
+
+    }
+
+  }catch(e){}
+
+}
+
+
+loadArmorInventory();
+
+
+/* =========================================
+   防具の重複をまとめる
+========================================= */
+
+function getGroupedArmor(){
+
+  const map =
+    new Map();
+
+
+  armorInventory.forEach(item=>{
+
+    const key =
+      item.rarity+
+      "|" +
+      item.name+
+      "|" +
+      (item.stars || 0);
+
+
+    if(!map.has(key)){
+
+      map.set(
+        key,
+        {
+          ...item,
+          count:1
+        }
+      );
+
+    }else{
+
+      map.get(key).count++;
+
+    }
+
+  });
+
+
+  const rank = {
+
+    GOD:5,
+    LEGEND:4,
+    EPIC:3,
+    RARE:2,
+    NORMAL:1
+
+  };
+
+
+  return [...map.values()]
+    .sort((a,b)=>{
+
+      return (
+        rank[b.rarity] -
+        rank[a.rarity]
+      );
+
+    });
+
+}
+
+
+/* =========================================
+   防具による最終ダメージ計算
+========================================= */
+
+function calculateArmorDamage(rawDamage){
+
+  let damage =
+    Number(rawDamage || 0);
+
+
+  const a =
+    window.armor;
+
+
+  if(
+    !a ||
+    a.name === "なし"
+  ){
+
+    return Math.max(
+      1,
+      damage
+    );
+
+  }
+
+
+  /* =========================
+     固定軽減
+  ========================= */
+
+  const defense =
+    Number(
+      a.defense || 0
+    );
+
+
+  damage -= defense;
+
+
+  /* =========================
+     %軽減
+  ========================= */
+
+  const reduction =
+    Number(
+      a.reduction || 0
+    );
+
+
+  if(reduction > 0){
+
+    damage =
+      Math.ceil(
+        damage *
+        (
+          1 -
+          reduction / 100
+        )
+      );
+
+  }
+
+
+  /*
+    完全0ダメにはしない
+  */
+
+  return Math.max(
+    1,
+    damage
+  );
+
+}
+
+
+/* =========================================
+   通常DROPを一部防具へ変更
+========================================= */
+
+const armorOldShowDrop =
+  showDrop;
+
+
+showDrop = function(item){
+
+  /*
+    STAGE限定装備などは
+    防具に置き換えない
+  */
+
+  const canBecomeArmor =
+
+    item &&
+
+    !item.unique &&
+
+    item.type !== "armor" &&
+
+    armorLoot[item.rarity];
+
+
+  if(
+    canBecomeArmor &&
+    Math.random() <
+    ARMOR_DROP_SHARE
+  ){
+
+    const pool =
+      armorLoot[
+        item.rarity
+      ];
+
+
+    const armorItem = {
+
+      ...pool[
+        rand(
+          0,
+          pool.length - 1
+        )
+      ],
+
+      rarity:
+        item.rarity,
+
+      type:"armor",
+
+      stars:0
+
+    };
+
+
+    currentDrop =
+      armorItem;
+
+    item =
+      armorItem;
+
+  }
+
+
+  /*
+    今までの派手な
+    レア度演出をそのまま利用
+  */
+
+  armorOldShowDrop(
+    item
+  );
+
+
+  /*
+    防具なら表示内容変更
+  */
+
+  if(
+    item &&
+    item.type === "armor"
+  ){
+
+    const label =
+      document.querySelector(
+        ".dropLabel"
+      );
+
+
+    if(label){
+
+      label.textContent =
+        "ARMOR DROP";
+
+    }
+
+
+    const effect =
+      document.getElementById(
+        "dropEffect"
+      );
+
+
+    if(effect){
+
+      if(
+        Number(
+          item.reduction || 0
+        ) > 0
+      ){
+
+        effect.textContent =
+          "被ダメージ "+
+          item.reduction+
+          "% 軽減";
+
+      }else{
+
+        effect.textContent =
+          "被ダメージ -"+
+          item.defense;
+
+      }
+
+    }
+
+
+    const equipBtn =
+      document.querySelector(
+        ".equipBtn"
+      );
+
+
+    if(equipBtn){
+
+      equipBtn.textContent =
+        "🛡️ 装備する";
+
+    }
+
+  }else{
+
+    const label =
+      document.querySelector(
+        ".dropLabel"
+      );
+
+
+    if(label){
+
+      label.textContent =
+        "ITEM DROP";
+
+    }
+
+
+    const equipBtn =
+      document.querySelector(
+        ".equipBtn"
+      );
+
+
+    if(equipBtn){
+
+      equipBtn.textContent =
+        "装備する";
+
+    }
+
+  }
+
+};
+
+
+/* =========================================
+   防具DROPの保管・装備
+========================================= */
+
+const armorOldCloseDrop =
+  closeDrop;
+
+
+closeDrop = function(equip){
+
+  /*
+    武器なら
+    今まで通り
+  */
+
+  if(
+    !currentDrop ||
+    currentDrop.type !== "armor"
+  ){
+
+    armorOldCloseDrop(
+      equip
+    );
+
+    return;
+
+  }
+
+
+  /*
+    防具データを退避
+  */
+
+  const armorDrop =
+    currentDrop;
+
+
+  /*
+    既存closeDropを利用して
+    ステージ進行や
+    CHECKPOINT処理を維持する
+
+    equip=falseにすることで
+    武器として装備されるのを防ぐ
+  */
+
+  armorOldCloseDrop(
+    false
+  );
+
+
+  /*
+    既存inventoryへ一瞬入った
+    防具を取り除く
+  */
+
+  inventory =
+    inventory.filter(
+      item=>
+        item !== armorDrop
+    );
+
+
+  /*
+    防具専用所持品へ
+  */
+
+  armorInventory.push(
+    armorDrop
+  );
+
+
+  /*
+    装備を選択した場合
+  */
+
+  if(equip){
+
+    window.armor = {
+      ...armorDrop
+    };
+
+
+    saveArmorData();
+
+
+    initAudio();
+
+
+    sfxEquip();
+
+
+    vibrate([
+      35,
+      30,
+      70
+    ]);
+
+  }
+
+
+  saveArmorInventory();
+
+  saveGame();
+
+
+  update();
+
+  renderEquipment();
+
+
+  document.getElementById(
+    "message"
+  ).innerHTML =
+
+    equip
+
+    ? "🛡️ <b>"
+      +armorDrop.name+
+      "</b><br>を装備しました！"
+
+    : "🎒 <b>"
+      +armorDrop.name+
+      "</b><br>を保管しました！";
+
+};
+
+
+/* =========================================
+   防具を装備
+========================================= */
+
+function equipArmor(item){
+
+  window.armor = {
+    ...item
+  };
+
+
+  saveArmorData();
+
+  saveArmorInventory();
+
+
+  initAudio();
+
+  sfxEquip();
+
+
+  vibrate([
+    35,
+    30,
+    70
+  ]);
+
+
+  updateArmorDisplay();
+
+  updateDangerSystem();
+
+
+  renderEquipment();
+
+
+  document.getElementById(
+    "message"
+  ).innerHTML =
+
+    "🛡️ <b>"
+    +item.name+
+    "</b><br>"
+    +"を装備しました！";
+
+}
+
+
+/* =========================================
+   EQUIPMENT画面に
+   ARMOR一覧を追加
+========================================= */
+
+const armorOldRenderEquipment =
+  renderEquipment;
+
+
+renderEquipment = function(){
+
+  /*
+    まず今までの武器一覧を作る
+  */
+
+  armorOldRenderEquipment();
+
+
+  const list =
+    document.getElementById(
+      "equipList"
+    );
+
+
+  if(!list){
+
+    return;
+
+  }
+
+
+  /*
+    WEAPON見出し
+  */
+
+  const weaponTitle =
+    document.createElement(
+      "div"
+    );
+
+
+  weaponTitle.innerHTML = `
+
+    <div
+      style="
+        margin:
+        12px 2px 10px;
+
+        padding:
+        10px 12px;
+
+        border-radius:
+        13px;
+
+        background:
+        #171e36;
+
+        color:
+        #ffd84a;
+
+        font-size:
+        14px;
+
+        font-weight:
+        1000;
+      "
+    >
+      ⚔️ WEAPON
+    </div>
+
+  `;
+
+
+  list.insertBefore(
+    weaponTitle,
+    list.firstChild
+  );
+
+
+  /*
+    ARMORセクション
+  */
+
+  const armorSection =
+    document.createElement(
+      "div"
+    );
+
+
+  armorSection.style
+    .gridColumn =
+    "1 / -1";
+
+
+  armorSection.innerHTML = `
+
+    <div
+      style="
+        margin:
+        24px 2px 10px;
+
+        padding:
+        10px 12px;
+
+        border-radius:
+        13px;
+
+        background:
+        #142437;
+
+        color:
+        #66d9ff;
+
+        font-size:
+        14px;
+
+        font-weight:
+        1000;
+      "
+    >
+      🛡️ ARMOR
+    </div>
+
+  `;
+
+
+  list.appendChild(
+    armorSection
+  );
+
+
+  const groupedArmor =
+    getGroupedArmor();
+
+
+  /*
+    まだ防具なし
+  */
+
+  if(
+    groupedArmor.length === 0
+  ){
+
+    const empty =
+      document.createElement(
+        "div"
+      );
+
+
+    empty.innerHTML = `
+
+      <div
+        style="
+          padding:25px;
+
+          text-align:center;
+
+          color:#78849f;
+
+          font-size:13px;
+        "
+      >
+        まだ防具を
+        持っていません。
+      </div>
+
+    `;
+
+
+    list.appendChild(
+      empty
+    );
+
+
+    return;
+
+  }
+
+
+  /*
+    防具カード生成
+  */
+
+  groupedArmor
+  .forEach(item=>{
+
+    const isEquipped =
+
+      window.armor &&
+
+      window.armor.name ===
+        item.name &&
+
+      window.armor.rarity ===
+        item.rarity;
+
+
+    const card =
+      document.createElement(
+        "div"
+      );
+
+
+    card.className =
+      "equipCard "+
+      item.rarity;
+
+
+    card.style.position =
+      "relative";
+
+
+    let effectText = "";
+
+
+    if(
+      Number(
+        item.reduction || 0
+      ) > 0
+    ){
+
+      effectText =
+        "被ダメージ "+
+        item.reduction+
+        "%軽減";
+
+    }else{
+
+      effectText =
+        "被ダメージ -"+
+        item.defense;
+
+    }
+
+
+    card.innerHTML = `
+
+      ${
+        item.count > 1
+
+        ? `
+
+          <div
+            style="
+              position:absolute;
+
+              top:7px;
+              right:7px;
+
+              padding:
+              3px 7px;
+
+              border-radius:
+              999px;
+
+              background:
+              #65d9ff;
+
+              color:
+              #07131d;
+
+              font-size:
+              10px;
+
+              font-weight:
+              1000;
+            "
+          >
+            ×${item.count}
+          </div>
+
+        `
+
+        : ""
+      }
+
+
+      <div
+        class="equipIcon"
+      >
+        ${item.icon}
+      </div>
+
+
+      <div
+        class="equipInfo"
+      >
+
+        <div
+          class="equipRarity"
+        >
+          ${item.rarity}
+        </div>
+
+
+        <strong>
+          ${item.name}
+        </strong>
+
+
+        <div
+          class="equipAtk"
+        >
+          ${effectText}
+        </div>
+
+      </div>
+
+
+      <button
+        class="
+          equipButton
+          ${
+            isEquipped
+            ? "equipped"
+            : ""
+          }
+        "
+      >
+
+        ${
+          isEquipped
+          ? "EQUIPPED"
+          : "装備"
+        }
+
+      </button>
+
+    `;
+
+
+    const button =
+      card.querySelector(
+        ".equipButton"
+      );
+
+
+    if(
+      !isEquipped
+    ){
+
+      button.onclick =
+        ()=>{
+
+          equipArmor(
+            item
+          );
+
+        };
+
+    }
+
+
+    list.appendChild(
+      card
+    );
+
+  });
+
+};
+
+
+/* =========================================
+   敵攻撃へ防御効果を反映
+
+   現在のenemyAttackを壊さず、
+   一時的に敵の攻撃範囲を
+   防具適用後へ変更する
+========================================= */
+
+const armorOldEnemyAttack =
+  enemyAttack;
+
+
+enemyAttack = function(){
+
+  const enemy =
+    enemies[stage];
+
+
+  if(!enemy){
+
+    armorOldEnemyAttack();
+
+    return;
+
+  }
+
+
+  const originalMin =
+    enemy.min;
+
+
+  const originalMax =
+    enemy.max;
+
+
+  /*
+    防具適用後の値へ
+    一時変更
+  */
+
+  enemy.min =
+    calculateArmorDamage(
+      originalMin
+    );
+
+
+  enemy.max =
+    calculateArmorDamage(
+      originalMax
+    );
+
+
+  /*
+    既存の攻撃処理
+  */
+
+  armorOldEnemyAttack();
+
+
+  /*
+    元に戻す
+  */
+
+  enemy.min =
+    originalMin;
+
+
+  enemy.max =
+    originalMax;
+
+
+  updateDangerSystem();
+
+};
+
+
+/* =========================================
+   NEXT DAMAGEも
+   防具込みの数値に変更
+========================================= */
+
+const armorOldDangerUpdate =
+  updateDangerSystem;
+
+
+updateDangerSystem =
+function(){
+
+  const enemy =
+    enemies[stage];
+
+
+  if(!enemy){
+
+    armorOldDangerUpdate();
+
+    return;
+
+  }
+
+
+  const originalMin =
+    enemy.min;
+
+
+  const originalMax =
+    enemy.max;
+
+
+  enemy.min =
+    calculateArmorDamage(
+      originalMin
+    );
+
+
+  enemy.max =
+    calculateArmorDamage(
+      originalMax
+    );
+
+
+  armorOldDangerUpdate();
+
+
+  enemy.min =
+    originalMin;
+
+
+  enemy.max =
+    originalMax;
+
+};
+
+
+/* =========================================
+   初期更新
+========================================= */
+
+updateArmorDisplay();
+
+updateDangerSystem();
+
+renderEquipment();
 </script>
 
 </body>
