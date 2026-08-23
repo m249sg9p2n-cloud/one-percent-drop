@@ -2063,3 +2063,1149 @@
   );
 
 })();
+
+// =====================================================
+// SHOP SYSTEM Ver.1
+// 消耗品・特殊アイテム購入
+// =====================================================
+
+(() => {
+
+  if (window.__ONE_PERCENT_SHOP_V1__) return;
+  window.__ONE_PERCENT_SHOP_V1__ = true;
+
+
+  // =====================================================
+  // SHOP専用SAVE
+  // =====================================================
+
+  const SHOP_SAVE_KEY =
+    "onePercentDropShopItemsV1";
+
+
+  let specialItems = {
+    reviveStone: 0,
+    gachaTicket: 0,
+    fateKey: 0,
+    mysteryShard: 0
+  };
+
+
+  function loadSpecialItems(){
+
+    try{
+
+      const saved =
+        localStorage.getItem(
+          SHOP_SAVE_KEY
+        );
+
+
+      if(saved){
+
+        specialItems = {
+          ...specialItems,
+          ...JSON.parse(saved)
+        };
+
+      }
+
+    }catch(e){
+
+      console.log(
+        "SHOP ITEM LOAD ERROR",
+        e
+      );
+
+    }
+
+  }
+
+
+  function saveSpecialItems(){
+
+    try{
+
+      localStorage.setItem(
+        SHOP_SAVE_KEY,
+        JSON.stringify(
+          specialItems
+        )
+      );
+
+    }catch(e){
+
+      console.log(
+        "SHOP ITEM SAVE ERROR",
+        e
+      );
+
+    }
+
+  }
+
+
+  loadSpecialItems();
+
+
+  // =====================================================
+  // SHOP商品
+  // =====================================================
+
+  const shopProducts = [
+
+    {
+      id:"potion",
+      icon:"🧪",
+      name:"ポーション",
+      description:"HPを20回復",
+      price:250,
+      type:"consumable"
+    },
+
+    {
+      id:"highPotion",
+      icon:"🧪",
+      name:"ハイポーション",
+      description:"HPを40回復",
+      price:700,
+      type:"consumable"
+    },
+
+    {
+      id:"elixir",
+      icon:"❤️",
+      name:"エリクサー",
+      description:"HPを全回復",
+      price:2000,
+      type:"consumable"
+    },
+
+    {
+      id:"reviveStone",
+      icon:"🔥",
+      name:"蘇生石",
+      description:
+        "死亡時にHP30%で復活",
+      price:3500,
+      type:"special"
+    },
+
+    {
+      id:"gachaTicket",
+      icon:"🎫",
+      name:"装備ガチャチケット",
+      description:
+        "装備ガチャを1回引ける",
+      price:2500,
+      type:"special"
+    },
+
+    {
+      id:"fateKey",
+      icon:"🗝️",
+      name:"運命の鍵",
+      description:
+        "特殊な扉を開く謎の鍵",
+      price:5000,
+      type:"special"
+    },
+
+    {
+      id:"mysteryShard",
+      icon:"💎",
+      name:"神秘の欠片",
+      description:
+        "10個集めると何かが起こる…",
+      price:10000,
+      type:"special"
+    }
+
+  ];
+
+
+  // =====================================================
+  // CSS
+  // =====================================================
+
+  const shopStyle =
+    document.createElement("style");
+
+
+  shopStyle.textContent = `
+
+    #shopButton{
+
+      width:100%;
+
+      margin-top:10px;
+
+      padding:15px;
+
+      border:1px solid #66531d;
+
+      border-radius:15px;
+
+      background:
+        linear-gradient(
+          180deg,
+          #30270e,
+          #171205
+        );
+
+      color:#ffe266;
+
+      font-size:16px;
+
+      font-weight:1000;
+
+      letter-spacing:1px;
+
+    }
+
+
+    #shopOverlay{
+
+      position:fixed;
+
+      inset:0;
+
+      z-index:420000;
+
+      display:none;
+
+      align-items:center;
+
+      justify-content:center;
+
+      padding:16px;
+
+      background:
+        rgba(2,4,10,.97);
+
+      color:white;
+
+    }
+
+
+    #shopOverlay.show{
+
+      display:flex;
+
+    }
+
+
+    .shopPanel{
+
+      width:min(95vw,440px);
+
+      max-height:88vh;
+
+      overflow-y:auto;
+
+      padding:20px;
+
+      border-radius:23px;
+
+      border:
+        1px solid #66551f;
+
+      background:
+        linear-gradient(
+          150deg,
+          #1f1a0b,
+          #0c0f1c
+        );
+
+      box-shadow:
+        0 20px 55px
+        rgba(0,0,0,.6);
+
+    }
+
+
+    .shopHeader{
+
+      text-align:center;
+
+      margin-bottom:17px;
+
+    }
+
+
+    .shopTitle{
+
+      font-size:28px;
+
+      font-weight:1000;
+
+      color:#ffe169;
+
+    }
+
+
+    .shopGold{
+
+      margin-top:7px;
+
+      color:#fff1a1;
+
+      font-size:15px;
+
+      font-weight:1000;
+
+    }
+
+
+    .shopProduct{
+
+      display:grid;
+
+      grid-template-columns:
+        52px 1fr auto;
+
+      gap:10px;
+
+      align-items:center;
+
+      margin-top:10px;
+
+      padding:13px;
+
+      border-radius:15px;
+
+      border:
+        1px solid #454b64;
+
+      background:#11172a;
+
+    }
+
+
+    .shopIcon{
+
+      font-size:34px;
+
+      text-align:center;
+
+    }
+
+
+    .shopName{
+
+      font-size:14px;
+
+      font-weight:1000;
+
+    }
+
+
+    .shopDesc{
+
+      margin-top:3px;
+
+      color:#99a3bf;
+
+      font-size:11px;
+
+      line-height:1.35;
+
+    }
+
+
+    .shopOwned{
+
+      margin-top:5px;
+
+      color:#63dcff;
+
+      font-size:11px;
+
+      font-weight:900;
+
+    }
+
+
+    .shopBuyArea{
+
+      text-align:right;
+
+    }
+
+
+    .shopPrice{
+
+      margin-bottom:6px;
+
+      color:#ffe160;
+
+      font-size:13px;
+
+      font-weight:1000;
+
+    }
+
+
+    .shopBuyBtn{
+
+      min-width:73px;
+
+      padding:10px 8px;
+
+      border:0;
+
+      border-radius:10px;
+
+      background:#ffe04d;
+
+      color:#1b1300;
+
+      font-size:11px;
+
+      font-weight:1000;
+
+    }
+
+
+    .shopBuyBtn:disabled{
+
+      background:#2a2f42;
+
+      color:#747d94;
+
+    }
+
+
+    .shopNeedGold{
+
+      margin-top:5px;
+
+      color:#ff7a82;
+
+      font-size:9px;
+
+      font-weight:900;
+
+    }
+
+
+    #shopCloseButton{
+
+      width:100%;
+
+      margin-top:20px;
+
+      padding:13px;
+
+      border:
+        1px solid #454c67;
+
+      border-radius:12px;
+
+      background:#242b3f;
+
+      color:white;
+
+      font-weight:1000;
+
+    }
+
+
+    .shopPurchaseFlash{
+
+      position:fixed;
+
+      left:50%;
+
+      top:35%;
+
+      z-index:500000;
+
+      transform:
+        translate(-50%,-50%);
+
+      padding:14px 22px;
+
+      border-radius:999px;
+
+      background:
+        linear-gradient(
+          #fff7a8,
+          #ffd32f
+        );
+
+      color:#211600;
+
+      font-size:19px;
+
+      font-weight:1000;
+
+      pointer-events:none;
+
+      animation:
+        shopPurchasePop
+        .85s
+        forwards;
+
+    }
+
+
+    @keyframes shopPurchasePop{
+
+      0%{
+        opacity:0;
+        transform:
+          translate(-50%,-50%)
+          scale(.6);
+      }
+
+      25%{
+        opacity:1;
+        transform:
+          translate(-50%,-50%)
+          scale(1.1);
+      }
+
+      100%{
+        opacity:0;
+        transform:
+          translate(-50%,-75%)
+          scale(.95);
+      }
+
+    }
+
+  `;
+
+
+  document.head.appendChild(
+    shopStyle
+  );
+
+
+  // =====================================================
+  // SHOPボタン
+  // =====================================================
+
+  const shopButton =
+    document.createElement(
+      "button"
+    );
+
+
+  shopButton.id =
+    "shopButton";
+
+
+  shopButton.textContent =
+    "🏪 SHOP";
+
+
+  /*
+    ITEMボタンの下へ
+  */
+
+  const itemButton =
+    document.getElementById(
+      "itemMenuButton"
+    );
+
+
+  if(itemButton){
+
+    itemButton.insertAdjacentElement(
+      "afterend",
+      shopButton
+    );
+
+  }
+
+
+  // =====================================================
+  // SHOP OVERLAY
+  // =====================================================
+
+  const shopOverlay =
+    document.createElement(
+      "div"
+    );
+
+
+  shopOverlay.id =
+    "shopOverlay";
+
+
+  shopOverlay.innerHTML = `
+
+    <div class="shopPanel">
+
+      <div class="shopHeader">
+
+        <div class="shopTitle">
+          🏪 SHOP
+        </div>
+
+        <div
+          class="shopGold"
+          id="shopGold"
+        >
+        </div>
+
+      </div>
+
+
+      <div id="shopProductList"></div>
+
+
+      <button
+        id="shopCloseButton"
+        type="button"
+      >
+        閉じる
+      </button>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(
+    shopOverlay
+  );
+
+
+  // =====================================================
+  // 所持数取得
+  // =====================================================
+
+  function getOwnedCount(
+    product
+  ){
+
+    if(
+      product.type ===
+      "consumable"
+    ){
+
+      if(
+        window.ONE_PERCENT_ITEMS &&
+        typeof
+        window.ONE_PERCENT_ITEMS
+        .getAll === "function"
+      ){
+
+        const all =
+          window.ONE_PERCENT_ITEMS
+          .getAll();
+
+
+        return Number(
+          all[product.id] || 0
+        );
+
+      }
+
+
+      return 0;
+
+    }
+
+
+    return Number(
+      specialItems[
+        product.id
+      ] || 0
+    );
+
+  }
+
+
+  // =====================================================
+  // SHOP描画
+  // =====================================================
+
+  function renderShop(){
+
+    const gold =
+      window.ONE_PERCENT_GOLD
+      ? window.ONE_PERCENT_GOLD.get()
+      : 0;
+
+
+    const goldText =
+      document.getElementById(
+        "shopGold"
+      );
+
+
+    if(goldText){
+
+      goldText.textContent =
+        "💰 " +
+        gold.toLocaleString(
+          "ja-JP"
+        ) +
+        "G";
+
+    }
+
+
+    const list =
+      document.getElementById(
+        "shopProductList"
+      );
+
+
+    if(!list) return;
+
+
+    list.innerHTML = "";
+
+
+    shopProducts.forEach(
+      product=>{
+
+        const owned =
+          getOwnedCount(
+            product
+          );
+
+
+        const canBuy =
+          window.ONE_PERCENT_GOLD
+          &&
+          window.ONE_PERCENT_GOLD
+          .canAfford(
+            product.price
+          );
+
+
+        const missing =
+          Math.max(
+            0,
+            product.price - gold
+          );
+
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+
+        card.className =
+          "shopProduct";
+
+
+        card.innerHTML = `
+
+          <div class="shopIcon">
+            ${product.icon}
+          </div>
+
+
+          <div>
+
+            <div class="shopName">
+              ${product.name}
+            </div>
+
+
+            <div class="shopDesc">
+              ${product.description}
+            </div>
+
+
+            <div class="shopOwned">
+              所持 ×${owned}
+            </div>
+
+          </div>
+
+
+          <div class="shopBuyArea">
+
+            <div class="shopPrice">
+              ${product.price.toLocaleString(
+                "ja-JP"
+              )}G
+            </div>
+
+
+            <button
+              class="shopBuyBtn"
+              type="button"
+
+              ${canBuy ? "" : "disabled"}
+            >
+              購入
+            </button>
+
+
+            ${
+              !canBuy
+
+              ? `
+                <div class="shopNeedGold">
+                  あと
+                  ${missing.toLocaleString(
+                    "ja-JP"
+                  )}G
+                </div>
+              `
+
+              : ""
+            }
+
+          </div>
+
+        `;
+
+
+        const button =
+          card.querySelector(
+            ".shopBuyBtn"
+          );
+
+
+        if(canBuy){
+
+          button.addEventListener(
+            "click",
+            ()=>{
+
+              buyProduct(
+                product
+              );
+
+            }
+          );
+
+        }
+
+
+        list.appendChild(
+          card
+        );
+
+      }
+    );
+
+  }
+
+
+  // =====================================================
+  // 購入演出
+  // =====================================================
+
+  function showPurchaseEffect(
+    product
+  ){
+
+    const pop =
+      document.createElement(
+        "div"
+      );
+
+
+    pop.className =
+      "shopPurchaseFlash";
+
+
+    pop.textContent =
+      product.icon +
+      " " +
+      product.name +
+      " GET!";
+
+
+    document.body.appendChild(
+      pop
+    );
+
+
+    if(
+      typeof tone ===
+      "function"
+    ){
+
+      tone(
+        650,
+        .08,
+        "sine",
+        .045
+      );
+
+
+      tone(
+        900,
+        .10,
+        "sine",
+        .05,
+        .08
+      );
+
+
+      tone(
+        1200,
+        .15,
+        "sine",
+        .055,
+        .17
+      );
+
+    }
+
+
+    if(
+      typeof vibrate ===
+      "function"
+    ){
+
+      vibrate([
+        30,
+        20,
+        50
+      ]);
+
+    }
+
+
+    setTimeout(()=>{
+
+      pop.remove();
+
+    },900);
+
+  }
+
+
+  // =====================================================
+  // 購入
+  // =====================================================
+
+  function buyProduct(
+    product
+  ){
+
+    if(
+      !window.ONE_PERCENT_GOLD
+    ){
+      return;
+    }
+
+
+    /*
+      GOLD消費
+    */
+
+    const success =
+      window.ONE_PERCENT_GOLD
+      .spend(
+        product.price
+      );
+
+
+    if(!success){
+
+      renderShop();
+
+      return;
+
+    }
+
+
+    // -------------------------
+    // 回復アイテム
+    // -------------------------
+
+    if(
+      product.type ===
+      "consumable"
+    ){
+
+      if(
+        window.ONE_PERCENT_ITEMS
+      ){
+
+        window.ONE_PERCENT_ITEMS.add(
+          product.id,
+          1
+        );
+
+      }
+
+    }
+
+
+    // -------------------------
+    // 特殊アイテム
+    // -------------------------
+
+    else{
+
+      specialItems[
+        product.id
+      ] =
+        Number(
+          specialItems[
+            product.id
+          ] || 0
+        ) + 1;
+
+
+      saveSpecialItems();
+
+    }
+
+
+    showPurchaseEffect(
+      product
+    );
+
+
+    renderShop();
+
+  }
+
+
+  // =====================================================
+  // OPEN / CLOSE
+  // =====================================================
+
+  function openShop(){
+
+    renderShop();
+
+
+    shopOverlay.classList.add(
+      "show"
+    );
+
+  }
+
+
+  function closeShop(){
+
+    shopOverlay.classList.remove(
+      "show"
+    );
+
+  }
+
+
+  shopButton.addEventListener(
+    "click",
+    openShop
+  );
+
+
+  document
+    .getElementById(
+      "shopCloseButton"
+    )
+    .addEventListener(
+      "click",
+      closeShop
+    );
+
+
+  // =====================================================
+  // GLOBAL API
+  // 蘇生・ガチャ・鍵などで後から利用
+  // =====================================================
+
+  window.ONE_PERCENT_SPECIAL_ITEMS = {
+
+    getAll(){
+
+      return {
+        ...specialItems
+      };
+
+    },
+
+
+    get(
+      id
+    ){
+
+      return Number(
+        specialItems[id] || 0
+      );
+
+    },
+
+
+    add(
+      id,
+      amount=1
+    ){
+
+      if(
+        !(id in specialItems)
+      ){
+        return false;
+      }
+
+
+      specialItems[id] +=
+        Math.max(
+          0,
+          Math.floor(amount)
+        );
+
+
+      saveSpecialItems();
+
+      renderShop();
+
+      return true;
+
+    },
+
+
+    use(
+      id,
+      amount=1
+    ){
+
+      const value =
+        Math.max(
+          1,
+          Math.floor(amount)
+        );
+
+
+      if(
+        !(id in specialItems)
+        ||
+        specialItems[id] <
+        value
+      ){
+
+        return false;
+
+      }
+
+
+      specialItems[id] -=
+        value;
+
+
+      saveSpecialItems();
+
+      renderShop();
+
+      return true;
+
+    }
+
+  };
+
+
+  console.log(
+    "SHOP SYSTEM V1 READY"
+  );
+
+})();
