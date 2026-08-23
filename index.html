@@ -3757,6 +3757,616 @@ rollDrop = function(){
   originalRollDropV04();
 
 };
+  /* =========================================
+   Ver.0.5
+   CHECKPOINT SYSTEM
+========================================= */
+
+
+/* =========================================
+   最高到達STAGEを保存
+========================================= */
+
+let highestReachedStage = Number(
+  localStorage.getItem(
+    "onePercentDropHighestReachedStage"
+  ) || 1
+);
+
+/*
+  これまで遊んだデータも引き継ぐ
+*/
+highestReachedStage = Math.max(
+  highestReachedStage,
+  typeof unlockedStage !== "undefined"
+    ? unlockedStage
+    : 1,
+  stage + 1
+);
+
+localStorage.setItem(
+  "onePercentDropHighestReachedStage",
+  highestReachedStage
+);
+
+
+/* =========================================
+   CHECKPOINT判定
+   STAGE 5 / 10 / 15 / 20...
+========================================= */
+
+function isCheckpointStage(stageNumber){
+
+  return (
+    stageNumber >= 5 &&
+    stageNumber % 5 === 0
+  );
+
+}
+
+
+function isCheckpointUnlocked(stageNumber){
+
+  return (
+    isCheckpointStage(stageNumber) &&
+    highestReachedStage >= stageNumber
+  );
+
+}
+
+
+/* =========================================
+   STAGE到達記録
+========================================= */
+
+function recordStageReached(){
+
+  const stageNumber = stage + 1;
+
+  if(stageNumber > highestReachedStage){
+
+    highestReachedStage =
+      stageNumber;
+
+    localStorage.setItem(
+      "onePercentDropHighestReachedStage",
+      highestReachedStage
+    );
+
+
+    /* CHECKPOINT初到達 */
+    if(
+      isCheckpointStage(
+        stageNumber
+      )
+    ){
+
+      setTimeout(()=>{
+
+        initAudio();
+
+        bigFlash("#ffd83d");
+
+        screenShake(
+          8,
+          450
+        );
+
+        vibrate([
+          80,
+          50,
+          120
+        ]);
+
+        tone(
+          330,
+          .12,
+          "sine",
+          .09
+        );
+
+        tone(
+          550,
+          .16,
+          "sine",
+          .11,
+          .10
+        );
+
+        tone(
+          880,
+          .28,
+          "sine",
+          .13,
+          .20
+        );
+
+        document.getElementById(
+          "message"
+        ).innerHTML =
+
+        "🔥 <b>CHECKPOINT 解放！</b><br>"
+        +"次回から STAGE "
+        +stageNumber+
+        " から開始できます！";
+
+      },400);
+
+    }
+
+  }
+
+}
+
+
+/* =========================================
+   DROP終了後
+   次のSTAGE到達を記録
+========================================= */
+
+const checkpointOldCloseDrop =
+  closeDrop;
+
+
+closeDrop = function(equip){
+
+  checkpointOldCloseDrop(equip);
+
+  recordStageReached();
+
+  renderStageSelect();
+
+};
+
+
+/* =========================================
+   STAGE SELECTを
+   CHECKPOINT方式に変更
+========================================= */
+
+renderStageSelect = function(){
+
+  const grid =
+    document.getElementById(
+      "stageGrid"
+    );
+
+  if(!grid) return;
+
+
+  grid.innerHTML = "";
+
+
+  enemies.forEach(
+    (enemy,index)=>{
+
+      const number =
+        index + 1;
+
+      const reached =
+        number <=
+        highestReachedStage;
+
+      const checkpoint =
+        isCheckpointStage(
+          number
+        );
+
+      const checkpointUnlocked =
+        isCheckpointUnlocked(
+          number
+        );
+
+      const canStart =
+        number === 1 ||
+        checkpointUnlocked;
+
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.className =
+        "stageChoice" +
+        (
+          index === stage
+          ? " current"
+          : ""
+        ) +
+        (
+          !reached
+          ? " locked"
+          : ""
+        );
+
+
+      let statusText = "";
+
+
+      if(!reached){
+
+        statusText =
+          "🔒 未到達";
+
+      }
+
+      else if(
+        number === 1
+      ){
+
+        statusText =
+          "▶ START";
+
+      }
+
+      else if(
+        checkpointUnlocked
+      ){
+
+        statusText =
+          "🔥 CHECKPOINT";
+
+      }
+
+      else{
+
+        statusText =
+          "✓ 到達済み";
+
+      }
+
+
+      button.innerHTML = `
+
+        <div
+          class="stageNumber"
+        >
+          STAGE ${number}
+        </div>
+
+
+        <div
+          class="stageEnemy"
+        >
+          ${
+            reached
+            ? enemy.emoji
+            : "❔"
+          }
+        </div>
+
+
+        <div
+          class="stageEnemyName"
+        >
+          ${
+            reached
+            ? enemy.name
+            : "？？？"
+          }
+        </div>
+
+
+        <div
+          class="stageStatus"
+        >
+          ${statusText}
+        </div>
+
+      `;
+
+
+      /*
+        開始できるのは
+
+        STAGE 1
+        または
+        解放済みCHECKPOINTだけ
+      */
+      if(canStart){
+
+        button.onclick = ()=>{
+
+          startFromCheckpoint(
+            index
+          );
+
+        };
+
+      }
+
+
+      grid.appendChild(
+        button
+      );
+
+    }
+  );
+
+};
+
+
+/* =========================================
+   START / CHECKPOINTから開始
+========================================= */
+
+function startFromCheckpoint(
+  stageIndex
+){
+
+  const stageNumber =
+    stageIndex + 1;
+
+
+  /*
+    不正なSTAGEからは開始不可
+  */
+  if(
+    stageNumber !== 1 &&
+    !isCheckpointUnlocked(
+      stageNumber
+    )
+  ){
+
+    return;
+
+  }
+
+
+  stage =
+    stageIndex;
+
+
+  enemyHp =
+    enemies[stage].hp;
+
+
+  /*
+    チェックポイント再開時は
+    HP全回復
+  */
+  playerHp =
+    playerMaxHp;
+
+
+  update();
+
+  saveGame();
+
+
+  closeStageSelect();
+
+
+  initAudio();
+
+
+  tone(
+    330,
+    .08,
+    "sine",
+    .07
+  );
+
+  tone(
+    600,
+    .15,
+    "sine",
+    .09,
+    .08
+  );
+
+
+  if(
+    stageNumber === 1
+  ){
+
+    document.getElementById(
+      "message"
+    ).innerHTML =
+
+    "⚔️ <b>STAGE 1</b><br>"
+    +"最初から挑戦！";
+
+  }
+
+  else{
+
+    bigFlash(
+      "#ffd83d"
+    );
+
+    vibrate([
+      40,
+      35,
+      70
+    ]);
+
+
+    document.getElementById(
+      "message"
+    ).innerHTML =
+
+    "🔥 <b>CHECKPOINT</b><br>"
+    +"STAGE "
+    +stageNumber+
+    " から再開！";
+
+  }
+
+}
+
+
+/* =========================================
+   敗北処理を変更
+========================================= */
+
+enemyAttack = function(){
+
+  const e =
+    enemies[stage];
+
+
+  const dmg =
+    rand(
+      e.min,
+      e.max
+    );
+
+
+  /* 既存SE */
+  initAudio();
+
+  sfxEnemyHit();
+
+  screenShake(
+    4,
+    180
+  );
+
+
+  playerHp -= dmg;
+
+
+  if(playerHp < 0){
+
+    playerHp = 0;
+
+  }
+
+
+  vibrate(60);
+
+
+  document.getElementById(
+    "message"
+  ).innerHTML =
+
+  "💢 "
+  +e.name+
+  "の反撃！<br>"
+  +"❤️ -"
+  +dmg;
+
+
+  update();
+
+
+  if(playerHp <= 0){
+
+    busy = true;
+
+    document.getElementById(
+      "attackBtn"
+    ).disabled =
+      true;
+
+
+    setTimeout(()=>{
+
+      /* 敗北演出 */
+
+      bigFlash(
+        "#6c0018"
+      );
+
+      screenShake(
+        10,
+        500
+      );
+
+      tone(
+        100,
+        .30,
+        "sawtooth",
+        .12
+      );
+
+      tone(
+        55,
+        .50,
+        "square",
+        .10,
+        .15
+      );
+
+
+      document.getElementById(
+        "message"
+      ).innerHTML =
+
+      "💀 <b>DEFEAT</b><br>"
+      +"STAGE 1へ戻ります…";
+
+
+    },500);
+
+
+    setTimeout(()=>{
+
+      /*
+        到達情報・装備は残す
+        現在STAGEだけ1へ
+      */
+
+      stage = 0;
+
+      enemyHp =
+        enemies[0].hp;
+
+      playerHp =
+        playerMaxHp;
+
+
+      update();
+
+      saveGame();
+
+      renderStageSelect();
+
+
+      document.getElementById(
+        "message"
+      ).innerHTML =
+
+      "⚔️ STAGE 1から再挑戦！<br>"
+      +"解放済みCHECKPOINTから"
+      +"再開することもできます。";
+
+
+      busy = false;
+
+      document.getElementById(
+        "attackBtn"
+      ).disabled =
+        false;
+
+
+    },1800);
+
+
+  }else{
+
+    busy = false;
+
+    document.getElementById(
+      "attackBtn"
+    ).disabled =
+      false;
+
+  }
+
+}
+
+
+/* =========================================
+   初期状態を更新
+========================================= */
+
+recordStageReached();
+
+renderStageSelect();
 </script>
 
 </body>
