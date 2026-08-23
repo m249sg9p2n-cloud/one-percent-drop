@@ -4367,6 +4367,460 @@ enemyAttack = function(){
 recordStageReached();
 
 renderStageSelect();
+  /* =========================================
+   Ver.0.51
+   NEXT DAMAGE + DANGER SYSTEM
+========================================= */
+
+
+/* =========================================
+   STYLE
+========================================= */
+
+const dangerStyle =
+document.createElement("style");
+
+dangerStyle.textContent = `
+
+#nextDamagePanel{
+
+  margin-top:10px;
+
+  padding:10px 12px;
+
+  border-radius:14px;
+
+  background:#0b1021;
+
+  border:1px solid #36405f;
+
+  text-align:center;
+
+  transition:.2s;
+
+}
+
+
+#nextDamageLabel{
+
+  font-size:10px;
+
+  color:#8f9abe;
+
+  font-weight:900;
+
+  letter-spacing:2px;
+
+}
+
+
+#nextDamageValue{
+
+  margin-top:3px;
+
+  font-size:19px;
+
+  font-weight:1000;
+
+  color:#ffffff;
+
+}
+
+
+#dangerText{
+
+  margin-top:4px;
+
+  min-height:18px;
+
+  font-size:12px;
+
+  font-weight:1000;
+
+  letter-spacing:1px;
+
+}
+
+
+body.dangerMode::after{
+
+  content:"";
+
+  position:fixed;
+
+  inset:0;
+
+  pointer-events:none;
+
+  z-index:9990;
+
+  border:7px solid rgba(255,35,60,.75);
+
+  box-shadow:
+    inset 0 0 40px rgba(255,0,30,.45),
+    inset 0 0 100px rgba(255,0,20,.20);
+
+  animation:
+    dangerPulse .75s infinite alternate;
+
+}
+
+
+body.deathMode::after{
+
+  content:"";
+
+  position:fixed;
+
+  inset:0;
+
+  pointer-events:none;
+
+  z-index:9990;
+
+  border:10px solid rgba(255,0,20,.95);
+
+  box-shadow:
+    inset 0 0 60px rgba(255,0,20,.70),
+    inset 0 0 150px rgba(255,0,20,.38);
+
+  animation:
+    deathPulse .38s infinite alternate;
+
+}
+
+
+#nextDamagePanel.danger{
+
+  border-color:#ff3550;
+
+  background:
+    linear-gradient(
+      180deg,
+      #35101a,
+      #160a10
+    );
+
+  animation:
+    panelDangerPulse .75s infinite alternate;
+
+}
+
+
+#nextDamagePanel.death{
+
+  border-color:#ff001f;
+
+  background:
+    linear-gradient(
+      180deg,
+      #59000d,
+      #200006
+    );
+
+  animation:
+    panelDeathPulse .38s infinite alternate;
+
+}
+
+
+@keyframes dangerPulse{
+
+  from{
+    opacity:.35;
+  }
+
+  to{
+    opacity:1;
+  }
+
+}
+
+
+@keyframes deathPulse{
+
+  from{
+    opacity:.45;
+  }
+
+  to{
+    opacity:1;
+  }
+
+}
+
+
+@keyframes panelDangerPulse{
+
+  from{
+    box-shadow:
+      0 0 5px rgba(255,30,60,.2);
+  }
+
+  to{
+    box-shadow:
+      0 0 22px rgba(255,30,60,.65);
+  }
+
+}
+
+
+@keyframes panelDeathPulse{
+
+  from{
+    transform:scale(1);
+  }
+
+  to{
+    transform:scale(1.025);
+
+    box-shadow:
+      0 0 32px rgba(255,0,30,.9);
+  }
+
+}
+
+`;
+
+document.head.appendChild(
+  dangerStyle
+);
+
+
+/* =========================================
+   NEXT DAMAGE表示を作る
+========================================= */
+
+const dangerPanel =
+document.createElement("div");
+
+dangerPanel.id =
+"nextDamagePanel";
+
+dangerPanel.innerHTML = `
+
+  <div id="nextDamageLabel">
+    NEXT DAMAGE
+  </div>
+
+  <div id="nextDamageValue">
+    ---
+  </div>
+
+  <div id="dangerText"></div>
+
+`;
+
+
+/*
+  enemy HPバーの下に追加
+*/
+const enemyArea =
+document.querySelector(
+  ".enemyArea"
+);
+
+if(enemyArea){
+
+  enemyArea.appendChild(
+    dangerPanel
+  );
+
+}
+
+
+/* =========================================
+   DANGER表示更新
+========================================= */
+
+function updateDangerSystem(){
+
+  const enemy =
+    enemies[stage];
+
+  if(!enemy) return;
+
+
+  const minDamage =
+    enemy.min;
+
+  const maxDamage =
+    enemy.max;
+
+
+  const value =
+    document.getElementById(
+      "nextDamageValue"
+    );
+
+  const text =
+    document.getElementById(
+      "dangerText"
+    );
+
+  const panel =
+    document.getElementById(
+      "nextDamagePanel"
+    );
+
+
+  if(!value || !text || !panel){
+    return;
+  }
+
+
+  value.textContent =
+    minDamage+
+    " 〜 "+
+    maxDamage;
+
+
+  panel.classList.remove(
+    "danger",
+    "death"
+  );
+
+  document.body.classList.remove(
+    "dangerMode",
+    "deathMode"
+  );
+
+
+  /* =========================
+     確定死亡
+     HP <= 最小ダメージ
+  ========================= */
+
+  if(
+    playerHp <= minDamage &&
+    playerHp > 0
+  ){
+
+    panel.classList.add(
+      "death"
+    );
+
+    document.body.classList.add(
+      "deathMode"
+    );
+
+
+    value.style.color =
+      "#ff5169";
+
+
+    text.innerHTML =
+      "☠️ NEXT HIT = DEATH";
+
+
+    text.style.color =
+      "#ff2945";
+
+
+    return;
+  }
+
+
+  /* =========================
+     死亡可能性あり
+     HP <= 最大ダメージ
+  ========================= */
+
+  if(
+    playerHp <= maxDamage &&
+    playerHp > 0
+  ){
+
+    panel.classList.add(
+      "danger"
+    );
+
+    document.body.classList.add(
+      "dangerMode"
+    );
+
+
+    value.style.color =
+      "#ff7a8b";
+
+
+    text.innerHTML =
+      "⚠️ DANGER";
+
+
+    text.style.color =
+      "#ff5268";
+
+
+    return;
+  }
+
+
+  /* =========================
+     安全圏
+  ========================= */
+
+  value.style.color =
+    "#ffffff";
+
+  text.innerHTML =
+    "SAFE";
+
+  text.style.color =
+    "#68e5b0";
+
+}
+
+
+/* =========================================
+   update()に自動接続
+========================================= */
+
+const dangerOldUpdate =
+update;
+
+
+update = function(){
+
+  dangerOldUpdate();
+
+  updateDangerSystem();
+
+};
+
+
+/* =========================================
+   STAGE変更時も更新
+========================================= */
+
+const dangerOldStartFromCheckpoint =
+typeof startFromCheckpoint ===
+"function"
+? startFromCheckpoint
+: null;
+
+
+if(dangerOldStartFromCheckpoint){
+
+  startFromCheckpoint =
+  function(stageIndex){
+
+    dangerOldStartFromCheckpoint(
+      stageIndex
+    );
+
+    updateDangerSystem();
+
+  };
+
+}
+
+
+/* =========================================
+   初回表示
+========================================= */
+
+updateDangerSystem();
 </script>
 
 </body>
