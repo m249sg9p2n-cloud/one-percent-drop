@@ -1408,7 +1408,950 @@ closeDrop = function(equip){
   }
 
   originalCloseDropFX(equip);
+};  /* =========================================
+   1% DROP Ver.0.3
+   STAGE SELECT + EQUIPMENT SELECT
+========================================= */
+
+let unlockedStage = Number(
+  localStorage.getItem("onePercentDropUnlockedStage") || 1
+);
+
+/* 以前遊んでいた人は最低でも現在地点まで解放 */
+unlockedStage = Math.max(unlockedStage, stage + 1);
+
+
+/* ===============================
+   UI STYLE
+================================ */
+
+const v03Style = document.createElement("style");
+
+v03Style.textContent = `
+
+.v03Menu{
+  position:fixed;
+  left:50%;
+  bottom:14px;
+  transform:translateX(-50%);
+  z-index:40;
+
+  width:min(calc(100% - 24px),456px);
+
+  display:grid;
+  grid-template-columns:1fr 1fr;
+
+  gap:10px;
+
+  padding:9px;
+
+  border-radius:20px;
+
+  background:rgba(8,12,25,.94);
+
+  border:1px solid #39436c;
+
+  backdrop-filter:blur(14px);
+
+  box-shadow:
+  0 12px 35px rgba(0,0,0,.55);
+}
+
+
+.v03Menu button{
+
+  border:0;
+
+  border-radius:14px;
+
+  padding:13px 5px;
+
+  font-size:15px;
+
+  font-weight:1000;
+
+  color:white;
+
+  background:
+  linear-gradient(180deg,#283253,#171d36);
+
+  border:1px solid #46517a;
+}
+
+
+.v03Menu button:active{
+
+  transform:scale(.96);
+
+}
+
+
+.v03Overlay{
+
+  position:fixed;
+
+  inset:0;
+
+  z-index:200;
+
+  display:none;
+
+  background:
+  radial-gradient(circle at top,#20294a,#080b15 65%);
+
+  overflow-y:auto;
+
+  padding:
+  max(25px,env(safe-area-inset-top))
+  16px
+  110px;
+
+}
+
+
+.v03Overlay.show{
+
+  display:block;
+
+}
+
+
+.v03Header{
+
+  width:min(100%,480px);
+
+  margin:auto;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  margin-bottom:22px;
+
+}
+
+
+.v03Header h2{
+
+  margin:0;
+
+  font-size:27px;
+
+  font-weight:1000;
+
+}
+
+
+.v03Close{
+
+  width:43px;
+
+  height:43px;
+
+  border-radius:50%;
+
+  border:1px solid #566185;
+
+  background:#171e36;
+
+  color:white;
+
+  font-size:22px;
+
+  font-weight:900;
+
+}
+
+
+.stageGrid{
+
+  width:min(100%,480px);
+
+  margin:auto;
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:12px;
+
+}
+
+
+.stageChoice{
+
+  min-height:125px;
+
+  padding:15px;
+
+  border-radius:20px;
+
+  border:1px solid #3f496f;
+
+  background:
+  linear-gradient(145deg,#18203c,#0e1429);
+
+  color:white;
+
+  text-align:left;
+
+  box-shadow:
+  0 12px 25px rgba(0,0,0,.3);
+
+}
+
+
+.stageChoice.current{
+
+  border:2px solid #ffe054;
+
+  box-shadow:
+  0 0 22px rgba(255,224,84,.25);
+
+}
+
+
+.stageChoice.locked{
+
+  opacity:.38;
+
+  filter:grayscale(1);
+
+}
+
+
+.stageNumber{
+
+  font-size:23px;
+
+  font-weight:1000;
+
+}
+
+
+.stageEnemy{
+
+  margin-top:12px;
+
+  font-size:35px;
+
+}
+
+
+.stageEnemyName{
+
+  font-size:12px;
+
+  color:#aab4d7;
+
+  margin-top:4px;
+
+}
+
+
+.stageStatus{
+
+  margin-top:10px;
+
+  color:#ffe054;
+
+  font-size:11px;
+
+  font-weight:900;
+
+}
+
+
+.equipList{
+
+  width:min(100%,480px);
+
+  margin:auto;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:10px;
+
+}
+
+
+.equipCard{
+
+  display:grid;
+
+  grid-template-columns:58px 1fr auto;
+
+  gap:12px;
+
+  align-items:center;
+
+  padding:14px;
+
+  border-radius:18px;
+
+  background:#10172c;
+
+  border:1px solid #343f61;
+
+}
+
+
+.equipCard.NORMAL{
+  border-color:#727b90;
+}
+
+.equipCard.RARE{
+  border-color:#3d9dff;
+}
+
+.equipCard.EPIC{
+  border-color:#b95cff;
+  box-shadow:
+  inset 0 0 18px rgba(185,92,255,.12);
+}
+
+.equipCard.LEGEND{
+  border-color:#ffd337;
+  box-shadow:
+  0 0 16px rgba(255,211,55,.18);
+}
+
+.equipCard.GOD{
+
+  border-color:#ff66e8;
+
+  box-shadow:
+  0 0 12px #54eaff55,
+  0 0 25px #ff62e855;
+
+}
+
+
+.equipIcon{
+
+  font-size:42px;
+
+  text-align:center;
+
+}
+
+
+.equipInfo strong{
+
+  display:block;
+
+  font-size:15px;
+
+}
+
+
+.equipRarity{
+
+  font-size:10px;
+
+  font-weight:1000;
+
+  opacity:.75;
+
+}
+
+
+.equipAtk{
+
+  margin-top:5px;
+
+  color:#cbd4f2;
+
+  font-size:12px;
+
+}
+
+
+.equipButton{
+
+  border:0;
+
+  border-radius:12px;
+
+  padding:11px 10px;
+
+  font-size:11px;
+
+  font-weight:1000;
+
+  background:#ffe054;
+
+  color:#161100;
+
+}
+
+
+.equipButton.equipped{
+
+  color:#66f1bb;
+
+  background:#172e29;
+
+  border:1px solid #3bcf9a;
+
+}
+
+
+.emptyEquipment{
+
+  text-align:center;
+
+  padding:50px 15px;
+
+  color:#828cac;
+
+}
+
+
+#game{
+
+  padding-bottom:105px !important;
+
+}
+
+`;
+
+document.head.appendChild(v03Style);
+
+
+/* ===============================
+   下部メニュー
+================================ */
+
+const v03Menu = document.createElement("div");
+
+v03Menu.className = "v03Menu";
+
+v03Menu.innerHTML = `
+
+<button onclick="openStageSelect()">
+🗺️ STAGE
+</button>
+
+<button onclick="openEquipmentSelect()">
+🎒 EQUIPMENT
+</button>
+
+`;
+
+document.body.appendChild(v03Menu);
+
+
+/* ===============================
+   STAGE SELECT
+================================ */
+
+const stageOverlay = document.createElement("div");
+
+stageOverlay.id = "stageOverlay";
+
+stageOverlay.className = "v03Overlay";
+
+stageOverlay.innerHTML = `
+
+<div class="v03Header">
+
+<h2>🗺️ STAGE SELECT</h2>
+
+<button
+class="v03Close"
+onclick="closeStageSelect()"
+>
+×
+</button>
+
+</div>
+
+<div
+class="stageGrid"
+id="stageGrid"
+></div>
+
+`;
+
+document.body.appendChild(stageOverlay);
+
+
+function openStageSelect(){
+
+  initAudio();
+
+  renderStageSelect();
+
+  stageOverlay.classList.add("show");
+
+  tone(
+    420,
+    .08,
+    "sine",
+    .06
+  );
+
+}
+
+
+function closeStageSelect(){
+
+  stageOverlay.classList.remove("show");
+
+}
+
+
+function renderStageSelect(){
+
+  const grid =
+  document.getElementById("stageGrid");
+
+  grid.innerHTML = "";
+
+
+  enemies.forEach((enemy,index)=>{
+
+    const number = index + 1;
+
+    const locked =
+      number > unlockedStage;
+
+    const current =
+      index === stage;
+
+
+    const button =
+    document.createElement("button");
+
+    button.className =
+      "stageChoice" +
+      (current ? " current" : "") +
+      (locked ? " locked" : "");
+
+
+    button.innerHTML = `
+
+      <div class="stageNumber">
+      STAGE ${number}
+      </div>
+
+      <div class="stageEnemy">
+      ${locked ? "🔒" : enemy.emoji}
+      </div>
+
+      <div class="stageEnemyName">
+      ${locked ? "未解放" : enemy.name}
+      </div>
+
+      <div class="stageStatus">
+      ${
+        current
+        ? "● CURRENT"
+        : locked
+        ? "LOCKED"
+        : "SELECT"
+      }
+      </div>
+
+    `;
+
+
+    if(!locked){
+
+      button.onclick = ()=>{
+
+        selectStage(index);
+
+      };
+
+    }
+
+
+    grid.appendChild(button);
+
+  });
+
+}
+
+
+function selectStage(index){
+
+  stage = index;
+
+  enemyHp = enemies[stage].hp;
+
+  playerHp =
+  Math.min(
+    playerHp,
+    playerMaxHp
+  );
+
+
+  tone(
+    420,
+    .08,
+    "sine",
+    .08
+  );
+
+  tone(
+    650,
+    .13,
+    "sine",
+    .09,
+    .07
+  );
+
+
+  screenShake(
+    3,
+    170
+  );
+
+
+  update();
+
+  saveGame();
+
+  closeStageSelect();
+
+
+  document.getElementById("message")
+  .innerHTML =
+
+  "🗺️ <b>STAGE "
+  +(stage+1)+
+  "</b><br>"
+  +enemies[stage].name+
+  " に挑戦！";
+
+}
+
+
+/* ===============================
+   EQUIPMENT SELECT
+================================ */
+
+const equipmentOverlay =
+document.createElement("div");
+
+equipmentOverlay.id =
+"equipmentOverlay";
+
+equipmentOverlay.className =
+"v03Overlay";
+
+
+equipmentOverlay.innerHTML = `
+
+<div class="v03Header">
+
+<h2>🎒 EQUIPMENT</h2>
+
+<button
+class="v03Close"
+onclick="closeEquipmentSelect()"
+>
+×
+</button>
+
+</div>
+
+<div
+class="equipList"
+id="equipList"
+></div>
+
+`;
+
+document.body.appendChild(
+  equipmentOverlay
+);
+
+
+function openEquipmentSelect(){
+
+  initAudio();
+
+  renderEquipment();
+
+  equipmentOverlay
+  .classList.add("show");
+
+  tone(
+    380,
+    .08,
+    "sine",
+    .06
+  );
+
+}
+
+
+function closeEquipmentSelect(){
+
+  equipmentOverlay
+  .classList.remove("show");
+
+}
+
+
+function renderEquipment(){
+
+  const list =
+  document.getElementById(
+    "equipList"
+  );
+
+
+  if(
+    !inventory ||
+    inventory.length===0
+  ){
+
+    list.innerHTML = `
+
+    <div class="emptyEquipment">
+
+    まだ装備を持っていません。<br><br>
+
+    敵を倒して<br>
+    DROPを狙いましょう。
+
+    </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  list.innerHTML = "";
+
+
+  const items =
+  inventory
+  .slice()
+  .reverse();
+
+
+  items.forEach((item)=>{
+
+    const isEquipped =
+      weapon.name === item.name &&
+      weapon.atk === item.atk &&
+      weapon.rarity === item.rarity;
+
+
+    const card =
+    document.createElement("div");
+
+
+    card.className =
+      "equipCard "+
+      item.rarity;
+
+
+    card.innerHTML = `
+
+      <div class="equipIcon">
+      ${item.icon}
+      </div>
+
+      <div class="equipInfo">
+
+        <div class="equipRarity">
+        ${item.rarity}
+        </div>
+
+        <strong>
+        ${item.name}
+        </strong>
+
+        <div class="equipAtk">
+        攻撃力 +${item.atk}
+        </div>
+
+      </div>
+
+      <button
+      class="equipButton
+      ${isEquipped ? "equipped" : ""}"
+      >
+
+      ${
+        isEquipped
+        ? "EQUIPPED"
+        : "装備する"
+      }
+
+      </button>
+
+    `;
+
+
+    const button =
+    card.querySelector(
+      ".equipButton"
+    );
+
+
+    if(!isEquipped){
+
+      button.onclick = ()=>{
+
+        equipFromInventory(item);
+
+      };
+
+    }
+
+
+    list.appendChild(card);
+
+  });
+
+}
+
+
+function equipFromInventory(item){
+
+  weapon = item;
+
+  initAudio();
+
+  sfxEquip();
+
+  vibrate([
+    35,
+    30,
+    60
+  ]);
+
+
+  update();
+
+  saveGame();
+
+  renderEquipment();
+
+
+  document.getElementById("message")
+  .innerHTML =
+
+  "✨ <b>"
+  +item.name+
+  "</b><br>を装備しました！";
+
+}
+
+
+/* ===============================
+   STAGE 解放処理
+================================ */
+
+const v03OldDefeatEnemy =
+defeatEnemy;
+
+
+defeatEnemy = function(){
+
+  const clearedStage =
+  stage + 1;
+
+
+  if(
+    clearedStage <
+    enemies.length
+  ){
+
+    const nextStage =
+    clearedStage + 1;
+
+
+    if(
+      nextStage >
+      unlockedStage
+    ){
+
+      unlockedStage =
+      nextStage;
+
+
+      localStorage.setItem(
+        "onePercentDropUnlockedStage",
+        unlockedStage
+      );
+
+    }
+
+  }
+
+
+  v03OldDefeatEnemy();
+
 };
+
+
+/* ===============================
+   closeDropの自動進行を調整
+================================ */
+
+const v03CloseDrop =
+closeDrop;
+
+
+closeDrop = function(equip){
+
+  const beforeStage =
+  stage;
+
+
+  v03CloseDrop(equip);
+
+
+  /*
+   元ゲームはDROP後に
+   自動で次の敵へ行くので、
+   最終STAGEからSTAGE1へ
+   勝手に戻らないよう調整
+  */
+
+  if(
+    beforeStage ===
+    enemies.length-1
+  ){
+
+    stage =
+    beforeStage;
+
+    enemyHp =
+    enemies[stage].hp;
+
+    update();
+
+  }
+
+
+  localStorage.setItem(
+    "onePercentDropUnlockedStage",
+    unlockedStage
+  );
+
+};
+
+
+/* ===============================
+   初期化
+================================ */
+
+renderStageSelect();
 </script>
 
 </body>
