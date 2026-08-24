@@ -5268,3 +5268,857 @@
   );
 
 })();
+
+// =====================================================
+// EFFECTS Ver.9
+// PREMIUM CEREMONY
+//
+// ・重厚感
+// ・長い間
+// ・ゆっくり形成されるホログラム
+// ・LEGEND / GOD 紋章演出
+// ・黒背景を長く使う
+// ・最終爆発だけ派手に
+// ・iPhone軽量
+// =====================================================
+
+(() => {
+
+  if(window.__PREMIUM_CEREMONY_V9__) return;
+  window.__PREMIUM_CEREMONY_V9__ = true;
+
+
+  // =====================================================
+  // CSS
+  // =====================================================
+
+  const style =
+    document.createElement("style");
+
+  style.textContent = `
+
+    .v9CeremonyLayer{
+      position:fixed;
+      inset:0;
+      z-index:21000000;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      overflow:hidden;
+
+      pointer-events:none;
+
+      background:#000;
+
+      color:white;
+    }
+
+
+    /* -----------------------------------------
+       中央紋章
+    ----------------------------------------- */
+
+    .v9Sigil{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:210px;
+      height:210px;
+
+      transform:
+        translate(-50%,-50%)
+        scale(.35)
+        rotate(-18deg);
+
+      border-radius:50%;
+
+      opacity:0;
+
+      animation:
+        v9SigilForm
+        2.4s
+        cubic-bezier(.15,.7,.18,1)
+        forwards;
+
+      will-change:
+        transform,
+        opacity;
+
+    }
+
+
+    .v9Sigil::before,
+    .v9Sigil::after{
+
+      content:"";
+
+      position:absolute;
+
+      inset:18px;
+
+      border-radius:50%;
+
+      border:2px solid currentColor;
+
+      opacity:.75;
+
+    }
+
+
+    .v9Sigil::after{
+
+      inset:44px;
+
+      border-style:dashed;
+
+      opacity:.55;
+
+    }
+
+
+    @keyframes v9SigilForm{
+
+      0%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.35)
+          rotate(-18deg);
+
+      }
+
+
+      30%{
+
+        opacity:.25;
+
+      }
+
+
+      65%{
+
+        opacity:.75;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.92)
+          rotate(6deg);
+
+      }
+
+
+      100%{
+
+        opacity:1;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1)
+          rotate(0deg);
+
+      }
+
+    }
+
+
+    /* -----------------------------------------
+       光輪
+    ----------------------------------------- */
+
+    .v9Halo{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:320px;
+      height:320px;
+
+      transform:
+        translate(-50%,-50%)
+        scale(.55);
+
+      border-radius:50%;
+
+      border:1px solid currentColor;
+
+      opacity:0;
+
+      animation:
+        v9HaloOpen
+        2.8s
+        ease-out
+        forwards;
+
+    }
+
+
+    @keyframes v9HaloOpen{
+
+      0%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.55);
+
+      }
+
+
+      45%{
+
+        opacity:.28;
+
+      }
+
+
+      100%{
+
+        opacity:.65;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1.12);
+
+      }
+
+    }
+
+
+    /* -----------------------------------------
+       プレミア文字
+    ----------------------------------------- */
+
+    .v9PremiumText{
+
+      position:relative;
+
+      z-index:5;
+
+      text-align:center;
+
+      opacity:0;
+
+      transform:
+        scale(.82);
+
+      animation:
+        v9PremiumTextIn
+        2.1s
+        ease-out
+        forwards;
+
+    }
+
+
+    @keyframes v9PremiumTextIn{
+
+      0%{
+        opacity:0;
+        transform:scale(.82);
+      }
+
+      35%{
+        opacity:.20;
+      }
+
+      70%{
+        opacity:.82;
+      }
+
+      100%{
+        opacity:1;
+        transform:scale(1);
+      }
+
+    }
+
+
+    .v9Epic{
+      color:#f3d6ff;
+      text-shadow:
+        0 0 8px white,
+        0 0 20px #b347ff,
+        0 0 40px #641dba;
+    }
+
+
+    .v9Legend{
+      color:#fff4ba;
+      text-shadow:
+        0 0 8px white,
+        0 0 22px #ffd600,
+        0 0 45px #b64c00;
+    }
+
+
+    .v9God{
+      color:white;
+      text-shadow:
+        0 0 8px white,
+        0 0 22px #fff5a8,
+        0 0 42px #ff51dc,
+        0 0 60px #36e4ff;
+    }
+
+
+    /* -----------------------------------------
+       プレミアスキャン
+    ----------------------------------------- */
+
+    .v9Scan{
+
+      position:absolute;
+      inset:0;
+
+      opacity:.12;
+
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0px,
+          transparent 8px,
+          rgba(255,255,255,.15) 9px,
+          transparent 10px
+        );
+
+      animation:
+        v9ScanMove
+        1.25s linear infinite;
+
+    }
+
+
+    @keyframes v9ScanMove{
+
+      from{
+        transform:translateY(-12px);
+      }
+
+      to{
+        transform:translateY(12px);
+      }
+
+    }
+
+
+    /* -----------------------------------------
+       最終解放フラッシュ
+    ----------------------------------------- */
+
+    .v9ReleaseFlash{
+
+      position:absolute;
+      inset:0;
+
+      background:white;
+
+      opacity:0;
+
+      animation:
+        v9ReleaseFlash
+        .48s
+        ease-out
+        forwards;
+
+    }
+
+
+    @keyframes v9ReleaseFlash{
+
+      0%{
+        opacity:0;
+      }
+
+      30%{
+        opacity:1;
+      }
+
+      100%{
+        opacity:0;
+      }
+
+    }
+
+  `;
+
+  document.head.appendChild(style);
+
+
+  // =====================================================
+  // STATE
+  // =====================================================
+
+  let activeCeremony = null;
+
+
+  function clearV9(){
+
+    if(activeCeremony){
+
+      activeCeremony.remove();
+      activeCeremony = null;
+
+    }
+
+  }
+
+
+  // =====================================================
+  // プレミア儀式開始
+  // =====================================================
+
+  function startV9Ceremony(
+    rarity
+  ){
+
+    clearV9();
+
+
+    const layer =
+      document.createElement("div");
+
+    layer.className =
+      "v9CeremonyLayer";
+
+
+    const scan =
+      document.createElement("div");
+
+    scan.className =
+      "v9Scan";
+
+
+    const sigil =
+      document.createElement("div");
+
+    sigil.className =
+      "v9Sigil";
+
+
+    const halo =
+      document.createElement("div");
+
+    halo.className =
+      "v9Halo";
+
+
+    const text =
+      document.createElement("div");
+
+    text.className =
+      "v9PremiumText";
+
+
+    if(rarity==="EPIC"){
+
+      sigil.style.color =
+        "#b64cff";
+
+      halo.style.color =
+        "#9b3cff";
+
+      text.classList.add(
+        "v9Epic"
+      );
+
+      text.innerHTML = `
+        <div style="
+          font-size:14px;
+          letter-spacing:8px;
+          margin-bottom:12px;
+        ">
+          AWAKENING
+        </div>
+
+        <div style="
+          font-size:76px;
+          font-weight:1000;
+        ">
+          EPIC
+        </div>
+      `;
+
+    }
+
+
+    else if(rarity==="LEGEND"){
+
+      sigil.style.color =
+        "#ffd600";
+
+      halo.style.color =
+        "#ffb000";
+
+      text.classList.add(
+        "v9Legend"
+      );
+
+      text.innerHTML = `
+        <div style="
+          font-size:14px;
+          letter-spacing:8px;
+          margin-bottom:12px;
+        ">
+          PREMIUM ASCENSION
+        </div>
+
+        <div style="
+          font-size:76px;
+          font-weight:1000;
+        ">
+          LEGEND
+        </div>
+      `;
+
+    }
+
+
+    else{
+
+      sigil.style.color =
+        "#ffffff";
+
+      halo.style.color =
+        "#ffffff";
+
+      text.classList.add(
+        "v9God"
+      );
+
+      text.innerHTML = `
+        <div style="
+          font-size:14px;
+          letter-spacing:9px;
+          margin-bottom:12px;
+        ">
+          DIVINE ACCESS
+        </div>
+
+        <div style="
+          font-size:94px;
+          font-weight:1000;
+        ">
+          GOD
+        </div>
+      `;
+
+    }
+
+
+    layer.appendChild(scan);
+    layer.appendChild(halo);
+    layer.appendChild(sigil);
+    layer.appendChild(text);
+
+
+    document.body.appendChild(
+      layer
+    );
+
+
+    activeCeremony =
+      layer;
+
+
+    // -----------------------------------------
+    // 重厚な低音
+    // -----------------------------------------
+
+    if(
+      typeof tone ===
+      "function"
+    ){
+
+      tone(
+        38,
+        .65,
+        "sine",
+        .04
+      );
+
+    }
+
+
+    if(
+      typeof vibrate ===
+      "function"
+    ){
+
+      vibrate(30);
+
+    }
+
+
+    // -----------------------------------------
+    // 第二心拍
+    // -----------------------------------------
+
+    setTimeout(()=>{
+
+      if(!layer.isConnected){
+        return;
+      }
+
+
+      if(
+        typeof sfxKick ===
+        "function"
+      ){
+
+        sfxKick(
+          0,
+          rarity==="GOD"
+          ? .14
+          : .11
+        );
+
+      }
+
+
+      if(
+        typeof tone ===
+        "function"
+      ){
+
+        tone(
+          44,
+          .40,
+          "sine",
+          rarity==="GOD"
+          ? .06
+          : .045
+        );
+
+      }
+
+    },1500);
+
+
+    // -----------------------------------------
+    // 第三段階
+    // -----------------------------------------
+
+    setTimeout(()=>{
+
+      if(!layer.isConnected){
+        return;
+      }
+
+
+      if(
+        typeof sfxRiser ===
+        "function"
+      ){
+
+        sfxRiser(
+          0,
+          rarity==="GOD"
+          ? 1.2
+          : .85
+        );
+
+      }
+
+    },2500);
+
+
+    // -----------------------------------------
+    // 最終解放
+    // -----------------------------------------
+
+    setTimeout(()=>{
+
+      if(!layer.isConnected){
+        return;
+      }
+
+
+      const flash =
+        document.createElement(
+          "div"
+        );
+
+
+      flash.className =
+        "v9ReleaseFlash";
+
+
+      layer.appendChild(
+        flash
+      );
+
+
+      if(
+        typeof sfxHeavyImpact ===
+        "function"
+      ){
+
+        sfxHeavyImpact(0);
+
+      }
+
+
+      if(
+        typeof sfxKyuiin ===
+        "function"
+      ){
+
+        sfxKyuiin(
+          .05,
+          rarity==="GOD"
+          ? 1.2
+          : 1
+        );
+
+      }
+
+
+      if(
+        typeof vibrate ===
+        "function"
+      ){
+
+        vibrate(
+          rarity==="GOD"
+          ? [100,40,140]
+          : [70,30,100]
+        );
+
+      }
+
+    },3400);
+
+
+    // -----------------------------------------
+    // 解放
+    // -----------------------------------------
+
+    setTimeout(()=>{
+
+      clearV9();
+
+    },3950);
+
+  }
+
+
+  // =====================================================
+  // V8黒幕解除後を監視
+  // =====================================================
+
+  const observer =
+    new MutationObserver(()=>{
+
+      const freeze =
+        document.querySelector(
+          ".freezeStage"
+        );
+
+
+      if(!freeze){
+        return;
+      }
+
+
+      if(
+        freeze.dataset
+        .v9CeremonyDone === "1"
+      ){
+        return;
+      }
+
+
+      /*
+        ホログラムが出た時点で
+        レアリティを判断
+      */
+
+      let rarity = null;
+
+
+      if(
+        freeze.querySelector(
+          ".freezeGodText"
+        )
+      ){
+
+        rarity =
+          "GOD";
+
+      }
+
+
+      else if(
+        freeze.querySelector(
+          ".freezeLegendText"
+        )
+      ){
+
+        rarity =
+          "LEGEND";
+
+      }
+
+
+      else if(
+        freeze.querySelector(
+          ".freezeEpicText"
+        )
+      ){
+
+        rarity =
+          "EPIC";
+
+      }
+
+
+      if(!rarity){
+        return;
+      }
+
+
+      freeze.dataset
+        .v9CeremonyDone =
+        "1";
+
+
+      /*
+        ホログラムを一度しっかり見せてから
+        プレミア儀式へ
+      */
+
+      setTimeout(()=>{
+
+        startV9Ceremony(
+          rarity
+        );
+
+      },900);
+
+    });
+
+
+  observer.observe(
+    document.body,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+
+  console.log(
+    "PREMIUM CEREMONY V9 READY"
+  );
+
+})();
