@@ -4537,3 +4537,734 @@
   );
 
 })();
+
+// =====================================================
+// EFFECTS Ver.8
+// SUSPENSE FREEZE PATCH
+//
+// V4〜V7 削除不要
+//
+// 狙い：
+// プッツン！！！！
+// ↓
+// 十字CRT収束
+// ↓
+// 完全暗転
+// ↓
+// 「壊れた？」と思う長い間
+// ↓
+// ドクン……
+// ↓
+// さらに間
+// ↓
+// ホログラム / 昇格を見せる
+//
+// ※大量パーティクルなし
+// ※iPhone軽量優先
+// =====================================================
+
+(() => {
+
+  if(window.__SUSPENSE_FREEZE_V8__) return;
+  window.__SUSPENSE_FREEZE_V8__ = true;
+
+
+  // =====================================================
+  // CSS
+  // =====================================================
+
+  const style =
+    document.createElement("style");
+
+  style.textContent = `
+
+    /* -----------------------------------------
+       V7のCRTを少しゆっくりにする
+
+       速すぎず、
+       でも「ため」は暗転側で作る
+    ----------------------------------------- */
+
+    .crtPuchunScreen{
+
+      animation-duration:
+        1.35s !important;
+
+    }
+
+
+    .crtPuchunScreen::before,
+    .crtPuchunScreen::after{
+
+      animation-duration:
+        1.35s !important;
+
+    }
+
+
+    /* -----------------------------------------
+       完全暗転専用
+
+       CRTが消えた後も
+       最前面を真っ黒に保つ
+    ----------------------------------------- */
+
+    .v8SuspenseBlack{
+
+      position:fixed;
+
+      inset:0;
+
+      z-index:20000000;
+
+      background:#000;
+
+      pointer-events:none;
+
+      opacity:1;
+
+    }
+
+
+    /* -----------------------------------------
+       心拍時だけ中央がほんの少し光る
+
+       派手にしないのが重要
+    ----------------------------------------- */
+
+    .v8SuspenseBlack::after{
+
+      content:"";
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:140px;
+      height:140px;
+
+      transform:
+        translate(-50%,-50%)
+        scale(.35);
+
+      border-radius:50%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(255,255,255,.11) 0%,
+          rgba(255,255,255,.025) 32%,
+          transparent 70%
+        );
+
+      opacity:0;
+
+      pointer-events:none;
+
+    }
+
+
+    .v8SuspenseBlack.v8Beat::after{
+
+      animation:
+        v8BeatLight
+        .32s
+        ease-out;
+
+    }
+
+
+    @keyframes v8BeatLight{
+
+      0%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.30);
+
+      }
+
+      18%{
+
+        opacity:.75;
+
+      }
+
+      100%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1.15);
+
+      }
+
+    }
+
+
+    /* -----------------------------------------
+       黒幕が最後に開く
+
+       フェードではなく
+       一瞬で世界が戻る
+    ----------------------------------------- */
+
+    .v8SuspenseRelease{
+
+      animation:
+        v8Release
+        .10s
+        linear
+        forwards;
+
+    }
+
+
+    @keyframes v8Release{
+
+      0%{
+        opacity:1;
+      }
+
+      70%{
+        opacity:1;
+      }
+
+      100%{
+        opacity:0;
+      }
+
+    }
+
+  `;
+
+  document.head.appendChild(style);
+
+
+  // =====================================================
+  // STATE
+  // =====================================================
+
+  let suspenseRunning = false;
+
+
+  // =====================================================
+  // レアリティ判定
+  //
+  // freezeStageの中身を少し待って確認
+  // =====================================================
+
+  function detectFreezeRarity(){
+
+    const stage =
+      document.querySelector(
+        ".freezeStage"
+      );
+
+
+    if(!stage){
+      return "EPIC";
+    }
+
+
+    if(
+      stage.querySelector(
+        ".freezeGodText"
+      )
+    ){
+      return "GOD";
+    }
+
+
+    if(
+      stage.querySelector(
+        ".freezeLegendText"
+      )
+    ){
+      return "LEGEND";
+    }
+
+
+    if(
+      stage.querySelector(
+        ".freezeEpicText"
+      )
+    ){
+      return "EPIC";
+    }
+
+
+    /*
+      ホログラムがまだ出ていない場合。
+
+      GOD虹があればGOD。
+    */
+
+    if(
+      stage.querySelector(
+        ".freezeGodRainbow"
+      )
+    ){
+      return "GOD";
+    }
+
+
+    return "EPIC";
+
+  }
+
+
+  // =====================================================
+  // 心拍
+  // =====================================================
+
+  function v8Heartbeat(
+    black,
+    power=1
+  ){
+
+    if(!black?.isConnected){
+      return;
+    }
+
+
+    /*
+      光を一瞬だけ出す
+    */
+
+    black.classList.remove(
+      "v8Beat"
+    );
+
+
+    void black.offsetWidth;
+
+
+    black.classList.add(
+      "v8Beat"
+    );
+
+
+    /*
+      低音
+    */
+
+    if(
+      typeof sfxKick ===
+      "function"
+    ){
+
+      sfxKick(
+        0,
+        .12 * power
+      );
+
+    }
+
+
+    if(
+      typeof tone ===
+      "function"
+    ){
+
+      tone(
+        42,
+        .32,
+        "sine",
+        .055 * power
+      );
+
+    }
+
+
+    if(
+      typeof vibrate ===
+      "function"
+    ){
+
+      vibrate(
+        Math.round(
+          28 * power
+        )
+      );
+
+    }
+
+  }
+
+
+  // =====================================================
+  // 黒幕を解除
+  // =====================================================
+
+  function releaseSuspense(
+    black
+  ){
+
+    if(!black?.isConnected){
+      suspenseRunning = false;
+      return;
+    }
+
+
+    black.classList.add(
+      "v8SuspenseRelease"
+    );
+
+
+    /*
+      黒幕が切れた瞬間に
+      白フラッシュ
+    */
+
+    setTimeout(()=>{
+
+      if(black.isConnected){
+        black.remove();
+      }
+
+
+      suspenseRunning =
+        false;
+
+
+      if(
+        typeof superFlash ===
+        "function"
+      ){
+
+        superFlash(
+          "#ffffff",
+          115
+        );
+
+      }
+
+    },110);
+
+  }
+
+
+  // =====================================================
+  // SUSPENSE本体
+  // =====================================================
+
+  function startSuspense(){
+
+    /*
+      GOD二段目などは
+      前の暗転が終わってから
+      新しく開始できる
+    */
+
+    if(suspenseRunning){
+      return;
+    }
+
+
+    suspenseRunning =
+      true;
+
+
+    /*
+      CRTの十字収束を
+      ちゃんと最後まで見せる。
+
+      1.35秒後に黒幕開始。
+    */
+
+    setTimeout(()=>{
+
+      const black =
+        document.createElement(
+          "div"
+        );
+
+
+      black.className =
+        "v8SuspenseBlack";
+
+
+      document.body.appendChild(
+        black
+      );
+
+
+      /*
+        少し待ってレアリティ確認
+      */
+
+      setTimeout(()=>{
+
+        const rarity =
+          detectFreezeRarity();
+
+
+        // =====================================
+        // EPIC
+        //
+        // CRT後
+        // 1.5秒完全無音
+        // ↓
+        // ドクン
+        // ↓
+        // 0.55秒
+        // ↓
+        // 解放
+        // =====================================
+
+        if(rarity==="EPIC"){
+
+          setTimeout(()=>{
+
+            v8Heartbeat(
+              black,
+              .82
+            );
+
+          },1500);
+
+
+          setTimeout(()=>{
+
+            releaseSuspense(
+              black
+            );
+
+          },2050);
+
+
+          return;
+        }
+
+
+        // =====================================
+        // LEGEND
+        //
+        // CRT後
+        // 2.2秒完全暗転
+        // ↓
+        // ドクン
+        // ↓
+        // 0.65秒
+        // ↓
+        // ドクン
+        // ↓
+        // 0.65秒
+        // ↓
+        // 解放
+        // =====================================
+
+        if(rarity==="LEGEND"){
+
+          setTimeout(()=>{
+
+            v8Heartbeat(
+              black,
+              .98
+            );
+
+          },2200);
+
+
+          setTimeout(()=>{
+
+            v8Heartbeat(
+              black,
+              1.08
+            );
+
+          },2850);
+
+
+          setTimeout(()=>{
+
+            releaseSuspense(
+              black
+            );
+
+          },3500);
+
+
+          return;
+        }
+
+
+        // =====================================
+        // GOD
+        //
+        // CRT後
+        // 3秒完全暗転
+        // ↓
+        // ドクン……
+        // ↓
+        // 0.8秒
+        // ↓
+        // ドクン……
+        // ↓
+        // 0.8秒
+        // ↓
+        // 解放
+        //
+        // V4の二段プチュンは
+        // そのまま残る
+        // =====================================
+
+        setTimeout(()=>{
+
+          v8Heartbeat(
+            black,
+            1.05
+          );
+
+        },3000);
+
+
+        setTimeout(()=>{
+
+          v8Heartbeat(
+            black,
+            1.15
+          );
+
+        },3800);
+
+
+        setTimeout(()=>{
+
+          releaseSuspense(
+            black
+          );
+
+        },4600);
+
+
+      },100);
+
+    },1350);
+
+  }
+
+
+  // =====================================================
+  // V7 CRTを監視
+  //
+  // crtPuchunScreen が出た
+  // ＝プッツン開始
+  // =====================================================
+
+  const observer =
+    new MutationObserver(
+      mutations=>{
+
+        mutations.forEach(
+          mutation=>{
+
+            mutation.addedNodes
+            .forEach(node=>{
+
+              if(
+                !(node instanceof HTMLElement)
+              ){
+                return;
+              }
+
+
+              if(
+                !node.classList
+                ?.contains(
+                  "crtPuchunScreen"
+                )
+              ){
+                return;
+              }
+
+
+              if(
+                node.dataset
+                .v8SuspenseDone === "1"
+              ){
+                return;
+              }
+
+
+              node.dataset
+                .v8SuspenseDone =
+                "1";
+
+
+              startSuspense();
+
+            });
+
+          }
+
+        );
+
+      }
+    );
+
+
+  observer.observe(
+    document.body,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+
+  // =====================================================
+  // 保険
+  //
+  // 黒画面が万一残っても
+  // 永久に操作不能にはしない
+  // =====================================================
+
+  setInterval(()=>{
+
+    const black =
+      document.querySelector(
+        ".v8SuspenseBlack"
+      );
+
+
+    if(
+      black &&
+      !document.querySelector(
+        ".freezeStage"
+      )
+    ){
+
+      setTimeout(()=>{
+
+        if(
+          black.isConnected &&
+          !document.querySelector(
+            ".freezeStage"
+          )
+        ){
+
+          black.remove();
+
+          suspenseRunning =
+            false;
+
+        }
+
+      },5000);
+
+    }
+
+  },3000);
+
+
+  console.log(
+    "SUSPENSE FREEZE V8 READY"
+  );
+
+})();
