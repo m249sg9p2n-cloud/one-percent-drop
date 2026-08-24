@@ -2296,3 +2296,1156 @@
   );
 
 })();
+
+// =====================================================
+// EFFECTS Ver.5
+// PUCHUN FREEZE ENHANCEMENT PATCH
+//
+// Ver.4は削除不要
+//
+// ・既存プチュンをそのまま使用
+// ・ホログラム強化
+// ・RGBズレ
+// ・走査線強化
+// ・瞬間ノイズ
+// ・画面故障感
+// ・心拍追加
+// ・EPIC / LEGEND / GODで格差
+// ・既存関数の上書きなし
+// ・iPhone軽量優先
+// =====================================================
+
+(() => {
+
+  if(
+    window.__PUCHUN_V5_ENHANCEMENT__
+  ){
+    return;
+  }
+
+  window.__PUCHUN_V5_ENHANCEMENT__ =
+    true;
+
+
+  // =====================================================
+  // CSS
+  // =====================================================
+
+  const style =
+    document.createElement(
+      "style"
+    );
+
+
+  style.textContent = `
+
+    /* =========================================
+       Ver.4ホログラムをさらに立体化
+    ========================================= */
+
+    .freezeHologram{
+
+      position:relative !important;
+
+      animation:
+        v5HoloUpgrade
+        .72s
+        cubic-bezier(.15,.8,.2,1)
+        forwards !important;
+
+    }
+
+
+    @keyframes v5HoloUpgrade{
+
+      0%{
+
+        opacity:0;
+
+        transform:
+          perspective(550px)
+          rotateY(-17deg)
+          scale(.72);
+
+      }
+
+
+      18%{
+
+        opacity:.25;
+
+      }
+
+
+      27%{
+
+        opacity:.88;
+
+        transform:
+          perspective(550px)
+          rotateY(7deg)
+          scale(.96);
+
+      }
+
+
+      34%{
+
+        opacity:.30;
+
+      }
+
+
+      42%{
+
+        opacity:1;
+
+      }
+
+
+      55%{
+
+        transform:
+          perspective(550px)
+          rotateY(-3deg)
+          scale(1.04);
+
+      }
+
+
+      100%{
+
+        opacity:.96;
+
+        transform:
+          perspective(550px)
+          rotateY(0deg)
+          scale(1);
+
+      }
+
+    }
+
+
+    /* =========================================
+       RGB色ズレ
+
+       DOMを増やさず
+       text-shadowだけで疑似表現
+    ========================================= */
+
+    .freezeEpicText{
+
+      text-shadow:
+
+        -4px 0 0
+        rgba(0,230,255,.48),
+
+        4px 0 0
+        rgba(255,40,210,.42),
+
+        0 0 8px white,
+
+        0 0 22px #dc55ff,
+
+        0 0 42px #762cff !important;
+
+    }
+
+
+    .freezeLegendText{
+
+      text-shadow:
+
+        -3px 0 0
+        rgba(255,60,40,.38),
+
+        3px 0 0
+        rgba(255,245,70,.40),
+
+        0 0 8px white,
+
+        0 0 22px #ffe000,
+
+        0 0 45px #ff8700 !important;
+
+    }
+
+
+    .freezeGodText{
+
+      text-shadow:
+
+        -5px 0 0
+        rgba(0,234,255,.55),
+
+        5px 0 0
+        rgba(255,40,220,.52),
+
+        0 0 8px white,
+
+        0 0 22px #fff000,
+
+        0 0 42px #ff32da,
+
+        0 0 62px #00eaff !important;
+
+    }
+
+
+    /* =========================================
+       走査線を少し強化
+    ========================================= */
+
+    .freezeScan{
+
+      opacity:.30 !important;
+
+      background:
+
+        repeating-linear-gradient(
+
+          to bottom,
+
+          transparent 0px,
+
+          transparent 5px,
+
+          rgba(255,255,255,.20)
+          6px,
+
+          transparent
+          7px
+
+        ) !important;
+
+      animation:
+        v5ScanUpgrade
+        .46s
+        linear
+        infinite !important;
+
+    }
+
+
+    @keyframes v5ScanUpgrade{
+
+      from{
+
+        transform:
+          translateY(-12px);
+
+      }
+
+      to{
+
+        transform:
+          translateY(12px);
+
+      }
+
+    }
+
+
+    /* =========================================
+       一瞬だけ映像がズレる
+    ========================================= */
+
+    .v5FreezeGlitch{
+
+      animation:
+        v5FreezeGlitch
+        .27s
+        steps(2,end);
+
+    }
+
+
+    @keyframes v5FreezeGlitch{
+
+      0%{
+
+        transform:
+          translateX(0);
+
+        filter:
+          brightness(1);
+
+      }
+
+
+      20%{
+
+        transform:
+          translateX(-5px);
+
+        filter:
+          brightness(.5);
+
+      }
+
+
+      40%{
+
+        transform:
+          translateX(6px);
+
+        filter:
+          brightness(1.7);
+
+      }
+
+
+      60%{
+
+        transform:
+          translateX(-3px);
+
+        filter:
+          brightness(.25);
+
+      }
+
+
+      80%{
+
+        transform:
+          translateX(2px);
+
+      }
+
+
+      100%{
+
+        transform:
+          translateX(0);
+
+        filter:
+          brightness(1);
+
+      }
+
+    }
+
+
+    /* =========================================
+       ノイズ横線
+
+       1個だけ生成
+    ========================================= */
+
+    .v5FreezeNoise{
+
+      position:absolute;
+
+      left:0;
+
+      top:48%;
+
+      width:100%;
+
+      height:7%;
+
+      z-index:999999;
+
+      pointer-events:none;
+
+      background:
+        rgba(255,255,255,.85);
+
+      mix-blend-mode:
+        screen;
+
+      opacity:0;
+
+      animation:
+        v5FreezeNoise
+        .30s
+        steps(3,end)
+        forwards;
+
+    }
+
+
+    @keyframes v5FreezeNoise{
+
+      0%{
+
+        opacity:0;
+
+        transform:
+          translateY(-45px);
+
+      }
+
+
+      25%{
+
+        opacity:.65;
+
+      }
+
+
+      50%{
+
+        height:2%;
+
+        transform:
+          translateY(15px);
+
+      }
+
+
+      75%{
+
+        opacity:.35;
+
+        transform:
+          translateY(40px);
+
+      }
+
+
+      100%{
+
+        opacity:0;
+
+        transform:
+          translateY(65px);
+
+      }
+
+    }
+
+
+    /* =========================================
+       瞬間全消灯
+
+       黒をさらに黒く見せる
+    ========================================= */
+
+    .v5TotalBlackout{
+
+      position:absolute;
+
+      inset:0;
+
+      z-index:999998;
+
+      background:#000;
+
+      opacity:1;
+
+      pointer-events:none;
+
+      animation:
+        v5TotalBlackout
+        .26s
+        forwards;
+
+    }
+
+
+    @keyframes v5TotalBlackout{
+
+      0%{
+        opacity:1;
+      }
+
+      65%{
+        opacity:1;
+      }
+
+      100%{
+        opacity:0;
+      }
+
+    }
+
+
+    /* =========================================
+       GOD専用
+
+       虹の奥に黒を残して
+       明るすぎないようにする
+    ========================================= */
+
+    .freezeGodRainbow{
+
+      opacity:.22 !important;
+
+      animation:
+        v5GodRainbowUpgrade
+        1.1s
+        ease-out
+        forwards !important;
+
+    }
+
+
+    @keyframes v5GodRainbowUpgrade{
+
+      0%{
+
+        opacity:0;
+
+        transform:
+          scale(.45)
+          rotate(-4deg);
+
+      }
+
+
+      55%{
+
+        opacity:.15;
+
+      }
+
+
+      100%{
+
+        opacity:.30;
+
+        transform:
+          scale(1.02)
+          rotate(3deg);
+
+      }
+
+    }
+
+
+    /* =========================================
+       GOD 0.1%用
+
+       少し不安定な点滅
+    ========================================= */
+
+    .freezeProbability{
+
+      animation:
+        v5ProbabilityFlicker
+        .72s
+        steps(2,end)
+        infinite;
+
+    }
+
+
+    @keyframes v5ProbabilityFlicker{
+
+      0%{
+        opacity:.85;
+      }
+
+      18%{
+        opacity:.32;
+      }
+
+      26%{
+        opacity:1;
+      }
+
+      70%{
+        opacity:.82;
+      }
+
+      76%{
+        opacity:.20;
+      }
+
+      100%{
+        opacity:.90;
+      }
+
+    }
+
+  `;
+
+
+  document.head.appendChild(
+    style
+  );
+
+
+  // =====================================================
+  // 共通：ノイズ1発
+  // =====================================================
+
+  function v5NoiseBurst(
+    stage
+  ){
+
+    if(!stage) return;
+
+
+    const noise =
+      document.createElement(
+        "div"
+      );
+
+
+    noise.className =
+      "v5FreezeNoise";
+
+
+    stage.appendChild(
+      noise
+    );
+
+
+    setTimeout(()=>{
+
+      if(noise.isConnected){
+
+        noise.remove();
+
+      }
+
+    },350);
+
+  }
+
+
+  // =====================================================
+  // 共通：全消灯1発
+  // =====================================================
+
+  function v5BlackoutPulse(
+    stage
+  ){
+
+    if(!stage) return;
+
+
+    const black =
+      document.createElement(
+        "div"
+      );
+
+
+    black.className =
+      "v5TotalBlackout";
+
+
+    stage.appendChild(
+      black
+    );
+
+
+    setTimeout(()=>{
+
+      if(black.isConnected){
+
+        black.remove();
+
+      }
+
+    },320);
+
+  }
+
+
+  // =====================================================
+  // 共通：低い心拍
+  // =====================================================
+
+  function v5DeepHeartbeat(
+    power=1
+  ){
+
+    if(
+      typeof sfxKick ===
+      "function"
+    ){
+
+      sfxKick(
+        0,
+        .09 * power
+      );
+
+    }
+
+
+    if(
+      typeof tone ===
+      "function"
+    ){
+
+      tone(
+        44,
+        .27,
+        "sine",
+        .048 * power
+      );
+
+    }
+
+
+    if(
+      typeof vibrate ===
+      "function"
+    ){
+
+      vibrate(
+        Math.round(
+          20 * power
+        )
+      );
+
+    }
+
+  }
+
+
+  // =====================================================
+  // FREEZE STAGE監視
+  //
+  // Ver.4が黒画面を作った瞬間だけ
+  // 追加演出する
+  // =====================================================
+
+  const freezeStageObserver =
+    new MutationObserver(
+      mutations=>{
+
+        mutations.forEach(
+          mutation=>{
+
+            mutation.addedNodes
+            .forEach(node=>{
+
+              if(
+                !(node instanceof
+                  HTMLElement)
+              ){
+                return;
+              }
+
+
+              if(
+                !node.classList
+                ?.contains(
+                  "freezeStage"
+                )
+              ){
+                return;
+              }
+
+
+              /*
+                同じ画面に2回実行しない
+              */
+
+              if(
+                node.dataset
+                .v5Enhanced === "1"
+              ){
+                return;
+              }
+
+
+              node.dataset
+              .v5Enhanced =
+                "1";
+
+
+              /*
+                プチュン直後
+
+                すぐ何かを出すのではなく、
+                黒を見せる。
+              */
+
+
+              /*
+                約0.35秒後
+                一瞬だけノイズ
+              */
+
+              setTimeout(()=>{
+
+                if(
+                  !node.isConnected
+                ){
+                  return;
+                }
+
+
+                v5NoiseBurst(
+                  node
+                );
+
+              },350);
+
+
+              /*
+                さらに遅れて
+                本当に画面が死んだような
+                全消灯
+              */
+
+              setTimeout(()=>{
+
+                if(
+                  !node.isConnected
+                ){
+                  return;
+                }
+
+
+                v5BlackoutPulse(
+                  node
+                );
+
+              },700);
+
+
+              /*
+                その後に心拍
+              */
+
+              setTimeout(()=>{
+
+                if(
+                  !node.isConnected
+                ){
+                  return;
+                }
+
+
+                v5DeepHeartbeat(
+                  .82
+                );
+
+              },980);
+
+            });
+
+          }
+
+        );
+
+      }
+    );
+
+
+  freezeStageObserver.observe(
+    document.body,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+
+  // =====================================================
+  // HOLOGRAM出現監視
+  // =====================================================
+
+  const holoObserver =
+    new MutationObserver(()=>{
+
+      const holos =
+        document.querySelectorAll(
+          ".freezeHologram"
+        );
+
+
+      holos.forEach(holo=>{
+
+        if(
+          holo.dataset
+          .v5HoloDone === "1"
+        ){
+          return;
+        }
+
+
+        holo.dataset.v5HoloDone =
+          "1";
+
+
+        /*
+          HOLOGRAM出現時に
+          一瞬だけ映像を壊す
+        */
+
+        holo.classList.add(
+          "v5FreezeGlitch"
+        );
+
+
+        setTimeout(()=>{
+
+          holo.classList.remove(
+            "v5FreezeGlitch"
+          );
+
+        },300);
+
+
+        /*
+          レア度判定
+        */
+
+        const epic =
+          holo.classList.contains(
+            "freezeEpicText"
+          );
+
+
+        const legend =
+          holo.classList.contains(
+            "freezeLegendText"
+          );
+
+
+        const god =
+          holo.classList.contains(
+            "freezeGodText"
+          );
+
+
+        // -----------------------------------------
+        // EPIC
+        // -----------------------------------------
+
+        if(epic){
+
+          /*
+            EPICは1回だけ心拍
+          */
+
+          v5DeepHeartbeat(
+            .85
+          );
+
+
+          if(
+            typeof tone ===
+            "function"
+          ){
+
+            tone(
+              620,
+              .08,
+              "sine",
+              .025
+            );
+
+          }
+
+        }
+
+
+        // -----------------------------------------
+        // LEGEND
+        // -----------------------------------------
+
+        else if(legend){
+
+          /*
+            金ホログラムは
+            二連心拍
+          */
+
+          v5DeepHeartbeat(
+            1
+          );
+
+
+          setTimeout(()=>{
+
+            v5DeepHeartbeat(
+              1.07
+            );
+
+          },370);
+
+
+          /*
+            一瞬ノイズ
+          */
+
+          setTimeout(()=>{
+
+            const stage =
+              holo.closest(
+                ".freezeStage"
+              );
+
+
+            v5NoiseBurst(
+              stage
+            );
+
+          },210);
+
+        }
+
+
+        // -----------------------------------------
+        // GOD
+        // -----------------------------------------
+
+        else if(god){
+
+          /*
+            GODだけ三連
+          */
+
+          v5DeepHeartbeat(
+            1.03
+          );
+
+
+          setTimeout(()=>{
+
+            v5DeepHeartbeat(
+              1.10
+            );
+
+          },420);
+
+
+          setTimeout(()=>{
+
+            v5DeepHeartbeat(
+              1.18
+            );
+
+          },900);
+
+
+          /*
+            GOD出現直後
+            一度全消灯
+          */
+
+          setTimeout(()=>{
+
+            const stage =
+              holo.closest(
+                ".freezeStage"
+              );
+
+
+            v5BlackoutPulse(
+              stage
+            );
+
+          },260);
+
+
+          /*
+            さらにノイズ
+          */
+
+          setTimeout(()=>{
+
+            const stage =
+              holo.closest(
+                ".freezeStage"
+              );
+
+
+            v5NoiseBurst(
+              stage
+            );
+
+          },580);
+
+        }
+
+      });
+
+    });
+
+
+  holoObserver.observe(
+    document.body,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+
+  // =====================================================
+  // PUSH前の異変
+  //
+  // 既存処理には触らず、
+  // 押した瞬間だけ短く異常化。
+  // =====================================================
+
+  document.addEventListener(
+    "pointerdown",
+    event=>{
+
+      const button =
+        event.target.closest(
+          ".ascensionPush"
+        );
+
+
+      if(!button){
+        return;
+      }
+
+
+      const game =
+        document.getElementById(
+          "game"
+        );
+
+
+      if(game){
+
+        game.classList.add(
+          "v5FreezeGlitch"
+        );
+
+
+        setTimeout(()=>{
+
+          game.classList.remove(
+            "v5FreezeGlitch"
+          );
+
+        },250);
+
+      }
+
+
+      /*
+        PUSHした瞬間は
+        派手な音を出さず、
+        小さい切断音だけ。
+      */
+
+      if(
+        typeof tone ===
+        "function"
+      ){
+
+        tone(
+          330,
+          .03,
+          "square",
+          .018
+        );
+
+      }
+
+    },
+    true
+  );
+
+
+  console.log(
+    "PUCHUN V5 ENHANCEMENT PATCH READY"
+  );
+
+})();
