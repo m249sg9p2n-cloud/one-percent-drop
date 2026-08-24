@@ -6122,3 +6122,1684 @@
   );
 
 })();
+
+// =====================================================
+// EFFECTS Ver.10
+// ASCENSION FINALE PREMIUM
+//
+// 超長尺・重厚・ゴージャス版
+//
+// 流れ
+// CRTプッツン
+// ↓
+// V8暗転
+// ↓
+// ホログラム形成
+// ↓
+// 波紋
+// ↓
+// 超巨大「昇格」
+// ↓
+// ホログラム増量
+// ↓
+// キラキラ
+// ↓
+// レアリティ降臨
+// ↓
+// 余韻
+// ↓
+// ドロップ詳細へ
+//
+// V4〜V9は削除不要
+// =====================================================
+
+(() => {
+
+  if (window.__ASCENSION_PREMIUM_V10__) return;
+  window.__ASCENSION_PREMIUM_V10__ = true;
+
+
+  // =====================================================
+  // CSS
+  // =====================================================
+
+  const style = document.createElement("style");
+
+  style.textContent = `
+
+    /* =================================================
+       V10 全画面ステージ
+    ================================================= */
+
+    .v10Stage{
+
+      position:fixed;
+      inset:0;
+
+      z-index:30000000;
+
+      overflow:hidden;
+
+      pointer-events:none;
+
+      background:#000;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      opacity:1;
+
+      isolation:isolate;
+    }
+
+
+    /* =================================================
+       背景の超薄いホログラム
+    ================================================= */
+
+    .v10Aura{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:150vmax;
+      height:150vmax;
+
+      transform:
+        translate(-50%,-50%)
+        scale(.25);
+
+      border-radius:50%;
+
+      opacity:0;
+
+      filter:blur(10px);
+
+      animation:
+        v10AuraBirth
+        4.2s
+        cubic-bezier(.18,.65,.20,1)
+        forwards;
+    }
+
+
+    @keyframes v10AuraBirth{
+
+      0%{
+        opacity:0;
+        transform:
+          translate(-50%,-50%)
+          scale(.20);
+      }
+
+      30%{
+        opacity:.05;
+      }
+
+      65%{
+        opacity:.13;
+      }
+
+      100%{
+        opacity:.20;
+        transform:
+          translate(-50%,-50%)
+          scale(.72);
+      }
+    }
+
+
+    /* =================================================
+       中央紋章
+    ================================================= */
+
+    .v10Emblem{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:230px;
+      height:230px;
+
+      transform:
+        translate(-50%,-50%)
+        scale(.15)
+        rotate(-40deg);
+
+      opacity:0;
+
+      border:
+        2px solid currentColor;
+
+      border-radius:50%;
+
+      box-shadow:
+        0 0 12px currentColor,
+        inset 0 0 16px currentColor;
+
+      animation:
+        v10EmblemBirth
+        3.6s
+        cubic-bezier(.12,.72,.20,1)
+        forwards;
+    }
+
+
+    .v10Emblem::before{
+
+      content:"";
+
+      position:absolute;
+
+      inset:22px;
+
+      border:
+        1px solid currentColor;
+
+      border-radius:50%;
+
+      opacity:.65;
+
+      animation:
+        v10EmblemSpin
+        12s
+        linear
+        infinite;
+    }
+
+
+    .v10Emblem::after{
+
+      content:"✦";
+
+      position:absolute;
+
+      inset:0;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      font-size:74px;
+
+      color:currentColor;
+
+      text-shadow:
+        0 0 10px currentColor,
+        0 0 28px currentColor;
+
+      opacity:.85;
+    }
+
+
+    @keyframes v10EmblemBirth{
+
+      0%{
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.15)
+          rotate(-40deg);
+      }
+
+      25%{
+        opacity:.12;
+      }
+
+      55%{
+        opacity:.40;
+      }
+
+      80%{
+        opacity:.78;
+      }
+
+      100%{
+        opacity:.92;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1)
+          rotate(0deg);
+      }
+    }
+
+
+    @keyframes v10EmblemSpin{
+
+      from{
+        transform:rotate(0deg);
+      }
+
+      to{
+        transform:rotate(360deg);
+      }
+    }
+
+
+    /* =================================================
+       外周ホログラムリング
+    ================================================= */
+
+    .v10Ring{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      border:
+        1px solid currentColor;
+
+      border-radius:50%;
+
+      opacity:0;
+
+      transform:
+        translate(-50%,-50%)
+        scale(.35);
+
+      box-shadow:
+        0 0 10px currentColor;
+
+      animation:
+        v10RingBirth
+        3.8s
+        ease-out
+        forwards;
+    }
+
+
+    .v10Ring1{
+      width:300px;
+      height:300px;
+    }
+
+
+    .v10Ring2{
+      width:365px;
+      height:365px;
+
+      animation-delay:.45s;
+    }
+
+
+    .v10Ring3{
+      width:430px;
+      height:430px;
+
+      animation-delay:.9s;
+    }
+
+
+    @keyframes v10RingBirth{
+
+      0%{
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.35);
+      }
+
+      40%{
+        opacity:.08;
+      }
+
+      75%{
+        opacity:.32;
+      }
+
+      100%{
+        opacity:.48;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1);
+      }
+    }
+
+
+    /* =================================================
+       波紋
+    ================================================= */
+
+    .v10Ripple{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:80px;
+      height:80px;
+
+      border-radius:50%;
+
+      border:
+        3px solid currentColor;
+
+      transform:
+        translate(-50%,-50%)
+        scale(.1);
+
+      opacity:0;
+
+      animation:
+        v10RippleExpand
+        2.3s
+        cubic-bezier(.12,.60,.18,1)
+        forwards;
+    }
+
+
+    @keyframes v10RippleExpand{
+
+      0%{
+        opacity:0;
+        transform:
+          translate(-50%,-50%)
+          scale(.1);
+      }
+
+      12%{
+        opacity:.95;
+      }
+
+      60%{
+        opacity:.45;
+      }
+
+      100%{
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(8);
+      }
+    }
+
+
+    /* =================================================
+       超巨大「昇格」
+    ================================================= */
+
+    .v10Ascension{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      transform:
+        translate(-50%,-50%)
+        scale(2.8);
+
+      white-space:nowrap;
+
+      font-weight:1000;
+
+      font-size:
+        clamp(92px, 27vw, 190px);
+
+      letter-spacing:.08em;
+
+      color:white;
+
+      opacity:0;
+
+      text-shadow:
+        0 0 8px white,
+        0 0 22px currentColor,
+        0 0 48px currentColor,
+        0 0 90px currentColor;
+
+      filter:
+        brightness(1.4);
+
+      animation:
+        v10AscensionDrop
+        2.6s
+        cubic-bezier(.10,.72,.15,1)
+        forwards;
+
+      will-change:
+        transform,
+        opacity;
+    }
+
+
+    @keyframes v10AscensionDrop{
+
+      0%{
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(3.2);
+
+        filter:
+          blur(12px)
+          brightness(2);
+      }
+
+      22%{
+        opacity:.25;
+      }
+
+      48%{
+        opacity:1;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1.15);
+
+        filter:
+          blur(0)
+          brightness(1.8);
+      }
+
+      68%{
+        transform:
+          translate(-50%,-50%)
+          scale(.96);
+      }
+
+      78%{
+        transform:
+          translate(-50%,-50%)
+          scale(1.02);
+      }
+
+      100%{
+        opacity:1;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1);
+
+        filter:
+          brightness(1.15);
+      }
+    }
+
+
+    /* =================================================
+       昇格を消す
+    ================================================= */
+
+    .v10AscensionOut{
+
+      animation:
+        v10AscensionOut
+        1.1s
+        ease-in
+        forwards !important;
+    }
+
+
+    @keyframes v10AscensionOut{
+
+      from{
+        opacity:1;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1);
+      }
+
+      to{
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1.18);
+
+        filter:
+          blur(8px);
+      }
+    }
+
+
+    /* =================================================
+       キラキラ
+    ================================================= */
+
+    .v10Spark{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:7px;
+      height:7px;
+
+      pointer-events:none;
+
+      opacity:0;
+
+      transform:
+        translate(-50%,-50%)
+        rotate(45deg);
+
+      background:white;
+
+      box-shadow:
+        0 0 8px white,
+        0 0 18px currentColor;
+
+      animation:
+        v10Sparkle
+        2.4s
+        ease-in-out
+        forwards;
+    }
+
+
+    .v10Spark::before{
+
+      content:"";
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:2px;
+      height:28px;
+
+      transform:
+        translate(-50%,-50%);
+
+      background:white;
+    }
+
+
+    .v10Spark::after{
+
+      content:"";
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:28px;
+      height:2px;
+
+      transform:
+        translate(-50%,-50%);
+
+      background:white;
+    }
+
+
+    @keyframes v10Sparkle{
+
+      0%{
+        opacity:0;
+        scale:.2;
+      }
+
+      30%{
+        opacity:1;
+        scale:1;
+      }
+
+      60%{
+        opacity:.85;
+        scale:.65;
+      }
+
+      100%{
+        opacity:0;
+        scale:.15;
+      }
+    }
+
+
+    /* =================================================
+       最終レアリティ
+    ================================================= */
+
+    .v10Rarity{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:100%;
+
+      transform:
+        translate(-50%,-50%)
+        scale(.68);
+
+      text-align:center;
+
+      opacity:0;
+
+      animation:
+        v10RarityReveal
+        3.4s
+        cubic-bezier(.15,.70,.18,1)
+        forwards;
+    }
+
+
+    .v10RaritySmall{
+
+      font-size:13px;
+
+      letter-spacing:
+        .65em;
+
+      margin-bottom:16px;
+
+      opacity:.72;
+    }
+
+
+    .v10RarityMain{
+
+      font-size:
+        clamp(74px, 22vw, 150px);
+
+      line-height:.9;
+
+      font-weight:1000;
+
+      letter-spacing:.02em;
+    }
+
+
+    @keyframes v10RarityReveal{
+
+      0%{
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.68);
+
+        filter:
+          blur(14px)
+          brightness(2);
+      }
+
+      35%{
+        opacity:.20;
+      }
+
+      65%{
+        opacity:.82;
+      }
+
+      100%{
+        opacity:1;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1);
+
+        filter:
+          blur(0)
+          brightness(1);
+      }
+    }
+
+
+    /* =================================================
+       EPIC
+    ================================================= */
+
+    .v10Epic{
+
+      color:#f5dcff;
+
+      text-shadow:
+        0 0 8px white,
+        0 0 22px #d46cff,
+        0 0 50px #8427e8,
+        0 0 90px #3c0c75;
+    }
+
+
+    /* =================================================
+       LEGEND
+    ================================================= */
+
+    .v10Legend{
+
+      color:#fff4bd;
+
+      text-shadow:
+        0 0 8px white,
+        0 0 20px #ffe067,
+        0 0 48px #ffad19,
+        0 0 90px #9d3a00;
+    }
+
+
+    /* =================================================
+       GOD
+    ================================================= */
+
+    .v10God{
+
+      color:white;
+
+      text-shadow:
+        0 0 10px white,
+        0 0 24px #fff59a,
+        0 0 48px #ff72df,
+        0 0 70px #52eaff,
+        0 0 110px #ffffff;
+    }
+
+
+    /* =================================================
+       最後の中央集光
+    ================================================= */
+
+    .v10FinalLight{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:150vmax;
+      height:150vmax;
+
+      transform:
+        translate(-50%,-50%)
+        scale(1);
+
+      border-radius:50%;
+
+      opacity:0;
+
+      background:
+        radial-gradient(
+          circle,
+          white 0%,
+          rgba(255,255,255,.88) 4%,
+          rgba(255,255,255,.20) 17%,
+          transparent 45%
+        );
+
+      animation:
+        v10FinalGather
+        1.8s
+        ease-in
+        forwards;
+    }
+
+
+    @keyframes v10FinalGather{
+
+      0%{
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1);
+      }
+
+      55%{
+        opacity:.45;
+      }
+
+      82%{
+        opacity:.85;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.20);
+      }
+
+      100%{
+        opacity:1;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.025);
+      }
+    }
+
+
+    /* =================================================
+       最終白飛び
+    ================================================= */
+
+    .v10WhiteOut{
+
+      position:absolute;
+
+      inset:0;
+
+      background:white;
+
+      opacity:0;
+
+      animation:
+        v10WhiteOut
+        .75s
+        ease-out
+        forwards;
+    }
+
+
+    @keyframes v10WhiteOut{
+
+      0%{
+        opacity:0;
+      }
+
+      40%{
+        opacity:1;
+      }
+
+      100%{
+        opacity:0;
+      }
+    }
+
+  `;
+
+  document.head.appendChild(style);
+
+
+  // =====================================================
+  // HELPERS
+  // =====================================================
+
+  const wait = ms =>
+    new Promise(resolve =>
+      setTimeout(resolve, ms)
+    );
+
+
+  let v10Running = false;
+
+
+  function v10Beat(power = 1){
+
+    if(typeof sfxKick === "function"){
+      sfxKick(
+        0,
+        .10 * power
+      );
+    }
+
+    if(typeof tone === "function"){
+      tone(
+        38,
+        .45,
+        "sine",
+        .05 * power
+      );
+    }
+
+    if(typeof vibrate === "function"){
+      vibrate(
+        Math.round(
+          25 * power
+        )
+      );
+    }
+  }
+
+
+  // =====================================================
+  // キラキラ生成
+  // 最大12個
+  // =====================================================
+
+  function createSparkles(
+    stage,
+    color,
+    amount = 10
+  ){
+
+    amount =
+      Math.min(amount,12);
+
+
+    for(let i=0;i<amount;i++){
+
+      const spark =
+        document.createElement("div");
+
+      spark.className =
+        "v10Spark";
+
+      spark.style.color =
+        color;
+
+      const angle =
+        Math.random() *
+        Math.PI * 2;
+
+      const distance =
+        90 +
+        Math.random() * 150;
+
+      const x =
+        Math.cos(angle) *
+        distance;
+
+      const y =
+        Math.sin(angle) *
+        distance;
+
+
+      spark.style.marginLeft =
+        `${x}px`;
+
+      spark.style.marginTop =
+        `${y}px`;
+
+      spark.style.animationDelay =
+        `${Math.random() * .8}s`;
+
+
+      stage.appendChild(spark);
+
+
+      setTimeout(()=>{
+
+        spark.remove();
+
+      },3400);
+
+    }
+  }
+
+
+  // =====================================================
+  // 波紋
+  // =====================================================
+
+  function createRipple(
+    stage,
+    color
+  ){
+
+    const ripple =
+      document.createElement("div");
+
+    ripple.className =
+      "v10Ripple";
+
+    ripple.style.color =
+      color;
+
+    stage.appendChild(ripple);
+
+
+    setTimeout(()=>{
+
+      ripple.remove();
+
+    },2400);
+  }
+
+
+  // =====================================================
+  // 最終演出
+  // =====================================================
+
+  async function playV10(
+    rarity
+  ){
+
+    if(v10Running) return;
+
+    v10Running = true;
+
+
+    // V9が残っていたら非表示
+    const oldV9 =
+      document.querySelector(
+        ".v9CeremonyLayer"
+      );
+
+    if(oldV9){
+      oldV9.style.display =
+        "none";
+    }
+
+
+    const stage =
+      document.createElement("div");
+
+    stage.className =
+      "v10Stage";
+
+
+    // ===================================================
+    // 色設定
+    // ===================================================
+
+    let color;
+    let aura;
+    let subtitle;
+
+
+    if(rarity === "LEGEND"){
+
+      color =
+        "#ffd65a";
+
+      aura =
+        "radial-gradient(circle,#7c4200 0%,#261000 32%,#000 68%)";
+
+      subtitle =
+        "PREMIUM ASCENSION";
+
+    }
+
+    else if(rarity === "GOD"){
+
+      color =
+        "#ffffff";
+
+      aura =
+        "conic-gradient(from 0deg,#ff5fd8,#5cecff,#fff59b,#ff5fd8)";
+
+      subtitle =
+        "DIVINE ASCENSION";
+
+    }
+
+    else{
+
+      color =
+        "#c968ff";
+
+      aura =
+        "radial-gradient(circle,#47106b 0%,#160522 35%,#000 70%)";
+
+      subtitle =
+        "ASCENSION";
+
+    }
+
+
+    // ===================================================
+    // 背景オーラ
+    // ===================================================
+
+    const auraEl =
+      document.createElement("div");
+
+    auraEl.className =
+      "v10Aura";
+
+    auraEl.style.background =
+      aura;
+
+
+    // ===================================================
+    // 紋章
+    // ===================================================
+
+    const emblem =
+      document.createElement("div");
+
+    emblem.className =
+      "v10Emblem";
+
+    emblem.style.color =
+      color;
+
+
+    // ===================================================
+    // リング
+    // ===================================================
+
+    const ring1 =
+      document.createElement("div");
+
+    ring1.className =
+      "v10Ring v10Ring1";
+
+    ring1.style.color =
+      color;
+
+
+    const ring2 =
+      document.createElement("div");
+
+    ring2.className =
+      "v10Ring v10Ring2";
+
+    ring2.style.color =
+      color;
+
+
+    const ring3 =
+      document.createElement("div");
+
+    ring3.className =
+      "v10Ring v10Ring3";
+
+    ring3.style.color =
+      color;
+
+
+    stage.append(
+      auraEl,
+      ring3,
+      ring2,
+      ring1,
+      emblem
+    );
+
+
+    document.body.appendChild(
+      stage
+    );
+
+
+    // ===================================================
+    // PHASE 1
+    //
+    // いきなり何も出さない。
+    // 真っ黒を見せる。
+    // ===================================================
+
+    await wait(1300);
+
+
+    v10Beat(.72);
+
+
+    // ===================================================
+    // PHASE 2
+    //
+    // 紋章形成を眺める
+    // ===================================================
+
+    await wait(1700);
+
+
+    v10Beat(.88);
+
+
+    await wait(1300);
+
+
+    // ===================================================
+    // PHASE 3
+    //
+    // 波紋
+    // ===================================================
+
+    createRipple(
+      stage,
+      color
+    );
+
+
+    if(typeof tone === "function"){
+
+      tone(
+        95,
+        .8,
+        "sine",
+        .035
+      );
+    }
+
+
+    await wait(1800);
+
+
+    // ===================================================
+    // PHASE 4
+    //
+    // まだ一瞬待つ
+    // ===================================================
+
+    await wait(700);
+
+
+    // ===================================================
+    // PHASE 5
+    //
+    // 超巨大「昇格」
+    // ===================================================
+
+    const ascension =
+      document.createElement("div");
+
+    ascension.className =
+      "v10Ascension";
+
+    ascension.style.color =
+      color;
+
+    ascension.textContent =
+      "昇格";
+
+
+    stage.appendChild(
+      ascension
+    );
+
+
+    if(typeof sfxHeavyImpact === "function"){
+
+      sfxHeavyImpact(0);
+
+    }
+
+    else{
+
+      v10Beat(1.25);
+
+    }
+
+
+    if(typeof vibrate === "function"){
+
+      vibrate([
+        80,
+        45,
+        120
+      ]);
+
+    }
+
+
+    // ===================================================
+    // 「昇格」をちゃんと見せる
+    // ===================================================
+
+    await wait(2700);
+
+
+    // ===================================================
+    // PHASE 6
+    //
+    // ホログラム増量
+    // ===================================================
+
+    createSparkles(
+      stage,
+      color,
+      rarity === "GOD"
+        ? 12
+        : 10
+    );
+
+
+    createRipple(
+      stage,
+      color
+    );
+
+
+    await wait(1000);
+
+
+    createSparkles(
+      stage,
+      color,
+      rarity === "GOD"
+        ? 12
+        : 8
+    );
+
+
+    // 昇格をゆっくり消す
+    ascension.classList.add(
+      "v10AscensionOut"
+    );
+
+
+    await wait(1200);
+
+
+    ascension.remove();
+
+
+    // ===================================================
+    // PHASE 7
+    //
+    // ここでも急いでレアリティを出さない
+    // ===================================================
+
+    await wait(900);
+
+
+    // ===================================================
+    // PHASE 8
+    //
+    // レアリティ降臨
+    // ===================================================
+
+    const rarityEl =
+      document.createElement("div");
+
+    rarityEl.className =
+      "v10Rarity";
+
+
+    let rarityClass;
+
+
+    if(rarity === "GOD"){
+
+      rarityClass =
+        "v10God";
+
+    }
+
+    else if(rarity === "LEGEND"){
+
+      rarityClass =
+        "v10Legend";
+
+    }
+
+    else{
+
+      rarityClass =
+        "v10Epic";
+
+    }
+
+
+    rarityEl.innerHTML = `
+
+      <div class="
+        v10RaritySmall
+        ${rarityClass}
+      ">
+        ${subtitle}
+      </div>
+
+      <div class="
+        v10RarityMain
+        ${rarityClass}
+      ">
+        ${rarity}
+      </div>
+
+    `;
+
+
+    stage.appendChild(
+      rarityEl
+    );
+
+
+    v10Beat(
+      rarity === "GOD"
+        ? 1.30
+        : 1.05
+    );
+
+
+    // ===================================================
+    // レアリティ形成中にキラキラ
+    // ===================================================
+
+    await wait(1500);
+
+
+    createSparkles(
+      stage,
+      color,
+      rarity === "GOD"
+        ? 12
+        : 10
+    );
+
+
+    await wait(2000);
+
+
+    // ===================================================
+    // PHASE 9
+    //
+    // 完成状態を何もせず見せる
+    // ===================================================
+
+    await wait(
+      rarity === "GOD"
+        ? 2300
+        : rarity === "LEGEND"
+          ? 1900
+          : 1500
+    );
+
+
+    // ===================================================
+    // PHASE 10
+    //
+    // 中央へ光を集める
+    // ===================================================
+
+    const finalLight =
+      document.createElement("div");
+
+    finalLight.className =
+      "v10FinalLight";
+
+
+    stage.appendChild(
+      finalLight
+    );
+
+
+    if(typeof tone === "function"){
+
+      tone(
+        240,
+        1.6,
+        "sine",
+        .025
+      );
+
+    }
+
+
+    await wait(1750);
+
+
+    // ===================================================
+    // PHASE 11
+    //
+    // 最後だけ一気に解放
+    // ===================================================
+
+    const white =
+      document.createElement("div");
+
+    white.className =
+      "v10WhiteOut";
+
+
+    stage.appendChild(
+      white
+    );
+
+
+    if(typeof sfxKyuiin === "function"){
+
+      sfxKyuiin(
+        0,
+        rarity === "GOD"
+          ? 1.3
+          : 1
+      );
+
+    }
+
+
+    if(typeof sfxHeavyImpact === "function"){
+
+      sfxHeavyImpact(.08);
+
+    }
+
+
+    if(typeof vibrate === "function"){
+
+      vibrate(
+        rarity === "GOD"
+          ? [120,60,160]
+          : [80,40,110]
+      );
+
+    }
+
+
+    await wait(720);
+
+
+    // ===================================================
+    // PHASE 12
+    //
+    // V10終了
+    //
+    // 下にある既存の
+    // ドロップアイテム詳細を見せる
+    // ===================================================
+
+    stage.remove();
+
+
+    if(oldV9){
+      oldV9.remove();
+    }
+
+
+    v10Running = false;
+
+  }
+
+
+  // =====================================================
+  // V8 → V9付近を監視
+  //
+  // freezeStage内のレアリティ確定後に
+  // V10開始
+  // =====================================================
+
+  const observer =
+    new MutationObserver(()=>{
+
+      if(v10Running){
+        return;
+      }
+
+
+      const freeze =
+        document.querySelector(
+          ".freezeStage"
+        );
+
+
+      if(!freeze){
+        return;
+      }
+
+
+      if(
+        freeze.dataset
+          .v10Done === "1"
+      ){
+        return;
+      }
+
+
+      let rarity = null;
+
+
+      if(
+        freeze.querySelector(
+          ".freezeGodText"
+        )
+      ){
+
+        rarity =
+          "GOD";
+
+      }
+
+      else if(
+        freeze.querySelector(
+          ".freezeLegendText"
+        )
+      ){
+
+        rarity =
+          "LEGEND";
+
+      }
+
+      else if(
+        freeze.querySelector(
+          ".freezeEpicText"
+        )
+      ){
+
+        rarity =
+          "EPIC";
+
+      }
+
+
+      if(!rarity){
+        return;
+      }
+
+
+      freeze.dataset
+        .v10Done =
+        "1";
+
+
+      /*
+        既存ホログラムを一瞬見せてから
+        V10の儀式へ
+      */
+
+      setTimeout(()=>{
+
+        playV10(
+          rarity
+        );
+
+      },1200);
+
+  });
+
+
+  observer.observe(
+    document.body,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+
+  console.log(
+    "ASCENSION FINALE PREMIUM V10 READY"
+  );
+
+})();
