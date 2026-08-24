@@ -570,7 +570,7 @@
 
 
   const MIGRATION_KEY =
-    "onePercentUpgradeMigrationV3";
+    "onePercentUpgradeMigrationV4";
 
 
   // =====================================================
@@ -988,7 +988,7 @@
 
     migrateAllWeapons();
 
-  },500);
+  },3000);
 
 
   // =====================================================
