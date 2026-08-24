@@ -11150,3 +11150,120 @@
   );
 
 })();
+
+// =====================================================
+// V11.1 RIPPLE EMERGENCY FIX
+// 波紋が残り続ける問題を強制修正
+// =====================================================
+
+(() => {
+
+  if(window.__RIPPLE_EMERGENCY_FIX_V111__) return;
+  window.__RIPPLE_EMERGENCY_FIX_V111__ = true;
+
+
+  function killRipple(ripple){
+
+    if(!ripple) return;
+
+    if(
+      ripple.dataset
+        .rippleKillTimer === "1"
+    ){
+      return;
+    }
+
+    ripple.dataset
+      .rippleKillTimer = "1";
+
+
+    // 1.15秒は波紋を見せる
+    setTimeout(()=>{
+
+      if(!ripple.isConnected){
+        return;
+      }
+
+      // 最後だけ滑らかに消す
+      ripple.style.transition =
+        "opacity .18s ease-out";
+
+      ripple.style.opacity =
+        "0";
+
+
+      // 完全削除
+      setTimeout(()=>{
+
+        if(ripple.isConnected){
+          ripple.remove();
+        }
+
+      },200);
+
+    },1150);
+
+  }
+
+
+  // すでに残っている波紋も処理
+  document
+    .querySelectorAll(".v10Ripple")
+    .forEach(killRipple);
+
+
+  // これから作られる波紋も処理
+  const observer =
+    new MutationObserver(
+      mutations=>{
+
+        mutations.forEach(
+          mutation=>{
+
+            mutation.addedNodes
+              .forEach(node=>{
+
+                if(
+                  !(node instanceof HTMLElement)
+                ){
+                  return;
+                }
+
+
+                if(
+                  node.classList
+                    ?.contains("v10Ripple")
+                ){
+
+                  killRipple(node);
+
+                }
+
+
+                node
+                  .querySelectorAll
+                  ?.(".v10Ripple")
+                  .forEach(killRipple);
+
+              });
+
+          });
+
+      }
+    );
+
+
+  observer.observe(
+    document.body,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+
+  console.log(
+    "RIPPLE EMERGENCY FIX V11.1 READY"
+  );
+
+})();
