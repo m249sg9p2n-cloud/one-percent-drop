@@ -7803,3 +7803,1069 @@
   );
 
 })();
+
+// =====================================================
+// EFFECTS Ver.10.3
+// PREMIUM ASCENSION VISUAL PATCH
+//
+// ・「昇格」を超重厚な明朝体へ
+// ・白銀 × 金属グラデーション
+// ・波紋を短く
+// ・ホログラム大幅強化
+// ・プリズム / RGBズレ / 走査線
+// ・大量DOMを使わない軽量設計
+// =====================================================
+
+(() => {
+
+  if(window.__PREMIUM_ASCENSION_VISUAL_V103__) return;
+  window.__PREMIUM_ASCENSION_VISUAL_V103__ = true;
+
+
+  const style =
+    document.createElement("style");
+
+
+  style.textContent = `
+
+    /* =================================================
+       ① 超巨大「昇格」
+       明朝体＋金属グラデーション
+    ================================================= */
+
+    .v10Ascension{
+
+      font-family:
+        "Hiragino Mincho ProN",
+        "Hiragino Mincho Pro",
+        "Yu Mincho",
+        "YuMincho",
+        "Noto Serif JP",
+        serif !important;
+
+      font-weight:900 !important;
+
+      font-size:
+        clamp(100px, 30vw, 205px)
+        !important;
+
+      letter-spacing:
+        .13em !important;
+
+      line-height:
+        .88 !important;
+
+
+      /* -------------------------------
+         金属グラデーション
+      ------------------------------- */
+
+      background:
+
+        linear-gradient(
+          180deg,
+
+          #ffffff 0%,
+
+          #fffdf1 9%,
+
+          #e7e7e7 18%,
+
+          #ffffff 29%,
+
+          #f8df8d 40%,
+
+          #fff8ca 49%,
+
+          #c48a20 59%,
+
+          #fff2aa 70%,
+
+          #ffffff 82%,
+
+          #cfcfcf 92%,
+
+          #fff8db 100%
+        ) !important;
+
+
+      -webkit-background-clip:
+        text !important;
+
+      background-clip:
+        text !important;
+
+      -webkit-text-fill-color:
+        transparent !important;
+
+
+      /* -------------------------------
+         黒金の輪郭
+      ------------------------------- */
+
+      -webkit-text-stroke:
+        2.5px
+        rgba(66,39,5,.95);
+
+
+      /* -------------------------------
+         立体感
+      ------------------------------- */
+
+      text-shadow:
+        none !important;
+
+
+      filter:
+
+        drop-shadow(
+          0 3px 0
+          rgba(79,43,0,.95)
+        )
+
+        drop-shadow(
+          0 7px 3px
+          rgba(0,0,0,.95)
+        )
+
+        drop-shadow(
+          0 0 7px
+          rgba(255,255,255,.95)
+        )
+
+        drop-shadow(
+          0 0 22px
+          currentColor
+        )
+
+        drop-shadow(
+          0 0 48px
+          currentColor
+        ) !important;
+
+    }
+
+
+    /* =================================================
+       昇格の背後に
+       ホログラムの残像文字
+    ================================================= */
+
+    .v10Ascension::before{
+
+      content:"昇 格";
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      transform:
+        translate(-50%,-50%)
+        translateX(-4px)
+        scale(1.025);
+
+      width:max-content;
+
+      color:#52eaff;
+
+      -webkit-text-fill-color:
+        #52eaff;
+
+      opacity:.30;
+
+      filter:
+        blur(.8px);
+
+      z-index:-1;
+
+      pointer-events:none;
+
+    }
+
+
+    .v10Ascension::after{
+
+      content:"昇 格";
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      transform:
+        translate(-50%,-50%)
+        translateX(4px)
+        scale(.99);
+
+      width:max-content;
+
+      color:#ff52dd;
+
+      -webkit-text-fill-color:
+        #ff52dd;
+
+      opacity:.27;
+
+      filter:
+        blur(.8px);
+
+      z-index:-1;
+
+      pointer-events:none;
+
+    }
+
+
+    /* =================================================
+       ② 波紋
+       2.3秒 → 約1.15秒
+    ================================================= */
+
+    .v10Ripple{
+
+      animation:
+        v103Ripple
+        1.15s
+        cubic-bezier(.10,.62,.16,1)
+        forwards !important;
+
+    }
+
+
+    @keyframes v103Ripple{
+
+      0%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.1);
+
+      }
+
+
+      10%{
+
+        opacity:1;
+
+      }
+
+
+      45%{
+
+        opacity:.62;
+
+      }
+
+
+      72%{
+
+        opacity:.30;
+
+      }
+
+
+      100%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(8.5);
+
+      }
+
+    }
+
+
+    /* =================================================
+       ③ V10ステージ全体
+       ホログラム空間化
+    ================================================= */
+
+    .v10Stage::before{
+
+      content:"";
+
+      position:absolute;
+
+      inset:0;
+
+      z-index:1;
+
+      pointer-events:none;
+
+      opacity:.22;
+
+
+      /* -------------------------------
+         ホログラム格子
+      ------------------------------- */
+
+      background:
+
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,.035)
+          1px,
+          transparent 1px
+        ),
+
+        linear-gradient(
+          rgba(255,255,255,.035)
+          1px,
+          transparent 1px
+        );
+
+
+      background-size:
+        34px 34px;
+
+
+      mask-image:
+        radial-gradient(
+          circle at center,
+          black 0%,
+          rgba(0,0,0,.85) 35%,
+          transparent 75%
+        );
+
+
+      -webkit-mask-image:
+        radial-gradient(
+          circle at center,
+          black 0%,
+          rgba(0,0,0,.85) 35%,
+          transparent 75%
+        );
+
+
+      animation:
+        v103GridMove
+        7s
+        linear
+        infinite;
+
+    }
+
+
+    @keyframes v103GridMove{
+
+      from{
+
+        transform:
+          perspective(700px)
+          rotateX(0deg)
+          scale(1.1);
+
+      }
+
+
+      to{
+
+        transform:
+          perspective(700px)
+          rotateX(2deg)
+          scale(1.16);
+
+      }
+
+    }
+
+
+    /* =================================================
+       虹色プリズム
+       1枚だけ
+    ================================================= */
+
+    .v10Stage::after{
+
+      content:"";
+
+      position:absolute;
+
+      inset:-30%;
+
+      z-index:2;
+
+      pointer-events:none;
+
+      opacity:.11;
+
+
+      background:
+
+        conic-gradient(
+          from 20deg,
+
+          transparent,
+
+          rgba(255,80,220,.45),
+
+          transparent 16%,
+
+          rgba(80,230,255,.42),
+
+          transparent 34%,
+
+          rgba(255,225,90,.36),
+
+          transparent 54%,
+
+          rgba(170,80,255,.36),
+
+          transparent 76%,
+
+          rgba(255,255,255,.24),
+
+          transparent
+        );
+
+
+      animation:
+        v103PrismTurn
+        10s
+        linear
+        infinite;
+
+    }
+
+
+    @keyframes v103PrismTurn{
+
+      from{
+
+        transform:
+          rotate(0deg)
+          scale(.82);
+
+      }
+
+
+      to{
+
+        transform:
+          rotate(360deg)
+          scale(1.02);
+
+      }
+
+    }
+
+
+    /* =================================================
+       ④ 紋章をホログラム化
+    ================================================= */
+
+    .v10Emblem{
+
+      border:
+        2px solid
+        rgba(255,255,255,.9)
+        !important;
+
+
+      background:
+
+        radial-gradient(
+          circle,
+
+          rgba(255,255,255,.10),
+
+          rgba(255,255,255,.025)
+          44%,
+
+          transparent
+          68%
+        );
+
+
+      box-shadow:
+
+        0 0 8px
+        rgba(255,255,255,.95),
+
+        0 0 22px
+        currentColor,
+
+        0 0 52px
+        currentColor,
+
+        inset 0 0 22px
+        rgba(255,255,255,.25)
+
+        !important;
+
+    }
+
+
+    .v10Emblem::before{
+
+      border:
+
+        2px
+        dashed
+        rgba(255,255,255,.72)
+        !important;
+
+
+      box-shadow:
+
+        0 0 8px
+        currentColor,
+
+        inset 0 0 12px
+        currentColor;
+
+
+      animation:
+        v103InnerSpin
+        8s
+        linear
+        infinite !important;
+
+    }
+
+
+    @keyframes v103InnerSpin{
+
+      from{
+        transform:rotate(0deg);
+      }
+
+      to{
+        transform:rotate(-360deg);
+      }
+
+    }
+
+
+    .v10Emblem::after{
+
+      font-size:
+        86px !important;
+
+      text-shadow:
+
+        -3px 0
+        rgba(0,230,255,.55),
+
+        3px 0
+        rgba(255,50,220,.50),
+
+        0 0 8px
+        white,
+
+        0 0 25px
+        currentColor,
+
+        0 0 55px
+        currentColor
+
+        !important;
+
+    }
+
+
+    /* =================================================
+       ⑤ 3重リングを
+       さらに高級ホログラム化
+    ================================================= */
+
+    .v10Ring{
+
+      border:
+        1.5px solid
+        rgba(255,255,255,.72)
+        !important;
+
+
+      box-shadow:
+
+        0 0 7px
+        white,
+
+        0 0 17px
+        currentColor,
+
+        inset 0 0 13px
+        currentColor
+
+        !important;
+
+    }
+
+
+    .v10Ring1{
+
+      animation:
+        v103Ring1
+        9s
+        linear
+        infinite !important;
+
+    }
+
+
+    .v10Ring2{
+
+      border-style:
+        dashed !important;
+
+      animation:
+        v103Ring2
+        13s
+        linear
+        infinite !important;
+
+    }
+
+
+    .v10Ring3{
+
+      opacity:.25;
+
+      animation:
+        v103Ring3
+        18s
+        linear
+        infinite !important;
+
+    }
+
+
+    @keyframes v103Ring1{
+
+      from{
+
+        opacity:.50;
+
+        transform:
+          translate(-50%,-50%)
+          rotate(0deg);
+
+      }
+
+      to{
+
+        opacity:.50;
+
+        transform:
+          translate(-50%,-50%)
+          rotate(360deg);
+
+      }
+
+    }
+
+
+    @keyframes v103Ring2{
+
+      from{
+
+        opacity:.36;
+
+        transform:
+          translate(-50%,-50%)
+          rotate(360deg);
+
+      }
+
+      to{
+
+        opacity:.36;
+
+        transform:
+          translate(-50%,-50%)
+          rotate(0deg);
+
+      }
+
+    }
+
+
+    @keyframes v103Ring3{
+
+      from{
+
+        opacity:.22;
+
+        transform:
+          translate(-50%,-50%)
+          rotate(0deg)
+          scale(1);
+
+      }
+
+      50%{
+
+        opacity:.38;
+
+        transform:
+          translate(-50%,-50%)
+          rotate(180deg)
+          scale(1.05);
+
+      }
+
+      to{
+
+        opacity:.22;
+
+        transform:
+          translate(-50%,-50%)
+          rotate(360deg)
+          scale(1);
+
+      }
+
+    }
+
+
+    /* =================================================
+       ⑥ 最終レアリティ文字にも
+       ホログラム感
+    ================================================= */
+
+    .v10RarityMain{
+
+      position:relative;
+
+      -webkit-text-stroke:
+        1px
+        rgba(255,255,255,.75);
+
+      filter:
+
+        drop-shadow(
+          -3px 0 1px
+          rgba(0,230,255,.32)
+        )
+
+        drop-shadow(
+          3px 0 1px
+          rgba(255,40,220,.30)
+        )
+
+        drop-shadow(
+          0 0 15px
+          currentColor
+        );
+
+    }
+
+
+    /* =================================================
+       ⑦ キラキラを
+       もっとホログラムっぽく
+    ================================================= */
+
+    .v10Spark{
+
+      background:
+
+        linear-gradient(
+          135deg,
+          #ffffff,
+          #b8f6ff,
+          #ffffff,
+          #ffe1fb
+        ) !important;
+
+
+      box-shadow:
+
+        0 0 7px
+        white,
+
+        0 0 15px
+        currentColor,
+
+        0 0 30px
+        rgba(255,255,255,.55)
+
+        !important;
+
+
+      animation-duration:
+        2.9s !important;
+
+    }
+
+
+    /* =================================================
+       ⑧ ホログラム走査光
+       追加DOM 1枚だけ
+    ================================================= */
+
+    .v103HoloSweep{
+
+      position:absolute;
+
+      left:-40%;
+      top:0;
+
+      width:28%;
+      height:100%;
+
+      z-index:20;
+
+      pointer-events:none;
+
+      opacity:0;
+
+      transform:
+        skewX(-18deg);
+
+
+      background:
+
+        linear-gradient(
+          90deg,
+
+          transparent,
+
+          rgba(255,255,255,.05),
+
+          rgba(120,240,255,.28),
+
+          rgba(255,255,255,.75),
+
+          rgba(255,110,230,.20),
+
+          transparent
+        );
+
+
+      animation:
+        v103HoloSweep
+        4.8s
+        ease-in-out
+        forwards;
+
+    }
+
+
+    @keyframes v103HoloSweep{
+
+      0%{
+
+        left:-40%;
+
+        opacity:0;
+
+      }
+
+
+      15%{
+
+        opacity:.55;
+
+      }
+
+
+      75%{
+
+        opacity:.42;
+
+      }
+
+
+      100%{
+
+        left:125%;
+
+        opacity:0;
+
+      }
+
+    }
+
+  `;
+
+
+  document.head.appendChild(
+    style
+  );
+
+
+  // =====================================================
+  // ホログラム走査光を
+  // V10開始時に追加
+  // =====================================================
+
+  const observer =
+    new MutationObserver(
+      mutations=>{
+
+        mutations.forEach(
+          mutation=>{
+
+            mutation.addedNodes
+            .forEach(node=>{
+
+              if(
+                !(node instanceof HTMLElement)
+              ){
+                return;
+              }
+
+
+              if(
+                !node.classList
+                ?.contains(
+                  "v10Stage"
+                )
+              ){
+                return;
+              }
+
+
+              if(
+                node.dataset
+                .v103HoloDone === "1"
+              ){
+                return;
+              }
+
+
+              node.dataset
+                .v103HoloDone =
+                "1";
+
+
+              // -----------------------------------------
+              // 1発目
+              // -----------------------------------------
+
+              setTimeout(()=>{
+
+                if(!node.isConnected){
+                  return;
+                }
+
+
+                const sweep =
+                  document.createElement(
+                    "div"
+                  );
+
+
+                sweep.className =
+                  "v103HoloSweep";
+
+
+                node.appendChild(
+                  sweep
+                );
+
+
+                setTimeout(()=>{
+
+                  sweep.remove();
+
+                },5000);
+
+
+              },1600);
+
+
+              // -----------------------------------------
+              // 2発目
+              // 昇格前後を狙う
+              // -----------------------------------------
+
+              setTimeout(()=>{
+
+                if(!node.isConnected){
+                  return;
+                }
+
+
+                const sweep =
+                  document.createElement(
+                    "div"
+                  );
+
+
+                sweep.className =
+                  "v103HoloSweep";
+
+
+                node.appendChild(
+                  sweep
+                );
+
+
+                setTimeout(()=>{
+
+                  sweep.remove();
+
+                },5000);
+
+
+              },6500);
+
+
+              // -----------------------------------------
+              // 3発目
+              // レアリティ表示付近
+              // -----------------------------------------
+
+              setTimeout(()=>{
+
+                if(!node.isConnected){
+                  return;
+                }
+
+
+                const sweep =
+                  document.createElement(
+                    "div"
+                  );
+
+
+                sweep.className =
+                  "v103HoloSweep";
+
+
+                node.appendChild(
+                  sweep
+                );
+
+
+                setTimeout(()=>{
+
+                  sweep.remove();
+
+                },5000);
+
+
+              },10500);
+
+            });
+
+          }
+
+        );
+
+      }
+    );
+
+
+  observer.observe(
+    document.body,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+
+  console.log(
+    "PREMIUM ASCENSION VISUAL V10.3 READY"
+  );
+
+})();
