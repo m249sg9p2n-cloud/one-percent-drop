@@ -1000,3 +1000,61 @@
   );
 
 })();
+
+// =====================================================
+// FREEZE EFFECTS Ver.3
+// OLD ASCENSION KILL SWITCH
+//
+// 削除作業なし。
+// 旧「昇格」を生成された瞬間にDOMごと消す。
+// GRADE UPだけ残す。
+// =====================================================
+
+(() => {
+
+  if(window.__OLD_ASCENSION_KILL_V3__) return;
+  window.__OLD_ASCENSION_KILL_V3__ = true;
+
+
+  function removeOldAscension(){
+
+    document
+      .querySelectorAll(
+        ".v10Ascension"
+      )
+      .forEach(el=>{
+
+        el.remove();
+
+      });
+
+  }
+
+
+  // すでに存在していたら即削除
+  removeOldAscension();
+
+
+  // 今後生成されても即削除
+  const observer =
+    new MutationObserver(()=>{
+
+      removeOldAscension();
+
+    });
+
+
+  observer.observe(
+    document.body,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+
+  console.log(
+    "OLD ASCENSION KILL SWITCH V3 READY"
+  );
+
+})();
