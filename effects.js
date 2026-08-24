@@ -918,3 +918,1381 @@
   );
 
 })();
+
+// =====================================================
+// EFFECTS Ver.4
+// PUCHUN FREEZE + HOLOGRAM SYSTEM
+//
+// EPIC   : プチュン → 紫HOLOGRAM → 昇格
+// LEGEND : EPIC気配 → プチュン → 金HOLOGRAM → 昇格
+// GOD    : RARE → プチュン → 長時間暗転 → 虹HOLOGRAM → GOD
+//
+// iPhone軽量設計
+// =====================================================
+
+(() => {
+
+  // 二重貼り防止
+  if(window.__PUCHUN_HOLOGRAM_V4__) return;
+  window.__PUCHUN_HOLOGRAM_V4__ = true;
+
+
+  // =====================================================
+  // CSS
+  // =====================================================
+
+  const style =
+    document.createElement("style");
+
+
+  style.textContent = `
+
+    /* -------------------------
+       FREEZE全面レイヤー
+    ------------------------- */
+
+    .freezeStage{
+
+      position:fixed;
+      inset:0;
+
+      z-index:950000;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      overflow:hidden;
+
+      background:#000;
+
+      color:white;
+
+      pointer-events:none;
+
+    }
+
+
+    /* -------------------------
+       HOLOGRAM
+    ------------------------- */
+
+    .freezeHologram{
+
+      position:relative;
+
+      z-index:3;
+
+      text-align:center;
+
+      font-weight:1000;
+
+      letter-spacing:8px;
+
+      opacity:0;
+
+      transform:
+        perspective(500px)
+        rotateY(-9deg)
+        scale(.88);
+
+      animation:
+        freezeHologramIn
+        .72s
+        ease-out
+        forwards;
+
+      will-change:
+        transform,
+        opacity;
+
+    }
+
+
+    @keyframes freezeHologramIn{
+
+      0%{
+        opacity:0;
+        transform:
+          perspective(500px)
+          rotateY(-13deg)
+          scale(.74);
+      }
+
+      30%{
+        opacity:.45;
+      }
+
+      55%{
+        opacity:1;
+        transform:
+          perspective(500px)
+          rotateY(4deg)
+          scale(1.04);
+      }
+
+      100%{
+        opacity:.92;
+        transform:
+          perspective(500px)
+          rotateY(0deg)
+          scale(1);
+      }
+
+    }
+
+
+    /* -------------------------
+       走査線
+
+       1枚だけなので軽い
+    ------------------------- */
+
+    .freezeScan{
+
+      position:absolute;
+      inset:0;
+
+      z-index:2;
+
+      opacity:.24;
+
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0px,
+          transparent 5px,
+          rgba(255,255,255,.18) 6px,
+          transparent 7px
+        );
+
+      animation:
+        freezeScanMove
+        .55s linear
+        infinite;
+
+      pointer-events:none;
+
+    }
+
+
+    @keyframes freezeScanMove{
+
+      from{
+        transform:translateY(-8px);
+      }
+
+      to{
+        transform:translateY(8px);
+      }
+
+    }
+
+
+    /* -------------------------
+       中央光
+    ------------------------- */
+
+    .freezeGlow{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:72vw;
+      height:72vw;
+
+      max-width:430px;
+      max-height:430px;
+
+      transform:
+        translate(-50%,-50%);
+
+      border-radius:50%;
+
+      opacity:.62;
+
+      pointer-events:none;
+
+    }
+
+
+    .freezeEpicGlow{
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(255,255,255,.95) 0%,
+          rgba(220,110,255,.60) 10%,
+          rgba(130,40,255,.25) 34%,
+          transparent 68%
+        );
+
+    }
+
+
+    .freezeLegendGlow{
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(255,255,255,.96) 0%,
+          rgba(255,230,80,.65) 10%,
+          rgba(255,135,0,.27) 36%,
+          transparent 70%
+        );
+
+    }
+
+
+    .freezeGodGlow{
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(255,255,255,1) 0%,
+          rgba(255,235,40,.57) 12%,
+          rgba(255,50,210,.34) 28%,
+          rgba(0,220,255,.28) 46%,
+          transparent 72%
+        );
+
+    }
+
+
+    /* -------------------------
+       HOLOGRAM文字色
+    ------------------------- */
+
+    .freezeEpicText{
+
+      color:#f0bcff;
+
+      font-size:
+        clamp(58px,18vw,88px);
+
+      text-shadow:
+        0 0 8px white,
+        0 0 18px #e06aff,
+        0 0 36px #8a3cff;
+
+    }
+
+
+    .freezeLegendText{
+
+      color:#fff5a0;
+
+      font-size:
+        clamp(58px,18vw,88px);
+
+      text-shadow:
+        0 0 8px white,
+        0 0 20px #ffe100,
+        0 0 40px #ff8a00;
+
+    }
+
+
+    .freezeGodText{
+
+      color:white;
+
+      font-size:
+        clamp(74px,23vw,112px);
+
+      text-shadow:
+        0 0 8px white,
+        0 0 20px #fff000,
+        0 0 38px #ff36dd,
+        0 0 55px #00eaff;
+
+    }
+
+
+    /* -------------------------
+       0.1%
+    ------------------------- */
+
+    .freezeProbability{
+
+      margin-bottom:14px;
+
+      font-size:14px;
+
+      font-weight:1000;
+
+      letter-spacing:10px;
+
+      color:white;
+
+      opacity:.85;
+
+    }
+
+
+    /* -------------------------
+       細い光線
+    ------------------------- */
+
+    .freezeLine{
+
+      position:absolute;
+
+      left:50%;
+      top:50%;
+
+      width:8px;
+      height:2px;
+
+      transform:
+        translate(-50%,-50%);
+
+      background:white;
+
+      opacity:0;
+
+      animation:
+        freezeLineOpen
+        .65s
+        ease-out
+        forwards;
+
+      box-shadow:
+        0 0 10px white,
+        0 0 25px currentColor;
+
+    }
+
+
+    @keyframes freezeLineOpen{
+
+      0%{
+        width:5px;
+        opacity:0;
+      }
+
+      25%{
+        opacity:1;
+      }
+
+      100%{
+        width:82%;
+        opacity:.95;
+      }
+
+    }
+
+
+    /* -------------------------
+       GOD虹背景
+
+       conic 1枚のみ
+    ------------------------- */
+
+    .freezeGodRainbow{
+
+      position:absolute;
+
+      inset:-25%;
+
+      opacity:.26;
+
+      background:
+        conic-gradient(
+          #ff1744,
+          #ffe600,
+          #00e676,
+          #00e5ff,
+          #704cff,
+          #e040fb,
+          #ff1744
+        );
+
+      transform:scale(.82);
+
+      animation:
+        freezeGodRainbowOpen
+        .9s
+        ease-out
+        forwards;
+
+    }
+
+
+    @keyframes freezeGodRainbowOpen{
+
+      from{
+        opacity:0;
+        transform:scale(.55);
+      }
+
+      to{
+        opacity:.33;
+        transform:scale(1.02);
+      }
+
+    }
+
+  `;
+
+
+  document.head.appendChild(
+    style
+  );
+
+
+  // =====================================================
+  // STATE
+  // =====================================================
+
+  let activeFreezeLayer =
+    null;
+
+
+  // =====================================================
+  // FREEZE画面削除
+  // =====================================================
+
+  function clearFreeze(){
+
+    if(activeFreezeLayer){
+
+      activeFreezeLayer.remove();
+
+      activeFreezeLayer =
+        null;
+
+    }
+
+  }
+
+
+  // =====================================================
+  // 黒画面作成
+  // =====================================================
+
+  function createFreezeStage(){
+
+    clearFreeze();
+
+
+    const layer =
+      document.createElement(
+        "div"
+      );
+
+
+    layer.className =
+      "freezeStage";
+
+
+    document.body.appendChild(
+      layer
+    );
+
+
+    activeFreezeLayer =
+      layer;
+
+
+    return layer;
+
+  }
+
+
+  // =====================================================
+  // プチュン音
+  //
+  // 原音コピーではなく
+  // 「断絶感」を作る短いSE
+  // =====================================================
+
+  function playPuchun(){
+
+    if(
+      typeof initAudio ===
+      "function"
+    ){
+
+      initAudio();
+
+    }
+
+
+    /*
+      高いクリック
+    */
+
+    if(
+      typeof tone ===
+      "function"
+    ){
+
+      tone(
+        950,
+        .025,
+        "square",
+        .04
+      );
+
+
+      /*
+        直後に低く落ちる
+      */
+
+      tone(
+        72,
+        .09,
+        "sine",
+        .07,
+        .025
+      );
+
+    }
+
+
+    if(
+      typeof vibrate ===
+      "function"
+    ){
+
+      vibrate(35);
+
+    }
+
+  }
+
+
+  // =====================================================
+  // 心拍
+  // =====================================================
+
+  function freezeHeartbeat(
+    power=1
+  ){
+
+    if(
+      typeof sfxKick ===
+      "function"
+    ){
+
+      sfxKick(
+        0,
+        .12 * power
+      );
+
+    }
+
+
+    if(
+      typeof tone ===
+      "function"
+    ){
+
+      tone(
+        48,
+        .24,
+        "sine",
+        .055 * power
+      );
+
+    }
+
+
+    if(
+      typeof vibrate ===
+      "function"
+    ){
+
+      vibrate(
+        Math.round(
+          25 * power
+        )
+      );
+
+    }
+
+  }
+
+
+  // =====================================================
+  // HOLOGRAM
+  // =====================================================
+
+  function showFreezeHologram(
+    type,
+    text,
+    sub=""
+  ){
+
+    const stage =
+      activeFreezeLayer ||
+      createFreezeStage();
+
+
+    /*
+      glow
+    */
+
+    const glow =
+      document.createElement(
+        "div"
+      );
+
+
+    glow.className =
+      "freezeGlow " +
+
+      (
+        type==="EPIC"
+        ? "freezeEpicGlow"
+
+        : type==="LEGEND"
+        ? "freezeLegendGlow"
+
+        : "freezeGodGlow"
+      );
+
+
+    /*
+      scan
+    */
+
+    const scan =
+      document.createElement(
+        "div"
+      );
+
+
+    scan.className =
+      "freezeScan";
+
+
+    /*
+      hologram
+    */
+
+    const holo =
+      document.createElement(
+        "div"
+      );
+
+
+    holo.className =
+      "freezeHologram " +
+
+      (
+        type==="EPIC"
+        ? "freezeEpicText"
+
+        : type==="LEGEND"
+        ? "freezeLegendText"
+
+        : "freezeGodText"
+      );
+
+
+    holo.innerHTML = `
+
+      ${
+        sub
+        ? `
+          <div class="freezeProbability">
+            ${sub}
+          </div>
+        `
+        : ""
+      }
+
+      ${text}
+
+    `;
+
+
+    stage.appendChild(
+      glow
+    );
+
+
+    stage.appendChild(
+      scan
+    );
+
+
+    if(type==="GOD"){
+
+      const rainbow =
+        document.createElement(
+          "div"
+        );
+
+
+      rainbow.className =
+        "freezeGodRainbow";
+
+
+      stage.appendChild(
+        rainbow
+      );
+
+    }
+
+
+    stage.appendChild(
+      holo
+    );
+
+  }
+
+
+  // =====================================================
+  // 細い光
+  // =====================================================
+
+  function freezeLine(
+    color
+  ){
+
+    if(!activeFreezeLayer){
+      return;
+    }
+
+
+    const line =
+      document.createElement(
+        "div"
+      );
+
+
+    line.className =
+      "freezeLine";
+
+
+    line.style.color =
+      color;
+
+
+    activeFreezeLayer.appendChild(
+      line
+    );
+
+  }
+
+
+  // =====================================================
+  // EPIC FREEZE
+  // =====================================================
+
+  function playEpicFreeze(
+    done
+  ){
+
+    createFreezeStage();
+
+
+    playPuchun();
+
+
+    /*
+      0.9秒しっかり黒
+    */
+
+    setTimeout(()=>{
+
+      freezeHeartbeat(.8);
+
+    },900);
+
+
+    /*
+      紫の一本線
+    */
+
+    setTimeout(()=>{
+
+      freezeLine(
+        "#bd4cff"
+      );
+
+    },1250);
+
+
+    /*
+      EPIC HOLOGRAM
+    */
+
+    setTimeout(()=>{
+
+      showFreezeHologram(
+        "EPIC",
+        "EPIC"
+      );
+
+
+      if(
+        typeof sfxRiser ===
+        "function"
+      ){
+
+        sfxRiser(
+          0,
+          .55
+        );
+
+      }
+
+    },1580);
+
+
+    /*
+      爆発へ
+    */
+
+    setTimeout(()=>{
+
+      clearFreeze();
+
+
+      if(
+        typeof superFlash ===
+        "function"
+      ){
+
+        superFlash(
+          "#ffffff",
+          150
+        );
+
+      }
+
+
+      if(done){
+        done();
+      }
+
+    },2300);
+
+  }
+
+
+  // =====================================================
+  // LEGEND FREEZE
+  // =====================================================
+
+  function playLegendFreeze(
+    done
+  ){
+
+    createFreezeStage();
+
+
+    playPuchun();
+
+
+    /*
+      EPICより長い完全暗転
+    */
+
+    setTimeout(()=>{
+
+      freezeHeartbeat(
+        .95
+      );
+
+    },1150);
+
+
+    setTimeout(()=>{
+
+      freezeHeartbeat(
+        1.05
+      );
+
+    },1600);
+
+
+    setTimeout(()=>{
+
+      freezeLine(
+        "#ffd600"
+      );
+
+    },1950);
+
+
+    /*
+      金HOLOGRAM
+    */
+
+    setTimeout(()=>{
+
+      showFreezeHologram(
+        "LEGEND",
+        "LEGEND"
+      );
+
+
+      if(
+        typeof sfxRiser ===
+        "function"
+      ){
+
+        sfxRiser(
+          0,
+          .68
+        );
+
+      }
+
+    },2250);
+
+
+    /*
+      少し見せてから爆発
+    */
+
+    setTimeout(()=>{
+
+      clearFreeze();
+
+
+      if(
+        typeof superFlash ===
+        "function"
+      ){
+
+        superFlash(
+          "#ffffff",
+          170
+        );
+
+      }
+
+
+      if(
+        typeof sfxHeavyImpact ===
+        "function"
+      ){
+
+        sfxHeavyImpact(0);
+
+      }
+
+
+      if(done){
+        done();
+      }
+
+    },3150);
+
+  }
+
+
+  // =====================================================
+  // GOD FREEZE
+  //
+  // 一番長い。
+  // RAREから直接別世界へ。
+  // =====================================================
+
+  function playGodFreeze(
+    done
+  ){
+
+    createFreezeStage();
+
+
+    playPuchun();
+
+
+    /*
+      1.5秒近く
+      本当に何も見せない
+    */
+
+    setTimeout(()=>{
+
+      freezeHeartbeat(
+        1
+      );
+
+    },1450);
+
+
+    /*
+      まだ黒
+    */
+
+    setTimeout(()=>{
+
+      freezeHeartbeat(
+        1.08
+      );
+
+    },2050);
+
+
+    /*
+      虹の一本線
+    */
+
+    setTimeout(()=>{
+
+      freezeLine(
+        "#ffffff"
+      );
+
+    },2450);
+
+
+    /*
+      0.1% HOLOGRAM
+    */
+
+    setTimeout(()=>{
+
+      showFreezeHologram(
+        "GOD",
+        "0.1%"
+      );
+
+    },2820);
+
+
+    /*
+      一度また完全に消す
+      ↓
+      二段目プチュン
+    */
+
+    setTimeout(()=>{
+
+      createFreezeStage();
+
+
+      playPuchun();
+
+    },3550);
+
+
+    /*
+      二段目の無音
+    */
+
+    setTimeout(()=>{
+
+      freezeHeartbeat(
+        1.15
+      );
+
+    },4400);
+
+
+    /*
+      GOD HOLOGRAM
+    */
+
+    setTimeout(()=>{
+
+      showFreezeHologram(
+        "GOD",
+        "GOD",
+        "SYSTEM FREEZE"
+      );
+
+
+      if(
+        typeof sfxRiser ===
+        "function"
+      ){
+
+        sfxRiser(
+          0,
+          .85
+        );
+
+      }
+
+    },4780);
+
+
+    /*
+      最終開放
+    */
+
+    setTimeout(()=>{
+
+      clearFreeze();
+
+
+      if(
+        typeof superFlash ===
+        "function"
+      ){
+
+        superFlash(
+          "#ffffff",
+          190
+        );
+
+      }
+
+
+      if(
+        typeof sfxHeavyImpact ===
+        "function"
+      ){
+
+        sfxHeavyImpact(0);
+
+      }
+
+
+      if(
+        typeof sfxKyuiin ===
+        "function"
+      ){
+
+        sfxKyuiin(
+          .08,
+          1.10
+        );
+
+      }
+
+
+      if(
+        typeof vibrate ===
+        "function"
+      ){
+
+        vibrate([
+          90,
+          30,
+          130
+        ]);
+
+      }
+
+
+      if(done){
+        done();
+      }
+
+    },5700);
+
+  }
+
+
+  // =====================================================
+  // 現在の昇格成功を保存
+  // =====================================================
+
+  const previousAscensionSuccess =
+    playAscensionSuccess;
+
+
+  // =====================================================
+  // EPIC / LEGEND
+  // PUSH成功後をFREEZEへ
+  // =====================================================
+
+  playAscensionSuccess =
+  function(
+    fromRarity,
+    toRarity,
+    premium=false
+  ){
+
+    /*
+      EPIC
+    */
+
+    if(
+      toRarity ===
+      "EPIC"
+    ){
+
+      playEpicFreeze(()=>{
+
+        previousAscensionSuccess(
+          fromRarity,
+          toRarity,
+          premium
+        );
+
+      });
+
+
+      return;
+
+    }
+
+
+    /*
+      LEGEND
+    */
+
+    if(
+      toRarity ===
+      "LEGEND"
+    ){
+
+      /*
+        一瞬EPICの気配を
+        見せてから切る
+      */
+
+      if(
+        typeof superFlash ===
+        "function"
+      ){
+
+        superFlash(
+          "#a83cff",
+          100
+        );
+
+      }
+
+
+      setTimeout(()=>{
+
+        playLegendFreeze(()=>{
+
+          previousAscensionSuccess(
+            fromRarity,
+            toRarity,
+            premium
+          );
+
+        });
+
+      },360);
+
+
+      return;
+
+    }
+
+
+    previousAscensionSuccess(
+      fromRarity,
+      toRarity,
+      premium
+    );
+
+  };
+
+
+  // =====================================================
+  // GOD
+  //
+  // 既存の
+  // RARE→GOD CHANCEは維持。
+  // PUSH後を大型FREEZEに変更。
+  // =====================================================
+
+  const previousGodReveal =
+    revealDirectGod;
+
+
+  revealDirectGod =
+  function(item){
+
+    playGodFreeze(()=>{
+
+      previousGodReveal(
+        item
+      );
+
+    });
+
+  };
+
+
+  // =====================================================
+  // 復活昇格にも
+  // 「長い間」を少し追加
+  // =====================================================
+
+  const previousRevival =
+    playAscensionRevival;
+
+
+  playAscensionRevival =
+  function(
+    fromRarity,
+    toRarity
+  ){
+
+    /*
+      既存FAILEDを開始
+    */
+
+    previousRevival(
+      fromRarity,
+      toRarity
+    );
+
+
+    /*
+      復活途中に追加プチュン
+      ただしGODほど長くしない
+    */
+
+    setTimeout(()=>{
+
+      createFreezeStage();
+
+
+      playPuchun();
+
+
+      setTimeout(()=>{
+
+        freezeHeartbeat(.9);
+
+      },900);
+
+
+      setTimeout(()=>{
+
+        clearFreeze();
+
+      },1450);
+
+
+    },1100);
+
+  };
+
+
+  // =====================================================
+  // SAFETY
+  // 長時間残ったFREEZEを掃除
+  // =====================================================
+
+  setInterval(()=>{
+
+    if(
+      activeFreezeLayer &&
+      !document.body.contains(
+        ascensionOverlay
+      )
+    ){
+
+      clearFreeze();
+
+    }
+
+  },5000);
+
+
+  console.log(
+    "PUCHUN FREEZE + HOLOGRAM V4 READY"
+  );
+
+})();
