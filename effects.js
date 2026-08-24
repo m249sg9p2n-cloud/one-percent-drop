@@ -3449,3 +3449,1091 @@
   );
 
 })();
+
+// =====================================================
+// EFFECTS Ver.7
+// CRT CROSS POWER-CUT PATCH
+//
+// 参考イメージ：
+// 突然消えるプチュン演出03（白/フレア）
+//
+// Ver.4〜6 削除不要
+//
+// PUSH
+// ↓
+// プッツン！！！！
+// ↓
+// 白フレア
+// ↓
+// 十字へ収束
+// ↓
+// 十字が縮む
+// ↓
+// 光点
+// ↓
+// 完全ブラックアウト
+// ↓
+// 既存FREEZE / HOLOGRAMへ
+//
+// iPhone軽量設計
+// =====================================================
+
+(() => {
+
+  if(window.__CRT_CROSS_POWER_CUT_V7__) return;
+  window.__CRT_CROSS_POWER_CUT_V7__ = true;
+
+
+  // =====================================================
+  // CSS
+  //
+  // Ver.6のcrtPuchunScreenを
+  // 上から十字収束へ変更
+  // =====================================================
+
+  const style =
+    document.createElement("style");
+
+
+  style.textContent = `
+
+    /* =========================================
+       CRT全面
+
+       Ver.6の横収束アニメーションを停止して
+       V7の十字収束に変更
+    ========================================= */
+
+    .crtPuchunScreen{
+
+      background:
+        radial-gradient(
+          ellipse at center,
+          rgba(255,255,255,.22) 0%,
+          rgba(220,240,255,.10) 20%,
+          rgba(90,150,255,.035) 46%,
+          rgba(0,0,0,.18) 72%,
+          rgba(0,0,0,.45) 100%
+        ) !important;
+
+      transform:none !important;
+
+      animation:
+        v7CrtWholeScreen
+        .82s
+        linear
+        forwards !important;
+
+      will-change:
+        opacity,
+        filter;
+
+    }
+
+
+    /* =========================================
+       横方向の白フレア
+
+       ::before
+    ========================================= */
+
+    .crtPuchunScreen::before{
+
+      content:"" !important;
+
+      position:absolute !important;
+
+      left:50% !important;
+      top:50% !important;
+
+      width:130vw !important;
+      height:9px !important;
+
+      transform:
+        translate(-50%,-50%)
+        scaleX(1) !important;
+
+      transform-origin:center !important;
+
+      opacity:0 !important;
+
+      background:
+        linear-gradient(
+          to bottom,
+
+          transparent 0%,
+
+          rgba(255,255,255,.32) 14%,
+
+          rgba(220,245,255,.95) 34%,
+
+          #ffffff 48%,
+
+          #ffffff 52%,
+
+          rgba(215,242,255,.92) 66%,
+
+          rgba(255,255,255,.28) 84%,
+
+          transparent 100%
+        ) !important;
+
+      box-shadow:
+        0 0 8px white,
+        0 0 22px rgba(220,245,255,.95),
+        0 0 48px rgba(165,220,255,.55) !important;
+
+      border-radius:50% !important;
+
+      animation:
+        v7HorizontalCollapse
+        .82s
+        cubic-bezier(.68,0,.32,1)
+        forwards !important;
+
+    }
+
+
+    /* =========================================
+       縦方向の白フレア
+
+       ::after
+    ========================================= */
+
+    .crtPuchunScreen::after{
+
+      content:"" !important;
+
+      position:absolute !important;
+
+      left:50% !important;
+      top:50% !important;
+
+      width:9px !important;
+      height:130vh !important;
+
+      transform:
+        translate(-50%,-50%)
+        scaleY(1) !important;
+
+      transform-origin:center !important;
+
+      opacity:0 !important;
+
+      background:
+        linear-gradient(
+          to right,
+
+          transparent 0%,
+
+          rgba(255,255,255,.32) 14%,
+
+          rgba(220,245,255,.95) 34%,
+
+          #ffffff 48%,
+
+          #ffffff 52%,
+
+          rgba(215,242,255,.92) 66%,
+
+          rgba(255,255,255,.28) 84%,
+
+          transparent 100%
+        ) !important;
+
+      box-shadow:
+        0 0 8px white,
+        0 0 22px rgba(220,245,255,.95),
+        0 0 48px rgba(165,220,255,.55) !important;
+
+      border-radius:50% !important;
+
+      animation:
+        v7VerticalCollapse
+        .82s
+        cubic-bezier(.68,0,.32,1)
+        forwards !important;
+
+    }
+
+
+    /* =========================================
+       画面全体
+
+       最初にブワッと発光
+       ↓
+       一気に電源断
+    ========================================= */
+
+    @keyframes v7CrtWholeScreen{
+
+      0%{
+
+        opacity:1;
+
+        filter:
+          brightness(1);
+
+      }
+
+
+      7%{
+
+        opacity:1;
+
+        filter:
+          brightness(2.2);
+
+      }
+
+
+      13%{
+
+        filter:
+          brightness(.72);
+
+      }
+
+
+      20%{
+
+        filter:
+          brightness(1.35);
+
+      }
+
+
+      72%{
+
+        opacity:1;
+
+        filter:
+          brightness(1);
+
+      }
+
+
+      84%{
+
+        opacity:1;
+
+        filter:
+          brightness(.35);
+
+      }
+
+
+      100%{
+
+        opacity:0;
+
+        filter:
+          brightness(0);
+
+      }
+
+    }
+
+
+    /* =========================================
+       横線
+
+       長い線
+       ↓
+       十字
+       ↓
+       中央へ
+    ========================================= */
+
+    @keyframes v7HorizontalCollapse{
+
+      0%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scaleX(1.15);
+
+      }
+
+
+      8%{
+
+        opacity:1;
+
+      }
+
+
+      22%{
+
+        opacity:1;
+
+        height:12px;
+
+        transform:
+          translate(-50%,-50%)
+          scaleX(1);
+
+      }
+
+
+      48%{
+
+        opacity:1;
+
+        height:7px;
+
+        transform:
+          translate(-50%,-50%)
+          scaleX(.52);
+
+      }
+
+
+      67%{
+
+        opacity:1;
+
+        height:5px;
+
+        transform:
+          translate(-50%,-50%)
+          scaleX(.18);
+
+      }
+
+
+      80%{
+
+        opacity:1;
+
+        height:4px;
+
+        transform:
+          translate(-50%,-50%)
+          scaleX(.045);
+
+      }
+
+
+      91%{
+
+        opacity:1;
+
+        transform:
+          translate(-50%,-50%)
+          scaleX(.012);
+
+      }
+
+
+      100%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scaleX(0);
+
+      }
+
+    }
+
+
+    /* =========================================
+       縦線
+
+       同時に中央へ収束
+    ========================================= */
+
+    @keyframes v7VerticalCollapse{
+
+      0%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scaleY(1.15);
+
+      }
+
+
+      8%{
+
+        opacity:1;
+
+      }
+
+
+      22%{
+
+        opacity:1;
+
+        width:12px;
+
+        transform:
+          translate(-50%,-50%)
+          scaleY(1);
+
+      }
+
+
+      48%{
+
+        opacity:1;
+
+        width:7px;
+
+        transform:
+          translate(-50%,-50%)
+          scaleY(.52);
+
+      }
+
+
+      67%{
+
+        opacity:1;
+
+        width:5px;
+
+        transform:
+          translate(-50%,-50%)
+          scaleY(.18);
+
+      }
+
+
+      80%{
+
+        opacity:1;
+
+        width:4px;
+
+        transform:
+          translate(-50%,-50%)
+          scaleY(.045);
+
+      }
+
+
+      91%{
+
+        opacity:1;
+
+        transform:
+          translate(-50%,-50%)
+          scaleY(.012);
+
+      }
+
+
+      100%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scaleY(0);
+
+      }
+
+    }
+
+
+    /* =========================================
+       最後の光点
+
+       observerから1個だけ追加
+    ========================================= */
+
+    .v7CrtFinalDot{
+
+      position:fixed;
+
+      left:50%;
+      top:50%;
+
+      z-index:10000000;
+
+      width:18px;
+      height:18px;
+
+      transform:
+        translate(-50%,-50%)
+        scale(0);
+
+      border-radius:50%;
+
+      pointer-events:none;
+
+      opacity:0;
+
+      background:white;
+
+      box-shadow:
+        0 0 8px white,
+        0 0 22px #d8f4ff,
+        0 0 50px rgba(150,220,255,.65);
+
+      animation:
+        v7FinalDot
+        .28s
+        ease-out
+        forwards;
+
+    }
+
+
+    @keyframes v7FinalDot{
+
+      0%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(1.25);
+
+      }
+
+
+      18%{
+
+        opacity:1;
+
+      }
+
+
+      45%{
+
+        opacity:1;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.72);
+
+      }
+
+
+      75%{
+
+        opacity:.85;
+
+        transform:
+          translate(-50%,-50%)
+          scale(.24);
+
+      }
+
+
+      100%{
+
+        opacity:0;
+
+        transform:
+          translate(-50%,-50%)
+          scale(0);
+
+      }
+
+    }
+
+  `;
+
+
+  document.head.appendChild(style);
+
+
+  // =====================================================
+  // 超強烈
+  // 「プッツン！！！！」
+  //
+  // Ver.6の電源落ち音へ
+  // さらに最初の1発を追加
+  // =====================================================
+
+  function v7PowerCutSnap(){
+
+    if(
+      typeof initAudio ===
+      "function"
+    ){
+
+      initAudio();
+
+    }
+
+
+    if(
+      typeof audioCtx ===
+      "undefined" ||
+      !audioCtx
+    ){
+
+      return;
+
+    }
+
+
+    const now =
+      audioCtx.currentTime;
+
+
+    // ===================================================
+    // ① バチッ！！
+    // ===================================================
+
+    const bufferLength =
+      Math.floor(
+        audioCtx.sampleRate *
+        .055
+      );
+
+
+    const buffer =
+      audioCtx.createBuffer(
+        1,
+        bufferLength,
+        audioCtx.sampleRate
+      );
+
+
+    const data =
+      buffer.getChannelData(0);
+
+
+    for(
+      let i=0;
+      i<bufferLength;
+      i++
+    ){
+
+      const life =
+        1 -
+        i /
+        bufferLength;
+
+
+      data[i] =
+        (
+          Math.random()*2 - 1
+        )
+        *
+        life *
+        life;
+
+    }
+
+
+    const noise =
+      audioCtx.createBufferSource();
+
+
+    const noiseGain =
+      audioCtx.createGain();
+
+
+    const noiseFilter =
+      audioCtx.createBiquadFilter();
+
+
+    noise.buffer =
+      buffer;
+
+
+    noiseFilter.type =
+      "bandpass";
+
+
+    noiseFilter.frequency
+      .setValueAtTime(
+        1100,
+        now
+      );
+
+
+    noiseFilter.Q
+      .setValueAtTime(
+        .7,
+        now
+      );
+
+
+    noiseGain.gain
+      .setValueAtTime(
+        .10,
+        now
+      );
+
+
+    noiseGain.gain
+      .exponentialRampToValueAtTime(
+        .001,
+        now + .06
+      );
+
+
+    noise.connect(
+      noiseFilter
+    );
+
+
+    noiseFilter.connect(
+      noiseGain
+    );
+
+
+    noiseGain.connect(
+      audioCtx.destination
+    );
+
+
+    noise.start(now);
+
+
+    // ===================================================
+    // ② 「プッ」
+    // 硬い瞬間音
+    // ===================================================
+
+    const snap =
+      audioCtx.createOscillator();
+
+
+    const snapGain =
+      audioCtx.createGain();
+
+
+    snap.type =
+      "square";
+
+
+    snap.frequency
+      .setValueAtTime(
+        780,
+        now
+      );
+
+
+    snap.frequency
+      .exponentialRampToValueAtTime(
+        95,
+        now + .065
+      );
+
+
+    snapGain.gain
+      .setValueAtTime(
+        .095,
+        now
+      );
+
+
+    snapGain.gain
+      .exponentialRampToValueAtTime(
+        .001,
+        now + .075
+      );
+
+
+    snap.connect(
+      snapGain
+    );
+
+
+    snapGain.connect(
+      audioCtx.destination
+    );
+
+
+    snap.start(now);
+
+
+    snap.stop(
+      now + .08
+    );
+
+
+    // ===================================================
+    // ③ 「ツン！！！！」
+    // 低音衝撃
+    // ===================================================
+
+    const impact =
+      audioCtx.createOscillator();
+
+
+    const impactGain =
+      audioCtx.createGain();
+
+
+    impact.type =
+      "sine";
+
+
+    impact.frequency
+      .setValueAtTime(
+        125,
+        now + .015
+      );
+
+
+    impact.frequency
+      .exponentialRampToValueAtTime(
+        34,
+        now + .14
+      );
+
+
+    impactGain.gain
+      .setValueAtTime(
+        .11,
+        now + .015
+      );
+
+
+    impactGain.gain
+      .exponentialRampToValueAtTime(
+        .001,
+        now + .15
+      );
+
+
+    impact.connect(
+      impactGain
+    );
+
+
+    impactGain.connect(
+      audioCtx.destination
+    );
+
+
+    impact.start(
+      now + .015
+    );
+
+
+    impact.stop(
+      now + .16
+    );
+
+
+    // ===================================================
+    // ④ ごく短い電気の余韻
+    //
+    // ジ……
+    //
+    // すぐ無音にする
+    // ===================================================
+
+    const tail =
+      audioCtx.createOscillator();
+
+
+    const tailGain =
+      audioCtx.createGain();
+
+
+    tail.type =
+      "sine";
+
+
+    tail.frequency
+      .setValueAtTime(
+        1700,
+        now + .05
+      );
+
+
+    tail.frequency
+      .exponentialRampToValueAtTime(
+        320,
+        now + .23
+      );
+
+
+    tailGain.gain
+      .setValueAtTime(
+        .027,
+        now + .05
+      );
+
+
+    tailGain.gain
+      .exponentialRampToValueAtTime(
+        .001,
+        now + .24
+      );
+
+
+    tail.connect(
+      tailGain
+    );
+
+
+    tailGain.connect(
+      audioCtx.destination
+    );
+
+
+    tail.start(
+      now + .05
+    );
+
+
+    tail.stop(
+      now + .25
+    );
+
+
+    // ===================================================
+    // 振動
+    //
+    // 一発で切断された感じ
+    // ===================================================
+
+    if(
+      typeof vibrate ===
+      "function"
+    ){
+
+      vibrate([
+        45,
+        18,
+        75
+      ]);
+
+    }
+
+  }
+
+
+  // =====================================================
+  // Ver.6のCRT発生を監視
+  //
+  // 既存コードを一切上書きしない
+  // =====================================================
+
+  const v7Observer =
+    new MutationObserver(
+      mutations=>{
+
+        mutations.forEach(
+          mutation=>{
+
+            mutation.addedNodes
+            .forEach(node=>{
+
+              if(
+                !(node instanceof HTMLElement)
+              ){
+
+                return;
+
+              }
+
+
+              if(
+                !node.classList
+                ?.contains(
+                  "crtPuchunScreen"
+                )
+              ){
+
+                return;
+
+              }
+
+
+              if(
+                node.dataset
+                .v7CrossDone === "1"
+              ){
+
+                return;
+
+              }
+
+
+              node.dataset
+              .v7CrossDone =
+                "1";
+
+
+              // =========================================
+              // 電源断一発音
+              // =========================================
+
+              v7PowerCutSnap();
+
+
+              // =========================================
+              // 十字がほぼ点になるタイミングで
+              // 最後の光点
+              // =========================================
+
+              setTimeout(()=>{
+
+                if(
+                  !document.body
+                ){
+                  return;
+                }
+
+
+                const dot =
+                  document.createElement(
+                    "div"
+                  );
+
+
+                dot.className =
+                  "v7CrtFinalDot";
+
+
+                document.body.appendChild(
+                  dot
+                );
+
+
+                setTimeout(()=>{
+
+                  if(dot.isConnected){
+
+                    dot.remove();
+
+                  }
+
+                },320);
+
+
+              },590);
+
+            });
+
+          }
+
+        );
+
+      }
+    );
+
+
+  v7Observer.observe(
+    document.body,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+
+  console.log(
+    "CRT CROSS POWER CUT V7 READY"
+  );
+
+})();
