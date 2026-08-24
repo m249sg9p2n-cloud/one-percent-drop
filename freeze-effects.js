@@ -777,3 +777,226 @@
   );
 
 })();
+
+
+// =====================================================
+// FREEZE EFFECTS Ver.2
+// CLEAN GRADE UP PATCH
+//
+// ・旧「昇格」完全非表示
+// ・V9/V10の重複文字を整理
+// ・GRADE UPだけを主役にする
+// ・ホログラムの重複を抑える
+// =====================================================
+
+(() => {
+
+  if(window.__CLEAN_GRADE_UP_V2__) return;
+  window.__CLEAN_GRADE_UP_V2__ = true;
+
+
+  const style =
+    document.createElement("style");
+
+
+  style.textContent = `
+
+    /* =========================================
+       旧「昇格」文字を完全に消す
+    ========================================= */
+
+    .v10Ascension{
+
+      display:none !important;
+
+      opacity:0 !important;
+
+      visibility:hidden !important;
+
+      pointer-events:none !important;
+
+    }
+
+
+    .v10Ascension::before,
+    .v10Ascension::after{
+
+      display:none !important;
+
+      content:none !important;
+
+    }
+
+
+    /* =========================================
+       旧V9の文字演出を非表示
+       背景・紋章だけ使う
+    ========================================= */
+
+    .v9PremiumText{
+
+      display:none !important;
+
+    }
+
+
+    /* =========================================
+       V10レアリティ前の重複文字を整理
+    ========================================= */
+
+    .v10RaritySmall{
+
+      opacity:.55 !important;
+
+      font-size:11px !important;
+
+      letter-spacing:.5em !important;
+
+    }
+
+
+    /* =========================================
+       旧ホログラム文字を弱める
+       GRADE UPと競合しないようにする
+    ========================================= */
+
+    .freezeHologram{
+
+      opacity:.45 !important;
+
+    }
+
+
+    .freezeEpicText,
+    .freezeLegendText,
+    .freezeGodText{
+
+      filter:
+        brightness(.75)
+        saturate(.85)
+        !important;
+
+    }
+
+
+    /* =========================================
+       GRADE UPを最前面へ
+    ========================================= */
+
+    .gradeUpPremium{
+
+      z-index:500 !important;
+
+    }
+
+
+    /* =========================================
+       GRADE UP以外の中央文字が
+       同時に出た場合は抑える
+    ========================================= */
+
+    .v10Stage
+    .v10Rarity{
+
+      z-index:80 !important;
+
+    }
+
+
+    .v10Stage
+    .gradeUpPremium{
+
+      z-index:500 !important;
+
+    }
+
+  `;
+
+
+  document.head.appendChild(
+    style
+  );
+
+
+  // =====================================================
+  // DOM重複監視
+  // =====================================================
+
+  const observer =
+    new MutationObserver(()=>{
+
+      // -----------------------------------------
+      // 旧「昇格」は出た瞬間消す
+      // -----------------------------------------
+
+      document
+        .querySelectorAll(
+          ".v10Ascension"
+        )
+        .forEach(el=>{
+
+          el.style.display =
+            "none";
+
+        });
+
+
+      // -----------------------------------------
+      // V9文字も消す
+      // -----------------------------------------
+
+      document
+        .querySelectorAll(
+          ".v9PremiumText"
+        )
+        .forEach(el=>{
+
+          el.style.display =
+            "none";
+
+        });
+
+
+      // -----------------------------------------
+      // GRADE UPが出ている間は
+      // 旧ホログラム文字を一時弱体化
+      // -----------------------------------------
+
+      const grade =
+        document.querySelector(
+          ".gradeUpPremium"
+        );
+
+
+      if(grade){
+
+        document
+          .querySelectorAll(
+            ".freezeHologram"
+          )
+          .forEach(holo=>{
+
+            holo.style.opacity =
+              ".22";
+
+          });
+
+      }
+
+    });
+
+
+  observer.observe(
+    document.body,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+
+  console.log(
+    "CLEAN GRADE UP V2 READY"
+  );
+
+})();
