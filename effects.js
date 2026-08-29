@@ -1,2479 +1,3060 @@
 // ============================================================
-// 1% DROP - EFFECTS V5 COMPLETE REBUILD
-// standalone / lightweight / iPhone friendly
+// 1% DROP
+// EFFECTS V5 - HYBRID COMPLETE
+//
+// V3 PUCHUN
+//   ↓
+// BLACK SILENCE
+//   ↓
+// V5 CINEMATIC AWAKENING
+//   ↓
+// RARITY IMPACT
+//   ↓
+// PREMIUM DROP
+//
+// COMPLETE REPLACEMENT / NO PATCHES
 // ============================================================
+
 (() => {
-  "use strict";
 
-  if (window.__ONE_PERCENT_EFFECTS_V5__) return;
-  window.__ONE_PERCENT_EFFECTS_V5__ = true;
+"use strict";
 
-  // ============================================================
-  // RARITY SETTINGS
-  // ============================================================
-
-  const R = {
-    RARE: {
-      c: "#45a7ff",
-      c2: "#bfe5ff",
-      phrase: "A BLUE SIGN APPEARS",
-      hold: 650
-    },
-
-    EPIC: {
-      c: "#c367ff",
-      c2: "#f1b6ff",
-      phrase: "POWER BEYOND THE ORDINARY",
-      hold: 760
-    },
-
-    LEGEND: {
-      c: "#ffd83d",
-      c2: "#fff0a5",
-      phrase: "THE LEGEND AWAKENS",
-      hold: 900
-    },
-
-    GOD: {
-      c: "#ffffff",
-      c2: "#8ff7ff",
-      phrase: "THE WORLD HAS CHOSEN YOU",
-      hold: 1150
-    }
-  };
+if(window.__OP_EFFECTS_V5_HYBRID__) return;
+window.__OP_EFFECTS_V5_HYBRID__ = true;
 
 
-  // ============================================================
-  // CSS
-  // ============================================================
+// ============================================================
+// RARITY
+// ============================================================
 
-  const css = `
+const DATA = {
 
-  .v5fx{
-    position:fixed;
-    inset:0;
-    z-index:2147483000;
-    background:#000;
-    overflow:hidden;
-    pointer-events:none;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  RARE:{
+    color:"#43a9ff",
+    light:"#d8f3ff",
+    phrase:"A BLUE SIGN APPEARS",
+    black:620,
+    build:1450,
+    particles:6
+  },
+
+  EPIC:{
+    color:"#c45cff",
+    light:"#f3c4ff",
+    phrase:"POWER BEYOND THE ORDINARY",
+    black:720,
+    build:1550,
+    particles:8
+  },
+
+  LEGEND:{
+    color:"#ffd63e",
+    light:"#fff2a0",
+    phrase:"THE LEGEND AWAKENS",
+    black:850,
+    build:1700,
+    particles:10
+  },
+
+  GOD:{
+    color:"#ffffff",
+    light:"#86f7ff",
+    phrase:"THE WORLD HAS CHOSEN YOU",
+    black:1100,
+    build:1950,
+    particles:12
   }
 
-  .v5fx *{
-    box-sizing:border-box;
+};
+
+
+// ============================================================
+// CSS
+// ============================================================
+
+const style=document.createElement("style");
+
+style.textContent=`
+
+/* =========================================================
+   MASTER
+========================================================= */
+
+.op5{
+  position:fixed;
+  inset:0;
+  z-index:2147483000;
+  overflow:hidden;
+  pointer-events:none;
+  background:#000;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+.op5 *{
+  box-sizing:border-box;
+}
+
+
+/* =========================================================
+   V3 STYLE PUCHUN
+========================================================= */
+
+.op5PuchunBlack{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background:#000;
+}
+
+
+.op5White{
+  position:absolute;
+  inset:0;
+  z-index:30;
+  background:#fff;
+  opacity:0;
+}
+
+.op5White.hit{
+  animation:op5White .055s steps(1,end) forwards;
+}
+
+@keyframes op5White{
+
+  0%{
+    opacity:1;
   }
 
+  70%{
+    opacity:.95;
+  }
 
-  /* ============================================================
-     PUCHUN
-  ============================================================ */
-
-  .v5white{
-    position:absolute;
-    inset:0;
-    background:#fff;
+  100%{
     opacity:0;
-    z-index:20;
   }
 
-  .v5white.go{
-    animation:v5white .045s steps(1) forwards;
-  }
-
-  @keyframes v5white{
-    0%,70%{opacity:1}
-    100%{opacity:0}
-  }
+}
 
 
-  .v5core{
-    position:absolute;
-    left:50%;
-    top:50%;
+.op5Flare{
+  position:absolute;
+  left:50%;
+  top:50%;
 
-    width:min(110vw,760px);
-    aspect-ratio:1;
+  width:145vw;
+  aspect-ratio:1;
 
-    border-radius:50%;
+  z-index:22;
+
+  border-radius:50%;
+
+  opacity:0;
+
+  transform:
+    translate(-50%,-50%)
+    scale(1.15);
+
+  background:
+    radial-gradient(
+      circle,
+      #fff 0%,
+      #fff 3%,
+      rgba(244,253,255,1) 7%,
+      rgba(194,236,255,.96) 13%,
+      rgba(116,190,255,.62) 23%,
+      rgba(80,135,255,.18) 40%,
+      transparent 62%
+    );
+
+  filter:brightness(1.15);
+}
+
+
+.op5Flare.cut{
+  animation:
+    op5FlareCut
+    .215s
+    cubic-bezier(.82,0,.98,.3)
+    forwards;
+}
+
+@keyframes op5FlareCut{
+
+  0%{
+    opacity:1;
 
     transform:
       translate(-50%,-50%)
       scale(1.15);
-
-    opacity:0;
-    z-index:16;
-
-    background:
-      radial-gradient(
-        circle,
-        #fff 0 3%,
-        rgba(225,248,255,1) 6%,
-        rgba(125,210,255,.8) 13%,
-        rgba(80,145,255,.25) 30%,
-        transparent 60%
-      );
   }
 
-  .v5core.go{
-    animation:
-      v5core
-      .19s
-      cubic-bezier(.8,0,1,.3)
-      forwards;
-  }
-
-  @keyframes v5core{
-
-    0%{
-      opacity:1;
-
-      transform:
-        translate(-50%,-50%)
-        scale(1.15);
-    }
-
-    35%{
-      opacity:1;
-
-      transform:
-        translate(-50%,-50%)
-        scale(.55);
-    }
-
-    70%{
-      opacity:.8;
-
-      transform:
-        translate(-50%,-50%)
-        scale(.12);
-    }
-
-    100%{
-      opacity:0;
-
-      transform:
-        translate(-50%,-50%)
-        scale(.005);
-    }
-  }
-
-
-  .v5beam{
-    position:absolute;
-    left:50%;
-    top:50%;
-
-    width:180vw;
-    height:10px;
-
-    z-index:17;
-
-    opacity:0;
-
-    transform:
-      translate(-50%,-50%);
-
-    background:
-      linear-gradient(
-        transparent,
-        #fff,
-        transparent
-      );
-
-    box-shadow:
-      0 0 9px #fff,
-      0 0 30px #9ddfff;
-  }
-
-  .v5beam.go{
-    animation:v5beam .18s linear forwards;
-  }
-
-  @keyframes v5beam{
-
-    0%{
-      opacity:1;
-      width:180vw;
-      height:10px;
-    }
-
-    60%{
-      opacity:.7;
-      width:55vw;
-      height:4px;
-    }
-
-    100%{
-      opacity:0;
-      width:1px;
-      height:1px;
-    }
-  }
-
-
-  /* ============================================================
-     DARK REVEAL
-  ============================================================ */
-
-  .v5scene{
-    position:absolute;
-    inset:0;
-
-    opacity:0;
-
-    color:var(--c);
-
-    background:
-      radial-gradient(
-        circle at 50% 50%,
-        color-mix(
-          in srgb,
-          var(--c) 8%,
-          transparent
-        ),
-        transparent 44%
-      ),
-      #000;
-  }
-
-  .v5scene.on{
+  20%{
     opacity:1;
-  }
-
-
-  .v5point{
-    position:absolute;
-    left:50%;
-    top:50%;
-
-    width:3px;
-    height:3px;
-
-    border-radius:50%;
-
-    background:#fff;
 
     transform:
       translate(-50%,-50%)
-      scale(.01);
-
-    opacity:0;
-
-    box-shadow:
-      0 0 5px #fff,
-      0 0 18px var(--c),
-      0 0 40px var(--c);
+      scale(.82);
   }
 
-  .v5scene.point .v5point{
-    animation:v5point .8s ease-out forwards;
-  }
-
-  @keyframes v5point{
-
-    0%{
-      opacity:0;
-
-      transform:
-        translate(-50%,-50%)
-        scale(.01);
-    }
-
-    55%{
-      opacity:1;
-    }
-
-    100%{
-      opacity:1;
-
-      transform:
-        translate(-50%,-50%)
-        scale(1.4);
-    }
-  }
-
-
-  .v5line{
-    position:absolute;
-    left:50%;
-    top:50%;
-
-    width:0;
-    height:1px;
-
-    opacity:0;
-
-    transform:
-      translate(-50%,-50%);
-
-    background:
-      linear-gradient(
-        90deg,
-        transparent,
-        var(--c),
-        #fff,
-        var(--c),
-        transparent
-      );
-
-    box-shadow:
-      0 0 9px #fff,
-      0 0 22px var(--c);
-  }
-
-  .v5scene.line .v5line{
-    animation:v5line .7s ease-out forwards;
-  }
-
-  @keyframes v5line{
-
-    0%{
-      width:0;
-      opacity:0;
-    }
-
-    15%{
-      opacity:1;
-    }
-
-    100%{
-      width:min(82vw,390px);
-      opacity:.7;
-    }
-  }
-
-
-  /* ============================================================
-     RINGS
-  ============================================================ */
-
-  .v5ring,
-  .v5ring2{
-    position:absolute;
-    left:50%;
-    top:50%;
-
-    border-radius:50%;
-
-    border:
-      1px solid
-      var(--c);
-
-    transform:
-      translate(-50%,-50%)
-      scale(.15);
-
-    opacity:0;
-  }
-
-  .v5ring{
-    width:min(78vw,370px);
-    aspect-ratio:1;
-  }
-
-  .v5ring2{
-    width:min(54vw,255px);
-    aspect-ratio:1;
-  }
-
-  .v5scene.build .v5ring{
-    animation:v5ring 1.8s ease-out forwards;
-  }
-
-  .v5scene.build .v5ring2{
-    animation:v5ring2 1.6s .12s ease-out forwards;
-  }
-
-  @keyframes v5ring{
-
-    0%{
-      opacity:0;
-
-      transform:
-        translate(-50%,-50%)
-        scale(.15)
-        rotate(-35deg);
-    }
-
-    45%{
-      opacity:.45;
-    }
-
-    100%{
-      opacity:.14;
-
-      transform:
-        translate(-50%,-50%)
-        scale(1.05)
-        rotate(20deg);
-    }
-  }
-
-  @keyframes v5ring2{
-
-    0%{
-      opacity:0;
-
-      transform:
-        translate(-50%,-50%)
-        scale(.2)
-        rotate(30deg);
-    }
-
-    45%{
-      opacity:.5;
-    }
-
-    100%{
-      opacity:.18;
-
-      transform:
-        translate(-50%,-50%)
-        scale(1)
-        rotate(-15deg);
-    }
-  }
-
-
-  /* ============================================================
-     TEXT
-  ============================================================ */
-
-  .v5small{
-    position:absolute;
-
-    left:0;
-    right:0;
-    top:37%;
-
-    text-align:center;
-
-    font-size:9px;
-    font-weight:900;
-
-    letter-spacing:7px;
-
-    color:var(--c);
-
-    opacity:0;
-  }
-
-  .v5scene.build .v5small{
-    animation:v5small .6s ease-out forwards;
-  }
-
-  @keyframes v5small{
-
-    from{
-      opacity:0;
-      letter-spacing:13px;
-    }
-
-    to{
-      opacity:.72;
-      letter-spacing:7px;
-    }
-  }
-
-
-  .v5phrase{
-    position:absolute;
-
-    left:6%;
-    right:6%;
-    top:43%;
-
-    text-align:center;
-
-    color:#fff;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size:
-      clamp(18px,5vw,27px);
-
-    font-weight:700;
-
-    letter-spacing:2px;
-
-    text-shadow:
-      0 0 12px var(--c),
-      0 0 28px var(--c);
-  }
-
-
-  .v5char{
-    display:inline-block;
-
-    opacity:0;
-
-    filter:blur(6px);
-
-    transform:
-      translateY(10px)
-      scale(.9);
-  }
-
-  .v5scene.build .v5char{
-    animation:v5char .46s ease-out forwards;
-
-    animation-delay:
-      calc(var(--i) * 38ms);
-  }
-
-  @keyframes v5char{
-
-    to{
-      opacity:1;
-      filter:blur(0);
-      transform:none;
-    }
-  }
-
-
-  /* ============================================================
-     LIGHT PARTICLES
-  ============================================================ */
-
-  .v5spark{
-    position:absolute;
-
-    left:50%;
-    top:50%;
-
-    width:2px;
-    height:2px;
-
-    border-radius:50%;
-
-    background:#fff;
-
-    box-shadow:
-      0 0 8px #fff,
-      0 0 14px var(--c);
-
-    opacity:0;
-
-    transform:
-      rotate(var(--a))
-      translateX(12px);
-  }
-
-  .v5scene.build .v5spark{
-    animation:
-      v5spark
-      1.3s
-      var(--d)
-      ease-out
-      forwards;
-  }
-
-  @keyframes v5spark{
-
-    0%{
-      opacity:0;
-
-      transform:
-        rotate(var(--a))
-        translateX(12px);
-    }
-
-    20%{
-      opacity:.9;
-    }
-
-    100%{
-      opacity:0;
-
-      transform:
-        rotate(var(--a))
-        translateX(var(--r));
-    }
-  }
-
-
-  /* ============================================================
-     SECOND BLACKOUT
-  ============================================================ */
-
-  .v5cut{
-    position:absolute;
-    inset:0;
-
-    background:#000;
-
-    opacity:0;
-
-    z-index:30;
-  }
-
-  .v5cut.go{
-    animation:v5cut .24s steps(1) forwards;
-  }
-
-  @keyframes v5cut{
-
-    0%,68%{
-      opacity:1;
-    }
-
-    69%,100%{
-      opacity:0;
-    }
-  }
-
-
-  /* ============================================================
-     FINAL RARITY
-  ============================================================ */
-
-  .v5final{
-    position:absolute;
-    inset:0;
-
-    z-index:25;
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-
-    opacity:0;
-  }
-
-  .v5final.go{
+  45%{
     opacity:1;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.42);
   }
 
+  68%{
+    opacity:.9;
 
-  .v5word{
-    font-size:
-      clamp(68px,22vw,120px);
-
-    font-weight:1000;
-
-    line-height:.85;
-
-    letter-spacing:-2px;
-
-    color:var(--c);
-
-    opacity:0;
-
-    filter:blur(8px);
-
-    transform:scale(2.4);
-
-    text-shadow:
-      0 0 12px var(--c),
-      0 0 35px var(--c),
-      0 0 70px var(--c);
+    transform:
+      translate(-50%,-50%)
+      scale(.16);
   }
 
-  .v5final.go .v5word{
-    animation:
-      v5word
-      .7s
-      cubic-bezier(.12,1.2,.25,1)
-      forwards;
+  84%{
+    opacity:.72;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.045);
   }
 
-  @keyframes v5word{
-
-    0%{
-      opacity:0;
-      filter:blur(8px);
-      transform:scale(2.4);
-    }
-
-    20%{
-      opacity:1;
-      filter:blur(0);
-    }
-
-    60%{
-      transform:scale(.9);
-    }
-
-    80%{
-      transform:scale(1.06);
-    }
-
-    100%{
-      opacity:1;
-      filter:blur(0);
-      transform:scale(1);
-    }
-  }
-
-
-  .v5burst{
-    position:absolute;
-
-    left:50%;
-    top:50%;
-
-    width:8px;
-    height:8px;
-
-    border-radius:50%;
-
-    background:#fff;
-
+  100%{
     opacity:0;
 
     transform:
       translate(-50%,-50%)
-      scale(.01);
-
-    box-shadow:
-      0 0 25px #fff,
-      0 0 80px var(--c);
+      scale(.002);
   }
 
-  .v5burst.go{
-    animation:v5burst .6s ease-out forwards;
-  }
+}
 
-  @keyframes v5burst{
 
-    0%{
-      opacity:1;
+/* horizontal CRT line */
 
-      transform:
-        translate(-50%,-50%)
-        scale(.01);
-    }
+.op5CutLine{
+  position:absolute;
 
-    55%{
-      opacity:.65;
-    }
+  left:50%;
+  top:50%;
 
-    100%{
-      opacity:0;
+  z-index:24;
 
-      transform:
-        translate(-50%,-50%)
-        scale(105);
-    }
-  }
+  width:190vw;
+  height:13px;
 
+  opacity:0;
 
-  .v5flash{
-    position:absolute;
-    inset:0;
+  transform:
+    translate(-50%,-50%);
 
-    background:#fff;
-
-    z-index:60;
-
-    opacity:0;
-  }
-
-  .v5flash.go{
-    animation:v5flash .16s ease-out forwards;
-  }
-
-  @keyframes v5flash{
-
-    from{
-      opacity:.95;
-    }
-
-    to{
-      opacity:0;
-    }
-  }
-
-
-  /* ============================================================
-     GOD SPECIAL
-  ============================================================ */
-
-  .v5scene.GOD .v5word{
-
-    background:
-      linear-gradient(
-        90deg,
-        #fff,
-        #7ff6ff,
-        #bd8cff,
-        #ff8add,
-        #fff2a0,
-        #fff
-      );
-
-    background-size:
-      240% 100%;
-
-    -webkit-background-clip:text;
-    background-clip:text;
-
-    color:transparent;
-
-    text-shadow:none;
-
-    filter:
-      drop-shadow(
-        0 0 12px
-        rgba(255,255,255,.9)
-      );
-  }
-
-  .v5scene.GOD .v5ring,
-  .v5scene.GOD .v5ring2{
-    border-color:#fff;
-  }
-
-
-  .v5godray{
-    display:none;
-
-    position:absolute;
-
-    left:50%;
-    top:50%;
-
-    width:0;
-    height:2px;
-
-    opacity:0;
-
-    transform-origin:
-      0 50%;
-
-    background:
-      linear-gradient(
-        90deg,
-        #fff,
-        #7ff6ff,
-        #c88cff,
-        #ff8add,
-        transparent
-      );
-
-    box-shadow:
-      0 0 8px #fff;
-  }
-
-  .v5scene.GOD.build .v5godray{
-    display:block;
-
-    animation:
-      v5godray
-      .8s
-      var(--d)
-      ease-out
-      forwards;
-  }
-
-  @keyframes v5godray{
-
-    0%{
-      width:0;
-      opacity:0;
-    }
-
-    18%{
-      opacity:1;
-    }
-
-    100%{
-      width:70vw;
-      opacity:.55;
-    }
-  }
-
-
-  /* ============================================================
-     PREMIUM DROP CARD
-  ============================================================ */
-
-  #dropOverlay.v5drop{
-    overflow:hidden;
-
-    background:
-      #02040a !important;
-
-    --dc:#fff;
-    --dg:rgba(255,255,255,.2);
-  }
-
-
-  #dropOverlay.v5drop:before{
-    content:"";
-
-    position:absolute;
-
-    left:50%;
-    top:44%;
-
-    width:min(120vw,620px);
-    aspect-ratio:1;
-
-    border-radius:50%;
-
-    transform:
-      translate(-50%,-50%);
-
-    background:
-      radial-gradient(
-        circle,
-        var(--dc),
-        transparent 60%
-      );
-
-    opacity:.16;
-
-    pointer-events:none;
-
-    animation:
-      v5aura
-      2.4s
-      ease-in-out
-      infinite
-      alternate;
-  }
-
-  @keyframes v5aura{
-
-    from{
-      opacity:.09;
-
-      transform:
-        translate(-50%,-50%)
-        scale(.82);
-    }
-
-    to{
-      opacity:.25;
-
-      transform:
-        translate(-50%,-50%)
-        scale(1.08);
-    }
-  }
-
-
-  #dropCard.v5card{
-    position:relative;
-
-    overflow:hidden;
-
-    border:
-      1px solid
-      var(--dc) !important;
-
-    background:
-      linear-gradient(
-        180deg,
-        rgba(255,255,255,.08),
-        rgba(11,14,28,.98) 32%,
-        #030409
-      ) !important;
-
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,.05),
-      0 0 30px var(--dg),
-      0 28px 70px rgba(0,0,0,.85) !important;
-
-    animation:
-      v5card
-      .65s
-      cubic-bezier(.15,1,.28,1)
-      forwards !important;
-  }
-
-  @keyframes v5card{
-
-    0%{
-      opacity:0;
-
-      transform:
-        translateY(28px)
-        scale(.78);
-    }
-
-    65%{
-      opacity:1;
-
-      transform:
-        translateY(-4px)
-        scale(1.025);
-    }
-
-    100%{
-      opacity:1;
-      transform:none;
-    }
-  }
-
-
-  #dropCard.v5card:after{
-    content:"";
-
-    position:absolute;
-
-    left:-70%;
-    top:-25%;
-
-    width:42%;
-    height:150%;
-
-    transform:rotate(18deg);
-
-    background:
-      linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,.04),
-        rgba(255,255,255,.23),
-        rgba(255,255,255,.04),
-        transparent
-      );
-
-    animation:
-      v5sweep
-      2.7s
-      .55s
-      ease-in-out
-      infinite;
-
-    pointer-events:none;
-  }
-
-  @keyframes v5sweep{
-
-    0%,30%{
-      left:-70%;
-    }
-
-    70%,100%{
-      left:130%;
-    }
-  }
-
-
-  #dropOverlay.v5drop .dropRarity{
-    text-shadow:
-      0 0 18px
-      var(--dc);
-  }
-
-
-  #dropOverlay.v5drop.GOD .dropRarity{
-
-    background:
-      linear-gradient(
-        90deg,
-        #fff,
-        #7ff6ff,
-        #c88cff,
-        #ff8add,
-        #fff2a0,
-        #fff
-      );
-
-    background-size:
-      230% 100%;
-
-    -webkit-background-clip:text;
-    background-clip:text;
-
-    color:
-      transparent !important;
-
-    animation:
-      v5grad
-      1.4s
-      linear
-      infinite;
-  }
-
-  @keyframes v5grad{
-
-    to{
-      background-position:
-        230% 0;
-    }
-  }
-
-  `;
-
-
-  const st =
-    document.createElement(
-      "style"
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(190,232,255,.25) 20%,
+      #fff 42%,
+      #fff 58%,
+      rgba(190,232,255,.25) 80%,
+      transparent 100%
     );
 
-  st.id =
-    "one-percent-effects-v5-style";
+  box-shadow:
+    0 0 6px #fff,
+    0 0 18px rgba(205,240,255,.95),
+    0 0 40px rgba(90,170,255,.5);
+}
 
-  st.textContent =
-    css;
 
-  document.head.appendChild(
-    st
+.op5CutLine.cut{
+  animation:
+    op5CutLine
+    .215s
+    linear
+    forwards;
+}
+
+
+@keyframes op5CutLine{
+
+  0%{
+    opacity:1;
+    width:190vw;
+    height:13px;
+  }
+
+  30%{
+    opacity:1;
+    width:130vw;
+    height:8px;
+  }
+
+  60%{
+    opacity:.9;
+    width:70vw;
+    height:4px;
+  }
+
+  82%{
+    opacity:.7;
+    width:22vw;
+    height:2px;
+  }
+
+  100%{
+    opacity:0;
+    width:1px;
+    height:1px;
+  }
+
+}
+
+
+/* short vertical flare */
+
+.op5CutVertical{
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  z-index:23;
+
+  width:5px;
+  height:90vh;
+
+  opacity:0;
+
+  transform:
+    translate(-50%,-50%);
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #fff,
+      transparent
+    );
+
+  box-shadow:
+    0 0 10px #fff,
+    0 0 25px rgba(130,210,255,.6);
+}
+
+
+.op5CutVertical.cut{
+  animation:
+    op5Vertical
+    .14s
+    linear
+    forwards;
+}
+
+
+@keyframes op5Vertical{
+
+  0%{
+    opacity:.8;
+    height:90vh;
+  }
+
+  55%{
+    opacity:.45;
+    height:35vh;
+  }
+
+  100%{
+    opacity:0;
+    height:1px;
+  }
+
+}
+
+
+/* =========================================================
+   BLACK CINEMATIC
+========================================================= */
+
+.op5Scene{
+  position:absolute;
+  inset:0;
+
+  z-index:10;
+
+  background:#000;
+
+  opacity:0;
+
+  color:var(--c);
+}
+
+
+.op5Scene.on{
+  opacity:1;
+}
+
+
+/* =========================================================
+   TINY LIGHT POINT
+========================================================= */
+
+.op5Point{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:3px;
+  height:3px;
+
+  border-radius:50%;
+
+  background:#fff;
+
+  opacity:0;
+
+  transform:
+    translate(-50%,-50%)
+    scale(.01);
+
+  box-shadow:
+    0 0 4px #fff,
+    0 0 13px var(--c),
+    0 0 32px var(--c);
+}
+
+
+.op5Scene.point .op5Point{
+
+  animation:
+    op5Point
+    .82s
+    cubic-bezier(.16,.75,.25,1)
+    forwards;
+}
+
+
+@keyframes op5Point{
+
+  0%{
+
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.01);
+
+  }
+
+  35%{
+
+    opacity:.25;
+
+  }
+
+  65%{
+
+    opacity:1;
+
+    transform:
+      translate(-50%,-50%)
+      scale(2.1);
+
+  }
+
+  100%{
+
+    opacity:1;
+
+    transform:
+      translate(-50%,-50%)
+      scale(1);
+
+  }
+
+}
+
+
+/* =========================================================
+   HORIZONTAL AWAKENING LINE
+========================================================= */
+
+.op5AwakeLine{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:0;
+  height:1px;
+
+  opacity:0;
+
+  transform:
+    translate(-50%,-50%);
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--c),
+      #fff,
+      var(--c),
+      transparent
+    );
+
+  box-shadow:
+    0 0 6px #fff,
+    0 0 17px var(--c);
+}
+
+
+.op5Scene.line .op5AwakeLine{
+
+  animation:
+    op5AwakeLine
+    .78s
+    cubic-bezier(.12,.75,.2,1)
+    forwards;
+}
+
+
+@keyframes op5AwakeLine{
+
+  0%{
+
+    width:0;
+    opacity:0;
+
+  }
+
+  15%{
+
+    opacity:.9;
+
+  }
+
+  100%{
+
+    width:min(82vw,390px);
+    opacity:.68;
+
+  }
+
+}
+
+
+/* =========================================================
+   RINGS
+========================================================= */
+
+.op5Ring,
+.op5Ring2{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  border-radius:50%;
+
+  border:
+    1px solid
+    var(--c);
+
+  opacity:0;
+
+  transform:
+    translate(-50%,-50%)
+    scale(.18);
+
+}
+
+
+.op5Ring{
+
+  width:min(78vw,370px);
+  aspect-ratio:1;
+
+}
+
+
+.op5Ring2{
+
+  width:min(55vw,260px);
+  aspect-ratio:1;
+
+}
+
+
+.op5Scene.build .op5Ring{
+
+  animation:
+    op5Ring
+    1.9s
+    ease-out
+    forwards;
+
+}
+
+
+.op5Scene.build .op5Ring2{
+
+  animation:
+    op5Ring2
+    1.75s
+    .13s
+    ease-out
+    forwards;
+
+}
+
+
+@keyframes op5Ring{
+
+  0%{
+
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.18)
+      rotate(-35deg);
+
+  }
+
+  45%{
+
+    opacity:.43;
+
+  }
+
+  100%{
+
+    opacity:.13;
+
+    transform:
+      translate(-50%,-50%)
+      scale(1.05)
+      rotate(17deg);
+
+  }
+
+}
+
+
+@keyframes op5Ring2{
+
+  0%{
+
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.22)
+      rotate(35deg);
+
+  }
+
+  48%{
+
+    opacity:.4;
+
+  }
+
+  100%{
+
+    opacity:.17;
+
+    transform:
+      translate(-50%,-50%)
+      scale(1)
+      rotate(-14deg);
+
+  }
+
+}
+
+
+/* =========================================================
+   SIGNAL TEXT
+========================================================= */
+
+.op5Signal{
+
+  position:absolute;
+
+  left:0;
+  right:0;
+
+  top:37%;
+
+  text-align:center;
+
+  font-size:9px;
+
+  font-weight:900;
+
+  letter-spacing:8px;
+
+  color:var(--c);
+
+  opacity:0;
+
+}
+
+
+.op5Scene.build .op5Signal{
+
+  animation:
+    op5Signal
+    .75s
+    ease-out
+    forwards;
+
+}
+
+
+@keyframes op5Signal{
+
+  from{
+
+    opacity:0;
+    letter-spacing:14px;
+
+  }
+
+  to{
+
+    opacity:.7;
+    letter-spacing:8px;
+
+  }
+
+}
+
+
+/* =========================================================
+   PHRASE
+========================================================= */
+
+.op5Phrase{
+
+  position:absolute;
+
+  left:6%;
+  right:6%;
+
+  top:43%;
+
+  text-align:center;
+
+  color:#fff;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-weight:700;
+
+  font-size:
+    clamp(18px,5.2vw,27px);
+
+  letter-spacing:2px;
+
+  text-shadow:
+    0 0 10px var(--c),
+    0 0 23px var(--c);
+
+}
+
+
+.op5Char{
+
+  display:inline-block;
+
+  opacity:0;
+
+  filter:blur(7px);
+
+  transform:
+    translateY(11px)
+    scale(.88);
+
+}
+
+
+.op5Scene.build .op5Char{
+
+  animation:
+    op5Char
+    .5s
+    ease-out
+    forwards;
+
+  animation-delay:
+    calc(var(--i) * 40ms);
+
+}
+
+
+@keyframes op5Char{
+
+  to{
+
+    opacity:1;
+
+    filter:blur(0);
+
+    transform:
+      translateY(0)
+      scale(1);
+
+  }
+
+}
+
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+.op5Spark{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:2px;
+  height:2px;
+
+  border-radius:50%;
+
+  background:#fff;
+
+  opacity:0;
+
+  box-shadow:
+    0 0 6px #fff,
+    0 0 13px var(--c);
+
+}
+
+
+.op5Scene.build .op5Spark{
+
+  animation:
+    op5Spark
+    1.35s
+    var(--delay)
+    ease-out
+    forwards;
+
+}
+
+
+@keyframes op5Spark{
+
+  0%{
+
+    opacity:0;
+
+    transform:
+      rotate(var(--angle))
+      translateX(8px);
+
+  }
+
+  25%{
+
+    opacity:.85;
+
+  }
+
+  100%{
+
+    opacity:0;
+
+    transform:
+      rotate(var(--angle))
+      translateX(var(--distance));
+
+  }
+
+}
+
+
+/* =========================================================
+   SECOND BLACK
+========================================================= */
+
+.op5SecondBlack{
+
+  position:absolute;
+
+  inset:0;
+
+  background:#000;
+
+  z-index:40;
+
+  opacity:0;
+
+}
+
+
+.op5SecondBlack.go{
+
+  animation:
+    op5SecondBlack
+    .24s
+    steps(1,end)
+    forwards;
+
+}
+
+
+@keyframes op5SecondBlack{
+
+  0%,72%{
+
+    opacity:1;
+
+  }
+
+  73%,100%{
+
+    opacity:0;
+
+  }
+
+}
+
+
+/* =========================================================
+   FINAL RARITY
+========================================================= */
+
+.op5Final{
+
+  position:absolute;
+
+  inset:0;
+
+  z-index:35;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  opacity:0;
+
+}
+
+
+.op5Final.go{
+
+  opacity:1;
+
+}
+
+
+.op5FinalWord{
+
+  font-size:
+    clamp(68px,22vw,120px);
+
+  line-height:.86;
+
+  font-weight:1000;
+
+  letter-spacing:-2px;
+
+  color:var(--c);
+
+  opacity:0;
+
+  transform:
+    scale(1.75);
+
+  filter:blur(5px);
+
+  text-shadow:
+    0 0 8px var(--c),
+    0 0 22px var(--c),
+    0 0 45px var(--c);
+
+}
+
+
+.op5Final.go .op5FinalWord{
+
+  animation:
+    op5FinalWord
+    .72s
+    cubic-bezier(.12,1.15,.25,1)
+    forwards;
+
+}
+
+
+@keyframes op5FinalWord{
+
+  0%{
+
+    opacity:0;
+
+    filter:blur(5px);
+
+    transform:
+      scale(1.75);
+
+  }
+
+  20%{
+
+    opacity:1;
+
+    filter:blur(0);
+
+  }
+
+  55%{
+
+    transform:
+      scale(.92);
+
+  }
+
+  78%{
+
+    transform:
+      scale(1.04);
+
+  }
+
+  100%{
+
+    opacity:1;
+
+    filter:blur(0);
+
+    transform:
+      scale(1);
+
+  }
+
+}
+
+
+/* =========================================================
+   FINAL BURST - intentionally weaker than old V5
+========================================================= */
+
+.op5Burst{
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:6px;
+  height:6px;
+
+  z-index:32;
+
+  border-radius:50%;
+
+  opacity:0;
+
+  background:#fff;
+
+  transform:
+    translate(-50%,-50%)
+    scale(.01);
+
+  box-shadow:
+    0 0 16px #fff,
+    0 0 38px var(--c);
+
+}
+
+
+.op5Burst.go{
+
+  animation:
+    op5Burst
+    .48s
+    ease-out
+    forwards;
+
+}
+
+
+@keyframes op5Burst{
+
+  0%{
+
+    opacity:.75;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.01);
+
+  }
+
+  45%{
+
+    opacity:.32;
+
+  }
+
+  100%{
+
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(58);
+
+  }
+
+}
+
+
+/* =========================================================
+   SOFT FINAL FLASH
+========================================================= */
+
+.op5FinalFlash{
+
+  position:absolute;
+
+  inset:0;
+
+  z-index:60;
+
+  opacity:0;
+
+  background:#fff;
+
+}
+
+
+.op5FinalFlash.go{
+
+  animation:
+    op5FinalFlash
+    .15s
+    ease-out
+    forwards;
+
+}
+
+
+@keyframes op5FinalFlash{
+
+  0%{
+
+    opacity:.30;
+
+  }
+
+  100%{
+
+    opacity:0;
+
+  }
+
+}
+
+
+/* =========================================================
+   GOD
+========================================================= */
+
+.op5Scene.GOD .op5FinalWord{
+
+  background:
+    linear-gradient(
+      90deg,
+      #ffffff,
+      #88f7ff,
+      #a993ff,
+      #fa8fe9,
+      #fff2a0,
+      #ffffff
+    );
+
+  background-size:
+    240% 100%;
+
+  -webkit-background-clip:text;
+  background-clip:text;
+
+  color:transparent;
+
+  text-shadow:none;
+
+  filter:
+    drop-shadow(
+      0 0 11px
+      rgba(255,255,255,.85)
+    );
+
+}
+
+
+.op5GodRay{
+
+  display:none;
+
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:0;
+  height:2px;
+
+  opacity:0;
+
+  transform-origin:
+    left center;
+
+  background:
+    linear-gradient(
+      90deg,
+      #fff,
+      #86f7ff,
+      #c994ff,
+      #ff92df,
+      transparent
+    );
+
+  box-shadow:
+    0 0 7px #fff;
+
+}
+
+
+.op5Scene.GOD.build .op5GodRay{
+
+  display:block;
+
+  animation:
+    op5GodRay
+    .85s
+    var(--delay)
+    ease-out
+    forwards;
+
+}
+
+
+@keyframes op5GodRay{
+
+  0%{
+
+    opacity:0;
+    width:0;
+
+  }
+
+  18%{
+
+    opacity:.9;
+
+  }
+
+  100%{
+
+    opacity:.42;
+    width:70vw;
+
+  }
+
+}
+
+
+/* =========================================================
+   DROP LUXURY
+========================================================= */
+
+#dropOverlay.op5Drop{
+
+  overflow:hidden;
+
+  background:
+    #02040a !important;
+
+  --dropColor:#fff;
+  --dropGlow:rgba(255,255,255,.2);
+
+}
+
+
+#dropOverlay.op5Drop::before{
+
+  content:"";
+
+  position:absolute;
+
+  left:50%;
+  top:44%;
+
+  width:min(120vw,620px);
+
+  aspect-ratio:1;
+
+  border-radius:50%;
+
+  transform:
+    translate(-50%,-50%);
+
+  background:
+    radial-gradient(
+      circle,
+      var(--dropColor),
+      transparent 60%
+    );
+
+  opacity:.14;
+
+  pointer-events:none;
+
+  animation:
+    op5DropAura
+    2.5s
+    ease-in-out
+    infinite
+    alternate;
+
+}
+
+
+@keyframes op5DropAura{
+
+  from{
+
+    opacity:.08;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.84);
+
+  }
+
+  to{
+
+    opacity:.23;
+
+    transform:
+      translate(-50%,-50%)
+      scale(1.07);
+
+  }
+
+}
+
+
+#dropCard.op5Card{
+
+  position:relative;
+
+  overflow:hidden;
+
+  border:
+    1px solid
+    var(--dropColor) !important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.08),
+      rgba(12,15,30,.98) 32%,
+      #030409
+    ) !important;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.05),
+    0 0 28px var(--dropGlow),
+    0 28px 68px rgba(0,0,0,.86) !important;
+
+  animation:
+    op5CardIn
+    .65s
+    cubic-bezier(.15,1,.28,1)
+    forwards !important;
+
+}
+
+
+@keyframes op5CardIn{
+
+  0%{
+
+    opacity:0;
+
+    transform:
+      translateY(28px)
+      scale(.8);
+
+  }
+
+  65%{
+
+    opacity:1;
+
+    transform:
+      translateY(-4px)
+      scale(1.025);
+
+  }
+
+  100%{
+
+    opacity:1;
+
+    transform:
+      translateY(0)
+      scale(1);
+
+  }
+
+}
+
+
+#dropCard.op5Card::after{
+
+  content:"";
+
+  position:absolute;
+
+  left:-70%;
+  top:-25%;
+
+  width:42%;
+  height:150%;
+
+  transform:
+    rotate(18deg);
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.04),
+      rgba(255,255,255,.22),
+      rgba(255,255,255,.04),
+      transparent
+    );
+
+  pointer-events:none;
+
+  animation:
+    op5CardSweep
+    2.8s
+    .6s
+    ease-in-out
+    infinite;
+
+}
+
+
+@keyframes op5CardSweep{
+
+  0%,30%{
+
+    left:-70%;
+
+  }
+
+  70%,100%{
+
+    left:130%;
+
+  }
+
+}
+
+
+#dropOverlay.op5Drop .dropRarity{
+
+  text-shadow:
+    0 0 18px
+    var(--dropColor);
+
+}
+
+
+#dropOverlay.op5Drop.GOD .dropRarity{
+
+  background:
+    linear-gradient(
+      90deg,
+      #fff,
+      #7ff6ff,
+      #c793ff,
+      #ff91df,
+      #fff2a0,
+      #fff
+    );
+
+  background-size:
+    240% 100%;
+
+  -webkit-background-clip:text;
+  background-clip:text;
+
+  color:
+    transparent !important;
+
+  animation:
+    op5GodText
+    1.5s
+    linear
+    infinite;
+
+}
+
+
+@keyframes op5GodText{
+
+  to{
+
+    background-position:
+      240% 0;
+
+  }
+
+}
+
+`;
+
+document.head.appendChild(style);
+
+
+// ============================================================
+// AUDIO ENGINE
+// ============================================================
+
+let ownAudio=null;
+
+
+function getAudio(){
+
+  try{
+
+    if(
+      typeof audioCtx!=="undefined" &&
+      audioCtx
+    ){
+
+      if(audioCtx.state==="suspended"){
+        audioCtx.resume();
+      }
+
+      return audioCtx;
+
+    }
+
+  }catch(e){}
+
+
+  try{
+
+    if(!ownAudio){
+
+      const AC=
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+      if(AC){
+        ownAudio=new AC();
+      }
+
+    }
+
+
+    if(
+      ownAudio &&
+      ownAudio.state==="suspended"
+    ){
+
+      ownAudio.resume();
+
+    }
+
+
+    return ownAudio;
+
+  }catch(e){
+
+    return null;
+
+  }
+
+}
+
+
+// ============================================================
+// BASIC TONE
+// ============================================================
+
+function tone(
+  start,
+  end,
+  duration,
+  volume,
+  type="sine"
+){
+
+  const ctx=getAudio();
+
+  if(!ctx) return;
+
+
+  const now=ctx.currentTime;
+
+  const oscillator=
+    ctx.createOscillator();
+
+  const gain=
+    ctx.createGain();
+
+
+  oscillator.type=type;
+
+
+  oscillator.frequency
+  .setValueAtTime(
+    start,
+    now
   );
 
 
-  // ============================================================
-  // AUDIO
-  // ============================================================
+  if(end>0){
 
-  let ownAC = null;
+    oscillator.frequency
+    .exponentialRampToValueAtTime(
+      end,
+      now+duration
+    );
 
-
-  function ac(){
-
-    try{
-
-      if(
-        typeof audioCtx !==
-        "undefined" &&
-        audioCtx
-      ){
-
-        if(
-          audioCtx.state ===
-          "suspended"
-        ){
-
-          audioCtx.resume();
-        }
-
-        return audioCtx;
-      }
-
-    }catch(e){}
-
-
-    try{
-
-      if(!ownAC){
-
-        const A =
-          window.AudioContext ||
-          window.webkitAudioContext;
-
-        if(A){
-          ownAC = new A();
-        }
-      }
-
-
-      if(
-        ownAC &&
-        ownAC.state ===
-        "suspended"
-      ){
-
-        ownAC.resume();
-      }
-
-
-      return ownAC;
-
-    }catch(e){
-
-      return null;
-    }
   }
 
 
-  function osc(
-    f1,
-    f2,
-    d,
-    v,
-    type="sine"
+  gain.gain
+  .setValueAtTime(
+    Math.max(.001,volume),
+    now
+  );
+
+
+  gain.gain
+  .exponentialRampToValueAtTime(
+    .001,
+    now+duration
+  );
+
+
+  oscillator.connect(gain);
+
+  gain.connect(
+    ctx.destination
+  );
+
+
+  oscillator.start(now);
+
+  oscillator.stop(
+    now+duration+.01
+  );
+
+}
+
+
+// ============================================================
+// V3 STYLE PUCHUN SOUND
+//
+// sharp electrical cut
+// +
+// very short sub impact
+//
+// NOT "DOOOON"
+// ============================================================
+
+function puchunSound(){
+
+  const ctx=getAudio();
+
+  if(!ctx) return;
+
+
+  const now=ctx.currentTime;
+
+
+  // --------------------------------------------------------
+  // SHARP SNAP
+  // --------------------------------------------------------
+
+  const snap=
+    ctx.createOscillator();
+
+  const snapGain=
+    ctx.createGain();
+
+  const snapFilter=
+    ctx.createBiquadFilter();
+
+
+  snap.type="square";
+
+
+  snap.frequency
+  .setValueAtTime(
+    1900,
+    now
+  );
+
+
+  snap.frequency
+  .exponentialRampToValueAtTime(
+    105,
+    now+.031
+  );
+
+
+  snapFilter.type=
+    "bandpass";
+
+  snapFilter.frequency.value=
+    1850;
+
+  snapFilter.Q.value=
+    .62;
+
+
+  snapGain.gain
+  .setValueAtTime(
+    .21,
+    now
+  );
+
+
+  snapGain.gain
+  .exponentialRampToValueAtTime(
+    .001,
+    now+.043
+  );
+
+
+  snap.connect(
+    snapFilter
+  );
+
+  snapFilter.connect(
+    snapGain
+  );
+
+  snapGain.connect(
+    ctx.destination
+  );
+
+
+  snap.start(now);
+
+  snap.stop(
+    now+.05
+  );
+
+
+  // --------------------------------------------------------
+  // VERY SHORT LOW IMPACT
+  // --------------------------------------------------------
+
+  tone(
+    86,
+    34,
+    .078,
+    .27,
+    "sine"
+  );
+
+
+  // --------------------------------------------------------
+  // ELECTRIC CUT NOISE
+  // --------------------------------------------------------
+
+  const length=
+    Math.floor(
+      ctx.sampleRate*.032
+    );
+
+
+  const buffer=
+    ctx.createBuffer(
+      1,
+      length,
+      ctx.sampleRate
+    );
+
+
+  const data=
+    buffer.getChannelData(0);
+
+
+  for(
+    let i=0;
+    i<length;
+    i++
   ){
 
-    const c = ac();
+    const life=
+      1-i/length;
 
-    if(!c) return;
+    data[i]=
+      (Math.random()*2-1)
+      *
+      life
+      *
+      life;
 
-
-    const t =
-      c.currentTime;
-
-
-    const o =
-      c.createOscillator();
-
-
-    const g =
-      c.createGain();
-
-
-    o.type =
-      type;
-
-
-    o.frequency.setValueAtTime(
-      f1,
-      t
-    );
-
-
-    if(f2 > 0){
-
-      o.frequency
-      .exponentialRampToValueAtTime(
-        f2,
-        t + d
-      );
-    }
-
-
-    g.gain.setValueAtTime(
-      Math.max(.001,v),
-      t
-    );
-
-
-    g.gain
-    .exponentialRampToValueAtTime(
-      .001,
-      t + d
-    );
-
-
-    o.connect(g);
-
-    g.connect(
-      c.destination
-    );
-
-
-    o.start(t);
-
-    o.stop(
-      t + d + .01
-    );
   }
 
 
-  // ============================================================
-  // PUCHUN SOUND
-  // sharp cut + instant sub bass
-  // ============================================================
+  const source=
+    ctx.createBufferSource();
 
-  function puchun(){
+  const noiseGain=
+    ctx.createGain();
 
-    const c = ac();
-
-    if(!c) return;
+  const high=
+    ctx.createBiquadFilter();
 
 
-    const t =
-      c.currentTime;
+  source.buffer=
+    buffer;
 
 
-    const o =
-      c.createOscillator();
+  high.type=
+    "highpass";
+
+  high.frequency.value=
+    1050;
 
 
-    const g =
-      c.createGain();
+  noiseGain.gain
+  .setValueAtTime(
+    .13,
+    now
+  );
 
 
-    const f =
-      c.createBiquadFilter();
+  noiseGain.gain
+  .exponentialRampToValueAtTime(
+    .001,
+    now+.032
+  );
 
 
-    o.type =
-      "square";
+  source.connect(high);
+
+  high.connect(
+    noiseGain
+  );
+
+  noiseGain.connect(
+    ctx.destination
+  );
 
 
-    o.frequency
-    .setValueAtTime(
-      1750,
-      t
-    );
+  source.start(now);
 
 
-    o.frequency
-    .exponentialRampToValueAtTime(
-      115,
-      t + .032
-    );
+  try{
 
-
-    f.type =
-      "bandpass";
-
-    f.frequency.value =
-      1750;
-
-    f.Q.value =
-      .55;
-
-
-    g.gain.setValueAtTime(
-      .18,
-      t
-    );
-
-
-    g.gain
-    .exponentialRampToValueAtTime(
-      .001,
-      t + .045
-    );
-
-
-    o.connect(f);
-
-    f.connect(g);
-
-    g.connect(
-      c.destination
-    );
-
-
-    o.start(t);
-
-    o.stop(
-      t + .05
-    );
-
-
-    // Instant low-frequency impact
-
-    osc(
-      68,
-      38,
-      .09,
-      .26,
-      "sine"
-    );
-
-
-    // Electric snap noise
-
-    const len =
-      Math.floor(
-        c.sampleRate * .035
-      );
-
-
-    const b =
-      c.createBuffer(
-        1,
-        len,
-        c.sampleRate
-      );
-
-
-    const d =
-      b.getChannelData(0);
-
-
-    for(
-      let i=0;
-      i<len;
-      i++
+    if(
+      typeof vibrate==="function"
     ){
 
-      const q =
-        1 - i/len;
+      vibrate(60);
 
-      d[i] =
-        (Math.random()*2-1)
-        *
-        q
-        *
-        q;
+    }else{
+
+      navigator.vibrate?.(60);
+
     }
 
+  }catch(e){}
 
-    const s =
-      c.createBufferSource();
-
-
-    const ng =
-      c.createGain();
+}
 
 
-    const hp =
-      c.createBiquadFilter();
+// ============================================================
+// DARK BUILD SOUND
+// ============================================================
+
+function buildSound(rarity){
+
+  tone(
+    rarity==="GOD"
+      ? 46
+      : 70,
+
+    rarity==="GOD"
+      ? 33
+      : 48,
+
+    .23,
+
+    rarity==="GOD"
+      ? .06
+      : .035,
+
+    "sine"
+  );
 
 
-    s.buffer =
-      b;
+  setTimeout(()=>{
 
+    tone(
+      rarity==="GOD"
+        ? 460
+        : rarity==="LEGEND"
+        ? 420
+        : rarity==="EPIC"
+        ? 350
+        : 310,
 
-    hp.type =
-      "highpass";
+      220,
 
-    hp.frequency.value =
-      900;
+      .12,
 
+      .023,
 
-    ng.gain.setValueAtTime(
-      .1,
-      t
+      "triangle"
     );
 
+  },560);
 
-    ng.gain
-    .exponentialRampToValueAtTime(
-      .001,
-      t + .035
+}
+
+
+// ============================================================
+// FINAL HIT
+// ============================================================
+
+function finalHitSound(rarity){
+
+  tone(
+    rarity==="GOD"
+      ? 56
+      : 64,
+
+    38,
+
+    .105,
+
+    rarity==="GOD"
+      ? .17
+      : .11,
+
+    "sine"
+  );
+
+
+  tone(
+    rarity==="GOD"
+      ? 980
+      : rarity==="LEGEND"
+      ? 850
+      : 720,
+
+    300,
+
+    .055,
+
+    .045,
+
+    "square"
+  );
+
+
+  setTimeout(()=>{
+
+    tone(
+      rarity==="GOD"
+        ? 1150
+        : rarity==="LEGEND"
+        ? 920
+        : rarity==="EPIC"
+        ? 810
+        : 690,
+
+      470,
+
+      .15,
+
+      .04,
+
+      "triangle"
     );
 
-
-    s.connect(hp);
-
-    hp.connect(ng);
-
-    ng.connect(
-      c.destination
-    );
+  },70);
 
 
-    s.start(t);
+  try{
 
+    if(
+      typeof vibrate==="function"
+    ){
 
-    try{
-
-      if(
-        typeof vibrate ===
-        "function"
-      ){
-
-        vibrate(65);
-
-      }else{
-
-        navigator.vibrate?.(65);
-      }
-
-    }catch(e){}
-  }
-
-
-  function buildSound(r){
-
-    osc(
-      r === "GOD"
-        ? 48
-        : 72,
-
-      r === "GOD"
-        ? 34
-        : 50,
-
-      .22,
-
-      r === "GOD"
-        ? .06
-        : .035,
-
-      "sine"
-    );
-
-
-    setTimeout(()=>{
-
-      osc(
-        r === "LEGEND" ||
-        r === "GOD"
-          ? 430
-          : 330,
-
-        220,
-        .13,
-        .025,
-        "triangle"
+      vibrate(
+        rarity==="GOD"
+        ? [75,30,110]
+        : 65
       );
 
-    },560);
-  }
+    }
+
+  }catch(e){}
+
+}
 
 
-  function hitSound(r){
+// ============================================================
+// TEXT HELPER
+// ============================================================
 
-    osc(
-      r === "GOD"
-        ? 54
-        : 64,
+function createLetters(text){
 
-      38,
-      .11,
+  return [...text]
+  .map((char,index)=>{
 
-      r === "GOD"
-        ? .16
-        : .11,
+    if(char===" "){
+      return "<span>&nbsp;</span>";
+    }
 
-      "sine"
-    );
+    return `
+      <span
+        class="op5Char"
+        style="--i:${index}"
+      >${char}</span>
+    `;
 
+  })
+  .join("");
 
-    osc(
-      r === "GOD"
-        ? 960
-        : 760,
-
-      300,
-      .065,
-      .05,
-      "square"
-    );
+}
 
 
-    setTimeout(()=>{
+// ============================================================
+// PARTICLES
+// ============================================================
 
-      osc(
-        r === "GOD"
-          ? 1100
-          : r === "LEGEND"
-          ? 920
-          : 780,
+function addParticles(
+  scene,
+  rarity
+){
 
-        450,
-        .15,
-        .04,
-        "triangle"
-      );
-
-    },70);
+  const count=
+    DATA[rarity].particles;
 
 
-    try{
-
-      const p =
-        r === "GOD"
-          ? [80,30,120]
-          : 70;
-
-
-      if(
-        typeof vibrate ===
-        "function"
-      ){
-
-        vibrate(p);
-
-      }else{
-
-        navigator.vibrate?.(p);
-      }
-
-    }catch(e){}
-  }
-
-
-  // ============================================================
-  // HELPERS
-  // ============================================================
-
-  const chars =
-    txt =>
-      [...txt]
-      .map(
-        (x,i)=>
-          x === " "
-            ? "<span>&nbsp;</span>"
-            : `<span class="v5char" style="--i:${i}">${x}</span>`
-      )
-      .join("");
-
-
-  // ============================================================
-  // MAIN CINEMATIC
-  // ============================================================
-
-  function playSequence(
-    rarity,
-    done
+  for(
+    let i=0;
+    i<count;
+    i++
   ){
 
-    const cfg =
-      R[rarity] ||
-      R.RARE;
-
-
-    document
-    .querySelectorAll(
-      ".v5fx"
-    )
-    .forEach(
-      x=>x.remove()
-    );
-
-
-    const root =
+    const spark=
       document.createElement(
-        "div"
+        "i"
       );
 
 
-    root.className =
-      "v5fx";
+    spark.className=
+      "op5Spark";
 
 
-    root.innerHTML = `
+    spark.style.setProperty(
+      "--angle",
+      Math.random()*360+"deg"
+    );
+
+
+    spark.style.setProperty(
+      "--distance",
+      80+Math.random()*150+"px"
+    );
+
+
+    spark.style.setProperty(
+      "--delay",
+      .12+Math.random()*.55+"s"
+    );
+
+
+    scene.appendChild(
+      spark
+    );
+
+  }
+
+}
+
+
+// ============================================================
+// FULL CINEMATIC
+// ============================================================
+
+function playSequence(
+  rarity,
+  done
+){
+
+  rarity=
+    DATA[rarity]
+    ? rarity
+    : "RARE";
+
+
+  const cfg=
+    DATA[rarity];
+
+
+  document
+  .querySelectorAll(
+    ".op5"
+  )
+  .forEach(
+    node=>node.remove()
+  );
+
+
+  const root=
+    document.createElement(
+      "div"
+    );
+
+
+  root.className=
+    "op5";
+
+
+  root.innerHTML=`
+
+    <div
+      class="op5PuchunBlack"
+    ></div>
+
+
+    <div
+      class="op5Scene ${rarity}"
+      style="--c:${cfg.color}"
+    >
 
       <div
-        class="v5scene ${rarity}"
+        class="op5Point"
+      ></div>
+
+      <div
+        class="op5AwakeLine"
+      ></div>
+
+      <div
+        class="op5Ring"
+      ></div>
+
+      <div
+        class="op5Ring2"
+      ></div>
+
+
+      <div
+        class="op5Signal"
+      >
+        RARITY SIGNAL DETECTED
+      </div>
+
+
+      <div
+        class="op5Phrase"
+      >
+        ${createLetters(cfg.phrase)}
+      </div>
+
+
+      <i
+        class="op5GodRay"
         style="
-          --c:${cfg.c};
-          --c2:${cfg.c2}
+          transform:rotate(-20deg);
+          --delay:.10s
         "
+      ></i>
+
+      <i
+        class="op5GodRay"
+        style="
+          transform:rotate(18deg);
+          --delay:.22s
+        "
+      ></i>
+
+      <i
+        class="op5GodRay"
+        style="
+          transform:rotate(145deg);
+          --delay:.36s
+        "
+      ></i>
+
+      <i
+        class="op5GodRay"
+        style="
+          transform:rotate(210deg);
+          --delay:.50s
+        "
+      ></i>
+
+
+      <div
+        class="op5SecondBlack"
+      ></div>
+
+
+      <div
+        class="op5Burst"
+      ></div>
+
+
+      <div
+        class="op5Final"
       >
 
-        <div class="v5point"></div>
-
-        <div class="v5line"></div>
-
-        <div class="v5ring"></div>
-
-        <div class="v5ring2"></div>
-
-
-        <i
-          class="v5godray"
-          style="
-            transform:rotate(-18deg);
-            --d:.1s
-          "
-        ></i>
-
-        <i
-          class="v5godray"
-          style="
-            transform:rotate(22deg);
-            --d:.24s
-          "
-        ></i>
-
-        <i
-          class="v5godray"
-          style="
-            transform:rotate(148deg);
-            --d:.38s
-          "
-        ></i>
-
-        <i
-          class="v5godray"
-          style="
-            transform:rotate(205deg);
-            --d:.52s
-          "
-        ></i>
-
-
-        <div class="v5small">
-          RARITY SIGNAL DETECTED
+        <div
+          class="op5FinalWord"
+        >
+          ${rarity}
         </div>
-
-
-        <div class="v5phrase">
-          ${chars(cfg.phrase)}
-        </div>
-
-
-        <div class="v5cut"></div>
-
-        <div class="v5burst"></div>
-
-
-        <div class="v5final">
-
-          <div class="v5word">
-            ${rarity}
-          </div>
-
-        </div>
-
-
-        <div class="v5flash"></div>
 
       </div>
 
 
-      <div class="v5core"></div>
+      <div
+        class="op5FinalFlash"
+      ></div>
 
-      <div class="v5beam"></div>
-
-      <div class="v5white"></div>
-
-    `;
+    </div>
 
 
-    document.body.appendChild(
-      root
+    <div
+      class="op5Flare"
+    ></div>
+
+
+    <div
+      class="op5CutLine"
+    ></div>
+
+
+    <div
+      class="op5CutVertical"
+    ></div>
+
+
+    <div
+      class="op5White"
+    ></div>
+
+  `;
+
+
+  document.body.appendChild(
+    root
+  );
+
+
+  const scene=
+    root.querySelector(
+      ".op5Scene"
+    );
+
+  const white=
+    root.querySelector(
+      ".op5White"
+    );
+
+  const flare=
+    root.querySelector(
+      ".op5Flare"
+    );
+
+  const line=
+    root.querySelector(
+      ".op5CutLine"
+    );
+
+  const vertical=
+    root.querySelector(
+      ".op5CutVertical"
     );
 
 
-    const scene =
-      root.querySelector(
-        ".v5scene"
-      );
+  addParticles(
+    scene,
+    rarity
+  );
 
 
-    const white =
-      root.querySelector(
-        ".v5white"
-      );
+  // ========================================================
+  // 1. Tiny delay after PUSH
+  // ========================================================
 
+  const START=245;
 
-    const core =
-      root.querySelector(
-        ".v5core"
-      );
 
+  // ========================================================
+  // 2. PUCHUN
+  // ========================================================
 
-    const beam =
-      root.querySelector(
-        ".v5beam"
-      );
+  setTimeout(()=>{
 
-
-    // ==========================================================
-    // Lightweight particles
-    // ==========================================================
-
-    const n =
-      rarity === "GOD"
-        ? 14
-        : rarity === "LEGEND"
-        ? 11
-        : rarity === "EPIC"
-        ? 8
-        : 6;
-
-
-    for(
-      let i=0;
-      i<n;
-      i++
-    ){
-
-      const s =
-        document.createElement(
-          "i"
-        );
-
-
-      s.className =
-        "v5spark";
-
-
-      s.style.cssText = `
-        --a:${Math.random()*360}deg;
-        --r:${80+Math.random()*150}px;
-        --d:${.1+Math.random()*.6}s
-      `;
-
-
-      scene.appendChild(s);
-    }
-
-
-    // ==========================================================
-    // 1. PUSH -> PUCHUN
-    // ==========================================================
-
-    const pre = 260;
-
-
-    setTimeout(()=>{
-
-      white.classList.add(
-        "go"
-      );
-
-      puchun();
-
-    },pre);
-
-
-    // ==========================================================
-    // 2. CRT collapse
-    // ==========================================================
-
-    setTimeout(()=>{
-
-      core.classList.add(
-        "go"
-      );
-
-      beam.classList.add(
-        "go"
-      );
-
-    },pre + 35);
-
-
-    // ==========================================================
-    // 3. Full blackout
-    // ==========================================================
-
-    setTimeout(()=>{
-
-      scene.classList.add(
-        "on"
-      );
-
-
-      white.remove();
-
-      core.remove();
-
-      beam.remove();
-
-    },pre + 275);
-
-
-    const b =
-      pre +
-      275 +
-      cfg.hold;
-
-
-    // ==========================================================
-    // 4. Tiny light
-    // ==========================================================
-
-    setTimeout(()=>{
-
-      scene.classList.add(
-        "point"
-      );
-
-      buildSound(
-        rarity
-      );
-
-    },b);
-
-
-    // ==========================================================
-    // 5. Horizontal line
-    // ==========================================================
-
-    setTimeout(()=>{
-
-      scene.classList.add(
-        "line"
-      );
-
-    },b + 620);
-
-
-    // ==========================================================
-    // 6. Rings + text
-    // ==========================================================
-
-    setTimeout(()=>{
-
-      scene.classList.add(
-        "build"
-      );
-
-    },b + 1030);
-
-
-    const cut =
-      b +
-      1030 +
-      (
-        rarity === "GOD"
-          ? 1950
-          : rarity === "LEGEND"
-          ? 1700
-          : 1500
-      );
-
-
-    // ==========================================================
-    // 7. Second blackout
-    // ==========================================================
-
-    setTimeout(()=>{
-
-      scene
-      .querySelector(
-        ".v5cut"
-      )
-      .classList.add(
-        "go"
-      );
-
-    },cut);
-
-
-    // ==========================================================
-    // 8. Rarity SLAM
-    // ==========================================================
-
-    setTimeout(()=>{
-
-      scene
-      .querySelector(
-        ".v5final"
-      )
-      .classList.add(
-        "go"
-      );
-
-
-      scene
-      .querySelector(
-        ".v5burst"
-      )
-      .classList.add(
-        "go"
-      );
-
-
-      hitSound(
-        rarity
-      );
-
-    },cut + 165);
-
-
-    // ==========================================================
-    // 9. Flash
-    // ==========================================================
-
-    setTimeout(()=>{
-
-      scene
-      .querySelector(
-        ".v5flash"
-      )
-      .classList.add(
-        "go"
-      );
-
-    },cut + 610);
-
-
-    const hold =
-      rarity === "GOD"
-        ? 1250
-        : rarity === "LEGEND"
-        ? 1050
-        : 900;
-
-
-    // ==========================================================
-    // 10. Fade out
-    // ==========================================================
-
-    setTimeout(()=>{
-
-      root.style.transition =
-        "opacity .24s";
-
-      root.style.opacity =
-        "0";
-
-    },
-    cut +
-    760 +
-    hold
+    white.classList.add(
+      "hit"
     );
 
 
-    // ==========================================================
-    // 11. Continue game
-    // ==========================================================
-
-    setTimeout(()=>{
-
-      root.remove();
-
-
-      if(
-        typeof done ===
-        "function"
-      ){
-
-        done();
-      }
-
-    },
-    cut +
-    1020 +
-    hold
+    flare.classList.add(
+      "cut"
     );
-  }
 
 
-  // ============================================================
-  // PREMIUM DROP
-  // ============================================================
-
-  function luxury(item){
-
-    if(!item) return;
+    line.classList.add(
+      "cut"
+    );
 
 
-    const o =
-      document.getElementById(
-        "dropOverlay"
-      );
+    vertical.classList.add(
+      "cut"
+    );
 
 
-    const c =
-      document.getElementById(
-        "dropCard"
-      );
+    puchunSound();
+
+  },START);
+
+
+  // ========================================================
+  // 3. TOTAL BLACK
+  // ========================================================
+
+  setTimeout(()=>{
+
+    white.remove();
+    flare.remove();
+    line.remove();
+    vertical.remove();
+
+    scene.classList.add(
+      "on"
+    );
+
+  },START+245);
+
+
+  // ========================================================
+  // 4. SILENCE / DARK WAIT
+  // ========================================================
+
+  const awake=
+    START+
+    245+
+    cfg.black;
+
+
+  // ========================================================
+  // 5. LIGHT POINT
+  // ========================================================
+
+  setTimeout(()=>{
+
+    scene.classList.add(
+      "point"
+    );
+
+    buildSound(
+      rarity
+    );
+
+  },awake);
+
+
+  // ========================================================
+  // 6. THIN LINE
+  // ========================================================
+
+  setTimeout(()=>{
+
+    scene.classList.add(
+      "line"
+    );
+
+  },awake+650);
+
+
+  // ========================================================
+  // 7. TEXT + RINGS
+  // ========================================================
+
+  setTimeout(()=>{
+
+    scene.classList.add(
+      "build"
+    );
+
+  },awake+1080);
+
+
+  const secondBlack=
+    awake+
+    1080+
+    cfg.build;
+
+
+  // ========================================================
+  // 8. SECOND BLACK
+  // ========================================================
+
+  setTimeout(()=>{
+
+    scene
+    .querySelector(
+      ".op5SecondBlack"
+    )
+    .classList.add(
+      "go"
+    );
+
+  },secondBlack);
+
+
+  // ========================================================
+  // 9. RARITY HIT
+  // ========================================================
+
+  setTimeout(()=>{
+
+    scene
+    .querySelector(
+      ".op5Final"
+    )
+    .classList.add(
+      "go"
+    );
+
+
+    scene
+    .querySelector(
+      ".op5Burst"
+    )
+    .classList.add(
+      "go"
+    );
+
+
+    finalHitSound(
+      rarity
+    );
+
+  },secondBlack+170);
+
+
+  // ========================================================
+  // 10. SOFT FLASH
+  // ========================================================
+
+  setTimeout(()=>{
+
+    scene
+    .querySelector(
+      ".op5FinalFlash"
+    )
+    .classList.add(
+      "go"
+    );
+
+  },secondBlack+590);
+
+
+  const finalHold=
+    rarity==="GOD"
+    ? 1350
+    : rarity==="LEGEND"
+    ? 1100
+    : rarity==="EPIC"
+    ? 980
+    : 850;
+
+
+  // ========================================================
+  // 11. FADE OUT
+  // ========================================================
+
+  setTimeout(()=>{
+
+    root.style.transition=
+      "opacity .25s ease";
+
+    root.style.opacity=
+      "0";
+
+  },
+  secondBlack+
+  740+
+  finalHold
+  );
+
+
+  // ========================================================
+  // 12. END
+  // ========================================================
+
+  setTimeout(()=>{
+
+    root.remove();
 
 
     if(
-      !o ||
-      !c
+      typeof done==="function"
     ){
 
-      return;
+      done();
+
     }
 
+  },
+  secondBlack+
+  1010+
+  finalHold
+  );
 
-    const m =
-      {
-
-        NORMAL:[
-          "#d8dce8",
-          "rgba(216,220,232,.16)"
-        ],
-
-        RARE:[
-          "#45a7ff",
-          "rgba(69,167,255,.34)"
-        ],
-
-        EPIC:[
-          "#c367ff",
-          "rgba(195,103,255,.38)"
-        ],
-
-        LEGEND:[
-          "#ffd83d",
-          "rgba(255,216,61,.45)"
-        ],
-
-        GOD:[
-          "#ffffff",
-          "rgba(120,240,255,.5)"
-        ]
-
-      }[item.rarity] ||
-      [
-        "#fff",
-        "rgba(255,255,255,.2)"
-      ];
+}
 
 
-    o.classList.remove(
-      "NORMAL",
-      "RARE",
-      "EPIC",
-      "LEGEND",
-      "GOD"
+// ============================================================
+// PREMIUM DROP
+// ============================================================
+
+function luxuryDrop(item){
+
+  if(!item) return;
+
+
+  const overlay=
+    document.getElementById(
+      "dropOverlay"
     );
 
 
-    o.classList.add(
-      "v5drop",
-      item.rarity
+  const card=
+    document.getElementById(
+      "dropCard"
     );
 
-
-    o.style.setProperty(
-      "--dc",
-      m[0]
-    );
-
-
-    o.style.setProperty(
-      "--dg",
-      m[1]
-    );
-
-
-    c.classList.add(
-      "v5card"
-    );
-
-
-    c.style.animation =
-      "none";
-
-
-    void c.offsetHeight;
-
-
-    c.style.animation =
-      "";
-  }
-
-
-  // ============================================================
-  // INSTALL INTO CURRENT GAME
-  // ============================================================
-
-  function install(){
-
-    // ----------------------------------------------------------
-    // Disable old revival success route
-    // ----------------------------------------------------------
-
-    try{
-
-      if(
-        typeof chooseSuccessPattern ===
-        "function"
-      ){
-
-        chooseSuccessPattern =
-          () => "SUCCESS";
-      }
-
-    }catch(e){}
-
-
-    // ==========================================================
-    // RARE -> EPIC
-    // EPIC -> LEGEND
-    // ==========================================================
-
-    try{
-
-      if(
-        typeof playAscensionSuccess ===
-        "function"
-      ){
-
-        playAscensionSuccess =
-          function(
-            fromRarity,
-            toRarity,
-            premium=false
-          ){
-
-            try{
-
-              ascensionClear();
-
-            }catch(e){}
-
-
-            playSequence(
-              toRarity,
-              ()=>{
-
-                try{
-
-                  ascensionCurrentIndex++;
-
-                  continueAscension();
-
-                }catch(e){
-
-                  console.error(
-                    "V5 ascension continue",
-                    e
-                  );
-                }
-              }
-            );
-          };
-      }
-
-    }catch(e){
-
-      console.error(
-        "V5 install playAscensionSuccess",
-        e
-      );
-    }
-
-
-    // ==========================================================
-    // GOD CHANCE
-    // Removes old simple GOD mini-puchun
-    // ==========================================================
-
-    try{
-
-      if(
-        typeof startGodAscension ===
-        "function"
-      ){
-
-        startGodAscension =
-          function(){
-
-            try{
-
-              ascensionClear();
-
-              ascensionOverlay.className =
-                "show";
-
-              ascensionOverlay.style.background =
-                "#000";
-
-            }catch(e){}
-
-
-            const s =
-              document.createElement(
-                "div"
-              );
-
-
-            s.className =
-              "ascensionStage ascensionGod";
-
-
-            s.innerHTML = `
-
-              <div class="ascensionSub">
-                0.1%
-              </div>
-
-              <div
-                style="
-                  margin-top:14px;
-                  font-size:13px;
-                  font-weight:900;
-                  letter-spacing:7px;
-                  color:#aaa;
-                "
-              >
-                GOD CHANCE
-              </div>
-
-              <div
-                style="
-                  margin-top:10px;
-                  font-size:28px;
-                  font-weight:1000;
-                  letter-spacing:8px;
-                  color:white;
-                "
-              >
-                ????
-              </div>
-
-              <button
-                id="v5GodPush"
-                class="
-                  ascensionPush
-                  ascensionRainbowPush
-                "
-                style="
-                  margin-top:34px
-                "
-              >
-                🌈
-                <br>
-                PUSH
-              </button>
-
-            `;
-
-
-            ascensionOverlay
-            .appendChild(
-              s
-            );
-
-
-            try{
-
-              sfxKyuiin(
-                .1,
-                .7
-              );
-
-            }catch(e){}
-
-
-            const b =
-              document.getElementById(
-                "v5GodPush"
-              );
-
-
-            if(b){
-
-              b.onclick =
-                ()=>{
-
-                  b.disabled =
-                    true;
-
-                  playGodAscensionSuccess();
-                };
-            }
-          };
-      }
-
-    }catch(e){
-
-      console.error(
-        "V5 install startGodAscension",
-        e
-      );
-    }
-
-
-    // ==========================================================
-    // GOD SUCCESS
-    // ==========================================================
-
-    try{
-
-      if(
-        typeof playGodAscensionSuccess ===
-        "function"
-      ){
-
-        playGodAscensionSuccess =
-          function(){
-
-            try{
-
-              ascensionClear();
-
-            }catch(e){}
-
-
-            playSequence(
-              "GOD",
-              ()=>{
-
-                try{
-
-                  const item =
-                    ascensionItem;
-
-
-                  if(
-                    item &&
-                    typeof revealSuperDropCard ===
-                    "function"
-                  ){
-
-                    revealSuperDropCard(
-                      item
-                    );
-                  }
-
-
-                  ascensionItem =
-                    null;
-
-                  ascensionFinalRarity =
-                    null;
-
-                  ascensionCurrentIndex =
-                    0;
-
-                }catch(e){
-
-                  console.error(
-                    "V5 GOD finish",
-                    e
-                  );
-                }
-              }
-            );
-          };
-      }
-
-    }catch(e){
-
-      console.error(
-        "V5 install GOD",
-        e
-      );
-    }
-
-
-    // ==========================================================
-    // PREMIUM DROP CARD
-    // ==========================================================
-
-    try{
-
-      if(
-        typeof revealSuperDropCard ===
-        "function"
-      ){
-
-        const old =
-          revealSuperDropCard;
-
-
-        revealSuperDropCard =
-          function(item){
-
-            old(item);
-
-
-            requestAnimationFrame(
-              ()=>{
-
-                luxury(
-                  item
-                );
-              }
-            );
-          };
-      }
-
-    }catch(e){
-
-      console.error(
-        "V5 install reveal",
-        e
-      );
-    }
-
-
-    console.log(
-      "1% DROP EFFECTS V5 COMPLETE READY"
-    );
-  }
-
-
-  // ============================================================
-  // START
-  // ============================================================
 
   if(
-    document.readyState ===
-    "loading"
+    !overlay ||
+    !card
   ){
 
-    document.addEventListener(
-      "DOMContentLoaded",
-      install,
-      {
-        once:true
-      }
-    );
+    return;
 
-  }else{
-
-    setTimeout(
-      install,
-      0
-    );
   }
+
+
+  const colors={
+
+    NORMAL:[
+      "#d8dce8",
+      "rgba(216,220,232,.15)"
+    ],
+
+    RARE:[
+      "#45a7ff",
+      "rgba(69,167,255,.34)"
+    ],
+
+    EPIC:[
+      "#c45cff",
+      "rgba(196,92,255,.38)"
+    ],
+
+    LEGEND:[
+      "#ffd63e",
+      "rgba(255,214,62,.45)"
+    ],
+
+    GOD:[
+      "#ffffff",
+      "rgba(120,240,255,.50)"
+    ]
+
+  };
+
+
+  const rarity=
+    item.rarity ||
+    "NORMAL";
+
+
+  const cfg=
+    colors[rarity] ||
+    colors.NORMAL;
+
+
+  overlay.classList.remove(
+    "NORMAL",
+    "RARE",
+    "EPIC",
+    "LEGEND",
+    "GOD"
+  );
+
+
+  overlay.classList.add(
+    "op5Drop",
+    rarity
+  );
+
+
+  overlay.style.setProperty(
+    "--dropColor",
+    cfg[0]
+  );
+
+
+  overlay.style.setProperty(
+    "--dropGlow",
+    cfg[1]
+  );
+
+
+  card.classList.add(
+    "op5Card"
+  );
+
+
+  card.style.animation=
+    "none";
+
+
+  void card.offsetHeight;
+
+
+  card.style.animation=
+    "";
+
+}
+
+
+// ============================================================
+// INSTALL
+// ============================================================
+
+function install(){
+
+  // ========================================================
+  // Success route only
+  // ========================================================
+
+  try{
+
+    if(
+      typeof chooseSuccessPattern===
+      "function"
+    ){
+
+      chooseSuccessPattern=
+        ()=>"SUCCESS";
+
+    }
+
+  }catch(e){}
+
+
+  // ========================================================
+  // RARE -> EPIC -> LEGEND
+  // ========================================================
+
+  try{
+
+    if(
+      typeof playAscensionSuccess===
+      "function"
+    ){
+
+      playAscensionSuccess=
+      function(
+        fromRarity,
+        toRarity,
+        premium=false
+      ){
+
+        try{
+
+          ascensionClear();
+
+        }catch(e){}
+
+
+        playSequence(
+          toRarity,
+          ()=>{
+
+            try{
+
+              ascensionCurrentIndex++;
+
+              continueAscension();
+
+            }catch(error){
+
+              console.error(
+                "V5 continue error",
+                error
+              );
+
+            }
+
+          }
+        );
+
+      };
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "V5 ascension install error",
+      error
+    );
+
+  }
+
+
+  // ========================================================
+  // GOD CHANCE
+  //
+  // no old mini-puchun
+  // ========================================================
+
+  try{
+
+    if(
+      typeof startGodAscension===
+      "function"
+    ){
+
+      startGodAscension=
+      function(){
+
+        try{
+
+          ascensionClear();
+
+
+          ascensionOverlay.className=
+            "show";
+
+
+          ascensionOverlay.style.background=
+            "#000";
+
+        }catch(e){}
+
+
+        const stage=
+          document.createElement(
+            "div"
+          );
+
+
+        stage.className=
+          "ascensionStage ascensionGod";
+
+
+        stage.innerHTML=`
+
+          <div
+            class="ascensionSub"
+          >
+            0.1%
+          </div>
+
+
+          <div
+            style="
+              margin-top:14px;
+              color:#aaa;
+              font-size:12px;
+              font-weight:900;
+              letter-spacing:7px;
+            "
+          >
+            GOD CHANCE
+          </div>
+
+
+          <div
+            style="
+              margin-top:12px;
+              color:#fff;
+              font-size:28px;
+              font-weight:1000;
+              letter-spacing:8px;
+            "
+          >
+            ????
+          </div>
+
+
+          <button
+            id="op5GodPush"
+            class="
+              ascensionPush
+              ascensionRainbowPush
+            "
+            style="
+              margin-top:34px;
+            "
+          >
+            🌈
+            <br>
+            PUSH
+          </button>
+
+        `;
+
+
+        ascensionOverlay.appendChild(
+          stage
+        );
+
+
+        try{
+
+          if(
+            typeof sfxKyuiin===
+            "function"
+          ){
+
+            sfxKyuiin(
+              .1,
+              .7
+            );
+
+          }
+
+        }catch(e){}
+
+
+        const button=
+          document.getElementById(
+            "op5GodPush"
+          );
+
+
+        if(button){
+
+          button.onclick=
+          ()=>{
+
+            button.disabled=true;
+
+            playGodAscensionSuccess();
+
+          };
+
+        }
+
+      };
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "V5 GOD CHANCE error",
+      error
+    );
+
+  }
+
+
+  // ========================================================
+  // GOD SUCCESS
+  // ========================================================
+
+  try{
+
+    if(
+      typeof playGodAscensionSuccess===
+      "function"
+    ){
+
+      playGodAscensionSuccess=
+      function(){
+
+        try{
+
+          ascensionClear();
+
+        }catch(e){}
+
+
+        playSequence(
+          "GOD",
+          ()=>{
+
+            try{
+
+              const item=
+                ascensionItem;
+
+
+              if(
+                item &&
+                typeof revealSuperDropCard===
+                "function"
+              ){
+
+                revealSuperDropCard(
+                  item
+                );
+
+              }
+
+
+              ascensionItem=null;
+
+              ascensionFinalRarity=null;
+
+              ascensionCurrentIndex=0;
+
+            }catch(error){
+
+              console.error(
+                "V5 GOD finish error",
+                error
+              );
+
+            }
+
+          }
+        );
+
+      };
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "V5 GOD install error",
+      error
+    );
+
+  }
+
+
+  // ========================================================
+  // PREMIUM DROP
+  // ========================================================
+
+  try{
+
+    if(
+      typeof revealSuperDropCard===
+      "function"
+    ){
+
+      const originalReveal=
+        revealSuperDropCard;
+
+
+      revealSuperDropCard=
+      function(item){
+
+        originalReveal(
+          item
+        );
+
+
+        requestAnimationFrame(
+          ()=>{
+
+            luxuryDrop(
+              item
+            );
+
+          }
+        );
+
+      };
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "V5 DROP install error",
+      error
+    );
+
+  }
+
+
+  console.log(
+    "1% DROP EFFECTS V5 HYBRID READY"
+  );
+
+}
+
+
+// ============================================================
+// START
+// ============================================================
+
+if(
+  document.readyState===
+  "loading"
+){
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    install,
+    {
+      once:true
+    }
+  );
+
+}else{
+
+  setTimeout(
+    install,
+    0
+  );
+
+}
 
 })();
