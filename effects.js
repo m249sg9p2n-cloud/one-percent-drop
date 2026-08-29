@@ -1,75 +1,45 @@
 // ============================================================
-// 1% DROP
-// EFFECTS V5 - COMPLETE REBUILD
-//
-// ・Sharp PUCHUN + short heavy sub impact
-// ・BLACKOUT
-// ・Text emerging from darkness
-// ・RARE / EPIC / LEGEND / GOD unique presentation
-// ・GOD uses the same real PUCHUN
-// ・Premium rarity-specific DROP CARD
-// ・No old patch dependency
-// ・iPhone lightweight
+// 1% DROP - EFFECTS V5 COMPLETE REBUILD
+// standalone / lightweight / iPhone friendly
 // ============================================================
-
 (() => {
-
   "use strict";
 
   if (window.__ONE_PERCENT_EFFECTS_V5__) return;
   window.__ONE_PERCENT_EFFECTS_V5__ = true;
 
-
   // ============================================================
-  // CONFIG
+  // RARITY SETTINGS
   // ============================================================
 
-  const FX = {
-
-    RARE:{
-      color:"#48aaff",
-      light:"#d7f1ff",
-      dark:"#03101e",
-      phrase:"A BLUE SIGN APPEARS",
-      rate:"20%",
-      hold:720,
-      build:1450,
-      particles:6
+  const R = {
+    RARE: {
+      c: "#45a7ff",
+      c2: "#bfe5ff",
+      phrase: "A BLUE SIGN APPEARS",
+      hold: 650
     },
 
-    EPIC:{
-      color:"#c45cff",
-      light:"#ff8deb",
-      dark:"#110319",
-      phrase:"POWER BEYOND THE ORDINARY",
-      rate:"8%",
-      hold:820,
-      build:1600,
-      particles:9
+    EPIC: {
+      c: "#c367ff",
+      c2: "#f1b6ff",
+      phrase: "POWER BEYOND THE ORDINARY",
+      hold: 760
     },
 
-    LEGEND:{
-      color:"#ffd63f",
-      light:"#fff3ae",
-      dark:"#181000",
-      phrase:"THE LEGEND AWAKENS",
-      rate:"1.9%",
-      hold:950,
-      build:1800,
-      particles:12
+    LEGEND: {
+      c: "#ffd83d",
+      c2: "#fff0a5",
+      phrase: "THE LEGEND AWAKENS",
+      hold: 900
     },
 
-    GOD:{
-      color:"#ffffff",
-      light:"#8ff7ff",
-      dark:"#000000",
-      phrase:"THE WORLD HAS CHOSEN YOU",
-      rate:"0.1%",
-      hold:1200,
-      build:2150,
-      particles:16
+    GOD: {
+      c: "#ffffff",
+      c2: "#8ff7ff",
+      phrase: "THE WORLD HAS CHOSEN YOU",
+      hold: 1150
     }
-
   };
 
 
@@ -77,34 +47,20 @@
   // CSS
   // ============================================================
 
-  const style = document.createElement("style");
+  const css = `
 
-  style.textContent = `
-
-  /* ============================================================
-     MASTER STAGE
-  ============================================================ */
-
-  .fx5Stage{
+  .v5fx{
     position:fixed;
     inset:0;
     z-index:2147483000;
+    background:#000;
     overflow:hidden;
     pointer-events:none;
-    background:transparent;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   }
 
-  .fx5Black{
-    position:absolute;
-    inset:0;
-    z-index:1;
-    background:#000;
-    opacity:0;
-  }
-
-  .fx5Black.on{
-    opacity:1;
+  .v5fx *{
+    box-sizing:border-box;
   }
 
 
@@ -112,119 +68,105 @@
      PUCHUN
   ============================================================ */
 
-  .fx5White{
+  .v5white{
     position:absolute;
     inset:0;
-    z-index:20;
-    background:white;
+    background:#fff;
     opacity:0;
+    z-index:20;
   }
 
-  .fx5White.fire{
-    animation:fx5White 34ms steps(1,end) forwards;
+  .v5white.go{
+    animation:v5white .045s steps(1) forwards;
   }
 
-  @keyframes fx5White{
-    0%,98%{opacity:1}
+  @keyframes v5white{
+    0%,70%{opacity:1}
     100%{opacity:0}
   }
 
 
-  .fx5Core{
+  .v5core{
     position:absolute;
     left:50%;
     top:50%;
-    z-index:15;
 
-    width:min(108vw,820px);
+    width:min(110vw,760px);
     aspect-ratio:1;
 
     border-radius:50%;
 
-    opacity:0;
-
     transform:
       translate(-50%,-50%)
-      scale(1.2);
+      scale(1.15);
+
+    opacity:0;
+    z-index:16;
 
     background:
       radial-gradient(
         circle,
-        #fff 0%,
-        #fff 3%,
-        rgba(234,250,255,1) 7%,
-        rgba(175,225,255,.85) 14%,
-        rgba(83,160,255,.33) 30%,
+        #fff 0 3%,
+        rgba(225,248,255,1) 6%,
+        rgba(125,210,255,.8) 13%,
+        rgba(80,145,255,.25) 30%,
         transparent 60%
       );
   }
 
-  .fx5Core.cut{
+  .v5core.go{
     animation:
-      fx5CoreCut
-      195ms
-      cubic-bezier(.76,0,.97,.35)
+      v5core
+      .19s
+      cubic-bezier(.8,0,1,.3)
       forwards;
   }
 
-  @keyframes fx5CoreCut{
+  @keyframes v5core{
 
     0%{
       opacity:1;
+
       transform:
         translate(-50%,-50%)
-        scale(1.2);
+        scale(1.15);
     }
 
-    22%{
+    35%{
       opacity:1;
+
       transform:
         translate(-50%,-50%)
-        scale(.78);
+        scale(.55);
     }
 
-    44%{
-      opacity:.98;
-      transform:
-        translate(-50%,-50%)
-        scale(.46);
-    }
+    70%{
+      opacity:.8;
 
-    65%{
-      opacity:.88;
       transform:
         translate(-50%,-50%)
-        scale(.23);
-    }
-
-    83%{
-      opacity:.55;
-      transform:
-        translate(-50%,-50%)
-        scale(.07);
+        scale(.12);
     }
 
     100%{
       opacity:0;
+
       transform:
         translate(-50%,-50%)
         scale(.005);
     }
-
   }
 
 
-  .fx5BeamH{
-
+  .v5beam{
     position:absolute;
-
     left:50%;
     top:50%;
 
-    z-index:16;
+    width:180vw;
+    height:10px;
 
-    width:185vw;
-    height:13px;
+    z-index:17;
 
     opacity:0;
 
@@ -233,160 +175,74 @@
 
     background:
       linear-gradient(
-        to bottom,
         transparent,
-        rgba(210,242,255,.35),
         #fff,
-        #fff,
-        rgba(210,242,255,.35),
         transparent
       );
 
     box-shadow:
-      0 0 8px #fff,
-      0 0 22px rgba(210,244,255,.9),
-      0 0 52px rgba(90,170,255,.55);
-
+      0 0 9px #fff,
+      0 0 30px #9ddfff;
   }
 
-
-  .fx5BeamH.cut{
-
-    animation:
-      fx5BeamHCut
-      195ms
-      linear
-      forwards;
-
+  .v5beam.go{
+    animation:v5beam .18s linear forwards;
   }
 
-
-  @keyframes fx5BeamHCut{
+  @keyframes v5beam{
 
     0%{
       opacity:1;
-      width:185vw;
-      height:13px;
+      width:180vw;
+      height:10px;
     }
 
-    45%{
-      opacity:.95;
-      width:100vw;
-      height:8px;
-    }
-
-    75%{
-      opacity:.65;
-      width:35vw;
-      height:3px;
+    60%{
+      opacity:.7;
+      width:55vw;
+      height:4px;
     }
 
     100%{
       opacity:0;
-      width:2px;
+      width:1px;
       height:1px;
     }
-
-  }
-
-
-  .fx5BeamV{
-
-    position:absolute;
-
-    left:50%;
-    top:50%;
-
-    z-index:16;
-
-    width:6px;
-    height:85vh;
-
-    opacity:0;
-
-    transform:
-      translate(-50%,-50%);
-
-    background:
-      linear-gradient(
-        to right,
-        transparent,
-        rgba(220,247,255,.6),
-        #fff,
-        rgba(220,247,255,.6),
-        transparent
-      );
-
-    box-shadow:
-      0 0 12px white,
-      0 0 32px rgba(110,205,255,.45);
-
-  }
-
-
-  .fx5BeamV.cut{
-
-    animation:
-      fx5BeamVCut
-      145ms
-      linear
-      forwards;
-
-  }
-
-
-  @keyframes fx5BeamVCut{
-
-    0%{
-      opacity:.85;
-      height:85vh;
-    }
-
-    55%{
-      opacity:.55;
-      height:32vh;
-    }
-
-    100%{
-      opacity:0;
-      height:2px;
-    }
-
   }
 
 
   /* ============================================================
-     AFTER PUCHUN
+     DARK REVEAL
   ============================================================ */
 
-  .fx5Awaken{
-
+  .v5scene{
     position:absolute;
     inset:0;
 
-    z-index:5;
-
-    overflow:hidden;
-
-    background:#000;
-
     opacity:0;
 
-    color:var(--fx);
+    color:var(--c);
 
+    background:
+      radial-gradient(
+        circle at 50% 50%,
+        color-mix(
+          in srgb,
+          var(--c) 8%,
+          transparent
+        ),
+        transparent 44%
+      ),
+      #000;
   }
 
-  .fx5Awaken.show{
+  .v5scene.on{
     opacity:1;
   }
 
 
-  /* ---- tiny point ---- */
-
-  .fx5Point{
-
+  .v5point{
     position:absolute;
-
     left:50%;
     top:50%;
 
@@ -397,282 +253,216 @@
 
     background:#fff;
 
-    opacity:0;
-
     transform:
       translate(-50%,-50%)
       scale(.01);
 
+    opacity:0;
+
     box-shadow:
-      0 0 5px white,
-      0 0 14px var(--fx),
-      0 0 35px var(--fx);
-
+      0 0 5px #fff,
+      0 0 18px var(--c),
+      0 0 40px var(--c);
   }
 
-
-  .fx5Awaken.point .fx5Point{
-
-    animation:
-      fx5Point
-      .8s
-      cubic-bezier(.12,.8,.25,1)
-      forwards;
-
+  .v5scene.point .v5point{
+    animation:v5point .8s ease-out forwards;
   }
 
-
-  @keyframes fx5Point{
+  @keyframes v5point{
 
     0%{
       opacity:0;
+
       transform:
         translate(-50%,-50%)
         scale(.01);
     }
 
-    50%{
-      opacity:.8;
-    }
-
-    80%{
+    55%{
       opacity:1;
-      transform:
-        translate(-50%,-50%)
-        scale(2.2);
     }
 
     100%{
       opacity:1;
+
       transform:
         translate(-50%,-50%)
-        scale(1);
+        scale(1.4);
     }
-
   }
 
 
-  /* ---- thin light ---- */
-
-  .fx5Line{
-
+  .v5line{
     position:absolute;
-
     left:50%;
     top:50%;
 
     width:0;
     height:1px;
 
+    opacity:0;
+
     transform:
       translate(-50%,-50%);
-
-    opacity:0;
 
     background:
       linear-gradient(
         90deg,
         transparent,
-        var(--fx),
+        var(--c),
         #fff,
-        var(--fx),
+        var(--c),
         transparent
       );
 
     box-shadow:
-      0 0 7px white,
-      0 0 18px var(--fx);
-
+      0 0 9px #fff,
+      0 0 22px var(--c);
   }
 
-
-  .fx5Awaken.line .fx5Line{
-
-    animation:
-      fx5Line
-      .72s
-      cubic-bezier(.15,.78,.25,1)
-      forwards;
-
+  .v5scene.line .v5line{
+    animation:v5line .7s ease-out forwards;
   }
 
-
-  @keyframes fx5Line{
+  @keyframes v5line{
 
     0%{
       width:0;
       opacity:0;
     }
 
-    12%{
+    15%{
       opacity:1;
     }
 
     100%{
-      width:min(84vw,390px);
+      width:min(82vw,390px);
       opacity:.7;
     }
-
   }
 
 
-  /* ---- rings ---- */
+  /* ============================================================
+     RINGS
+  ============================================================ */
 
-  .fx5Ring,
-  .fx5Ring2{
-
+  .v5ring,
+  .v5ring2{
     position:absolute;
-
     left:50%;
     top:50%;
 
     border-radius:50%;
 
-    opacity:0;
-
-    color:var(--fx);
+    border:
+      1px solid
+      var(--c);
 
     transform:
       translate(-50%,-50%)
-      scale(.2);
+      scale(.15);
 
+    opacity:0;
   }
 
-
-  .fx5Ring{
-
-    width:min(76vw,360px);
+  .v5ring{
+    width:min(78vw,370px);
     aspect-ratio:1;
-
-    border:1px solid currentColor;
-
   }
 
-
-  .fx5Ring2{
-
+  .v5ring2{
     width:min(54vw,255px);
     aspect-ratio:1;
-
-    border:1px solid currentColor;
-
   }
 
-
-  .fx5Awaken.build .fx5Ring{
-
-    animation:
-      fx5Ring1
-      2s
-      ease-out
-      forwards;
-
+  .v5scene.build .v5ring{
+    animation:v5ring 1.8s ease-out forwards;
   }
 
-
-  .fx5Awaken.build .fx5Ring2{
-
-    animation:
-      fx5Ring2
-      1.8s
-      ease-out
-      .12s
-      forwards;
-
+  .v5scene.build .v5ring2{
+    animation:v5ring2 1.6s .12s ease-out forwards;
   }
 
-
-  @keyframes fx5Ring1{
+  @keyframes v5ring{
 
     0%{
       opacity:0;
+
       transform:
         translate(-50%,-50%)
-        scale(.2)
-        rotate(-30deg);
+        scale(.15)
+        rotate(-35deg);
     }
 
-    50%{
-      opacity:.4;
+    45%{
+      opacity:.45;
     }
 
     100%{
-      opacity:.13;
+      opacity:.14;
+
       transform:
         translate(-50%,-50%)
         scale(1.05)
-        rotate(15deg);
+        rotate(20deg);
     }
-
   }
 
-
-  @keyframes fx5Ring2{
+  @keyframes v5ring2{
 
     0%{
       opacity:0;
+
       transform:
         translate(-50%,-50%)
-        scale(.25)
+        scale(.2)
         rotate(30deg);
     }
 
-    55%{
-      opacity:.4;
+    45%{
+      opacity:.5;
     }
 
     100%{
-      opacity:.17;
+      opacity:.18;
+
       transform:
         translate(-50%,-50%)
         scale(1)
-        rotate(-12deg);
+        rotate(-15deg);
     }
-
   }
 
 
-  /* ---- text ---- */
+  /* ============================================================
+     TEXT
+  ============================================================ */
 
-  .fx5Signal{
-
+  .v5small{
     position:absolute;
 
-    left:50%;
-    top:38%;
-
-    width:100%;
-
-    transform:
-      translateX(-50%);
+    left:0;
+    right:0;
+    top:37%;
 
     text-align:center;
 
     font-size:9px;
-
     font-weight:900;
 
-    letter-spacing:8px;
+    letter-spacing:7px;
 
-    color:var(--fx);
+    color:var(--c);
 
     opacity:0;
-
   }
 
-
-  .fx5Awaken.build .fx5Signal{
-
-    animation:
-      fx5Signal
-      .7s
-      ease-out
-      forwards;
-
+  .v5scene.build .v5small{
+    animation:v5small .6s ease-out forwards;
   }
 
-
-  @keyframes fx5Signal{
+  @keyframes v5small{
 
     from{
       opacity:0;
@@ -680,23 +470,22 @@
     }
 
     to{
-      opacity:.75;
-      letter-spacing:8px;
+      opacity:.72;
+      letter-spacing:7px;
     }
-
   }
 
 
-  .fx5Phrase{
-
+  .v5phrase{
     position:absolute;
 
-    left:5%;
-    right:5%;
-
+    left:6%;
+    right:6%;
     top:43%;
 
     text-align:center;
+
+    color:#fff;
 
     font-family:
       Georgia,
@@ -704,71 +493,52 @@
       serif;
 
     font-size:
-      clamp(18px,5.3vw,26px);
+      clamp(18px,5vw,27px);
 
     font-weight:700;
 
-    letter-spacing:3px;
-
-    color:white;
+    letter-spacing:2px;
 
     text-shadow:
-      0 0 10px var(--fx),
-      0 0 25px var(--fx);
-
+      0 0 12px var(--c),
+      0 0 28px var(--c);
   }
 
 
-  .fx5Letter{
-
+  .v5char{
     display:inline-block;
 
     opacity:0;
 
+    filter:blur(6px);
+
     transform:
-      translateY(12px)
-      scale(.88);
-
-    filter:blur(5px);
-
+      translateY(10px)
+      scale(.9);
   }
 
-
-  .fx5Awaken.build .fx5Letter{
-
-    animation:
-      fx5Letter
-      .52s
-      ease-out
-      forwards;
+  .v5scene.build .v5char{
+    animation:v5char .46s ease-out forwards;
 
     animation-delay:
-      calc(var(--i) * 42ms);
-
+      calc(var(--i) * 38ms);
   }
 
-
-  @keyframes fx5Letter{
+  @keyframes v5char{
 
     to{
       opacity:1;
-
       filter:blur(0);
-
-      transform:
-        translateY(0)
-        scale(1);
+      transform:none;
     }
-
   }
 
 
   /* ============================================================
-     PARTICLES
+     LIGHT PARTICLES
   ============================================================ */
 
-  .fx5Spark{
-
+  .v5spark{
     position:absolute;
 
     left:50%;
@@ -782,42 +552,36 @@
     background:#fff;
 
     box-shadow:
-      0 0 7px #fff,
-      0 0 15px var(--fx);
+      0 0 8px #fff,
+      0 0 14px var(--c);
 
     opacity:0;
 
     transform:
       rotate(var(--a))
-      translateX(10px);
-
+      translateX(12px);
   }
 
-
-  .fx5Awaken.build .fx5Spark{
-
+  .v5scene.build .v5spark{
     animation:
-      fx5Spark
-      1.5s
-      ease-out
+      v5spark
+      1.3s
       var(--d)
+      ease-out
       forwards;
-
   }
 
-
-  @keyframes fx5Spark{
+  @keyframes v5spark{
 
     0%{
       opacity:0;
 
       transform:
         rotate(var(--a))
-        translateX(10px)
-        scale(.4);
+        translateX(12px);
     }
 
-    25%{
+    20%{
       opacity:.9;
     }
 
@@ -826,10 +590,8 @@
 
       transform:
         rotate(var(--a))
-        translateX(var(--r))
-        scale(1);
+        translateX(var(--r));
     }
-
   }
 
 
@@ -837,33 +599,22 @@
      SECOND BLACKOUT
   ============================================================ */
 
-  .fx5SecondBlack{
-
+  .v5cut{
     position:absolute;
-
     inset:0;
-
-    z-index:30;
 
     background:#000;
 
     opacity:0;
 
+    z-index:30;
   }
 
-
-  .fx5SecondBlack.hit{
-
-    animation:
-      fx5SecondBlack
-      230ms
-      steps(1,end)
-      forwards;
-
+  .v5cut.go{
+    animation:v5cut .24s steps(1) forwards;
   }
 
-
-  @keyframes fx5SecondBlack{
+  @keyframes v5cut{
 
     0%,68%{
       opacity:1;
@@ -872,7 +623,6 @@
     69%,100%{
       opacity:0;
     }
-
   }
 
 
@@ -880,10 +630,8 @@
      FINAL RARITY
   ============================================================ */
 
-  .fx5Final{
-
+  .v5final{
     position:absolute;
-
     inset:0;
 
     z-index:25;
@@ -894,94 +642,79 @@
     justify-content:center;
 
     opacity:0;
-
   }
 
-
-  .fx5Final.hit{
+  .v5final.go{
     opacity:1;
   }
 
 
-  .fx5FinalWord{
-
-    position:relative;
-
+  .v5word{
     font-size:
-      clamp(72px,23vw,125px);
-
-    line-height:.85;
+      clamp(68px,22vw,120px);
 
     font-weight:1000;
 
+    line-height:.85;
+
     letter-spacing:-2px;
 
-    color:var(--fx);
+    color:var(--c);
 
     opacity:0;
 
-    transform:scale(2.6);
-
     filter:blur(8px);
 
+    transform:scale(2.4);
+
     text-shadow:
-      0 0 10px var(--fx),
-      0 0 30px var(--fx),
-      0 0 70px var(--fx);
-
+      0 0 12px var(--c),
+      0 0 35px var(--c),
+      0 0 70px var(--c);
   }
 
-
-  .fx5Final.hit
-  .fx5FinalWord{
-
+  .v5final.go .v5word{
     animation:
-      fx5Final
-      .72s
-      cubic-bezier(.12,1.25,.25,1)
+      v5word
+      .7s
+      cubic-bezier(.12,1.2,.25,1)
       forwards;
-
   }
 
-
-  @keyframes fx5Final{
+  @keyframes v5word{
 
     0%{
       opacity:0;
-      transform:scale(2.6);
       filter:blur(8px);
+      transform:scale(2.4);
     }
 
-    18%{
+    20%{
       opacity:1;
       filter:blur(0);
     }
 
-    55%{
-      transform:scale(.88);
+    60%{
+      transform:scale(.9);
     }
 
-    78%{
+    80%{
       transform:scale(1.06);
     }
 
     100%{
       opacity:1;
-      transform:scale(1);
       filter:blur(0);
+      transform:scale(1);
     }
-
   }
 
 
-  .fx5Burst{
-
+  .v5burst{
     position:absolute;
 
     left:50%;
     top:50%;
-
-    z-index:22;
 
     width:8px;
     height:8px;
@@ -997,24 +730,15 @@
       scale(.01);
 
     box-shadow:
-      0 0 25px white,
-      0 0 70px var(--fx);
-
+      0 0 25px #fff,
+      0 0 80px var(--c);
   }
 
-
-  .fx5Burst.hit{
-
-    animation:
-      fx5Burst
-      .62s
-      ease-out
-      forwards;
-
+  .v5burst.go{
+    animation:v5burst .6s ease-out forwards;
   }
 
-
-  @keyframes fx5Burst{
+  @keyframes v5burst{
 
     0%{
       opacity:1;
@@ -1024,8 +748,8 @@
         scale(.01);
     }
 
-    50%{
-      opacity:.7;
+    55%{
+      opacity:.65;
     }
 
     100%{
@@ -1033,9 +757,35 @@
 
       transform:
         translate(-50%,-50%)
-        scale(110);
+        scale(105);
+    }
+  }
+
+
+  .v5flash{
+    position:absolute;
+    inset:0;
+
+    background:#fff;
+
+    z-index:60;
+
+    opacity:0;
+  }
+
+  .v5flash.go{
+    animation:v5flash .16s ease-out forwards;
+  }
+
+  @keyframes v5flash{
+
+    from{
+      opacity:.95;
     }
 
+    to{
+      opacity:0;
+    }
   }
 
 
@@ -1043,20 +793,21 @@
      GOD SPECIAL
   ============================================================ */
 
-  .fx5Awaken.GOD .fx5FinalWord{
+  .v5scene.GOD .v5word{
 
     background:
       linear-gradient(
         90deg,
         #fff,
-        #7ff5ff,
+        #7ff6ff,
         #bd8cff,
-        #ff82dc,
-        #fff1a5,
+        #ff8add,
+        #fff2a0,
         #fff
       );
 
-    background-size:240% 100%;
+    background-size:
+      240% 100%;
 
     -webkit-background-clip:text;
     background-clip:text;
@@ -1068,14 +819,17 @@
     filter:
       drop-shadow(
         0 0 12px
-        rgba(255,255,255,.85)
+        rgba(255,255,255,.9)
       );
+  }
 
+  .v5scene.GOD .v5ring,
+  .v5scene.GOD .v5ring2{
+    border-color:#fff;
   }
 
 
-  .fx5GodCrack{
-
+  .v5godray{
     display:none;
 
     position:absolute;
@@ -1083,74 +837,47 @@
     left:50%;
     top:50%;
 
-    z-index:8;
-
-    width:1px;
-    height:1px;
-
-  }
-
-
-  .fx5Awaken.GOD
-  .fx5GodCrack{
-
-    display:block;
-
-  }
-
-
-  .fx5GodRay{
-
-    position:absolute;
-
-    left:0;
-    top:0;
-
     width:0;
     height:2px;
 
     opacity:0;
 
-    transform-origin:0 50%;
+    transform-origin:
+      0 50%;
 
     background:
       linear-gradient(
         90deg,
         #fff,
-        #85f6ff,
-        #d38cff,
-        #ff8edc,
+        #7ff6ff,
+        #c88cff,
+        #ff8add,
         transparent
       );
 
     box-shadow:
-      0 0 8px white,
-      0 0 18px #8bf5ff;
-
+      0 0 8px #fff;
   }
 
-
-  .fx5Awaken.GOD.build
-  .fx5GodRay{
+  .v5scene.GOD.build .v5godray{
+    display:block;
 
     animation:
-      fx5GodRay
-      .85s
+      v5godray
+      .8s
+      var(--d)
       ease-out
-      var(--delay)
       forwards;
-
   }
 
-
-  @keyframes fx5GodRay{
+  @keyframes v5godray{
 
     0%{
       width:0;
       opacity:0;
     }
 
-    15%{
+    18%{
       opacity:1;
     }
 
@@ -1158,78 +885,36 @@
       width:70vw;
       opacity:.55;
     }
-
   }
 
 
   /* ============================================================
-     FINAL FLASH
+     PREMIUM DROP CARD
   ============================================================ */
 
-  .fx5Flash{
-
-    position:absolute;
-
-    inset:0;
-
-    z-index:60;
-
-    background:#fff;
-
-    opacity:0;
-
-  }
-
-
-  .fx5Flash.hit{
-
-    animation:
-      fx5Flash
-      160ms
-      ease-out
-      forwards;
-
-  }
-
-
-  @keyframes fx5Flash{
-
-    from{opacity:.92}
-    to{opacity:0}
-
-  }
-
-
-  /* ============================================================
-     PREMIUM DROP SCREEN
-  ============================================================ */
-
-  #dropOverlay.fx5Drop{
-
+  #dropOverlay.v5drop{
     overflow:hidden;
 
-    background:#02040a !important;
+    background:
+      #02040a !important;
 
+    --dc:#fff;
+    --dg:rgba(255,255,255,.2);
   }
 
 
-  #dropOverlay.fx5Drop::before{
-
+  #dropOverlay.v5drop:before{
     content:"";
 
     position:absolute;
 
     left:50%;
-    top:45%;
+    top:44%;
 
-    width:min(120vw,600px);
+    width:min(120vw,620px);
     aspect-ratio:1;
 
     border-radius:50%;
-
-    pointer-events:none;
-
-    opacity:.25;
 
     transform:
       translate(-50%,-50%);
@@ -1237,71 +922,72 @@
     background:
       radial-gradient(
         circle,
-        var(--dropFX) 0%,
-        transparent 58%
+        var(--dc),
+        transparent 60%
       );
 
-    animation:
-      fx5DropAura
-      2.8s
-      ease-in-out
-      infinite alternate;
+    opacity:.16;
 
+    pointer-events:none;
+
+    animation:
+      v5aura
+      2.4s
+      ease-in-out
+      infinite
+      alternate;
   }
 
-
-  @keyframes fx5DropAura{
+  @keyframes v5aura{
 
     from{
-      opacity:.12;
+      opacity:.09;
+
       transform:
         translate(-50%,-50%)
         scale(.82);
     }
 
     to{
-      opacity:.3;
+      opacity:.25;
+
       transform:
         translate(-50%,-50%)
         scale(1.08);
     }
-
   }
 
 
-  #dropCard.fx5Card{
-
+  #dropCard.v5card{
     position:relative;
 
     overflow:hidden;
 
     border:
       1px solid
-      var(--dropFX) !important;
+      var(--dc) !important;
 
     background:
       linear-gradient(
         180deg,
-        rgba(255,255,255,.075),
-        rgba(10,12,23,.97) 30%,
-        rgba(3,4,9,.99)
+        rgba(255,255,255,.08),
+        rgba(11,14,28,.98) 32%,
+        #030409
       ) !important;
 
     box-shadow:
       0 0 0 1px rgba(255,255,255,.05),
-      0 0 28px var(--dropGlow),
-      0 30px 70px rgba(0,0,0,.8) !important;
+      0 0 30px var(--dg),
+      0 28px 70px rgba(0,0,0,.85) !important;
 
     animation:
-      fx5CardIn
-      .68s
+      v5card
+      .65s
       cubic-bezier(.15,1,.28,1)
       forwards !important;
-
   }
 
-
-  @keyframes fx5CardIn{
+  @keyframes v5card{
 
     0%{
       opacity:0;
@@ -1321,28 +1007,21 @@
 
     100%{
       opacity:1;
-
-      transform:
-        translateY(0)
-        scale(1);
+      transform:none;
     }
-
   }
 
 
-  #dropCard.fx5Card::after{
-
+  #dropCard.v5card:after{
     content:"";
 
     position:absolute;
 
-    left:-65%;
-    top:-30%;
+    left:-70%;
+    top:-25%;
 
-    width:45%;
-    height:160%;
-
-    pointer-events:none;
+    width:42%;
+    height:150%;
 
     transform:rotate(18deg);
 
@@ -1350,198 +1029,123 @@
       linear-gradient(
         90deg,
         transparent,
-        rgba(255,255,255,.05),
-        rgba(255,255,255,.22),
-        rgba(255,255,255,.05),
+        rgba(255,255,255,.04),
+        rgba(255,255,255,.23),
+        rgba(255,255,255,.04),
         transparent
       );
 
     animation:
-      fx5Sweep
+      v5sweep
       2.7s
+      .55s
       ease-in-out
-      .6s
       infinite;
 
+    pointer-events:none;
   }
 
-
-  @keyframes fx5Sweep{
+  @keyframes v5sweep{
 
     0%,30%{
-      left:-65%;
+      left:-70%;
     }
 
     70%,100%{
-      left:125%;
+      left:130%;
     }
-
   }
 
 
-  #dropOverlay.fx5Drop .dropLabel,
-  #dropOverlay.fx5Drop .dropRarity,
-  #dropOverlay.fx5Drop .dropIcon,
-  #dropOverlay.fx5Drop .dropName,
-  #dropOverlay.fx5Drop .dropEffect,
-  #dropOverlay.fx5Drop .dropChance,
-  #dropOverlay.fx5Drop .dropButtons{
-
-    opacity:0;
-
-    transform:
-      translateY(10px);
-
-    animation:
-      fx5DropPart
-      .55s
-      ease-out
-      forwards;
-
-  }
-
-
-  #dropOverlay.fx5Drop .dropLabel{
-    animation-delay:.18s;
-  }
-
-  #dropOverlay.fx5Drop .dropRarity{
-    animation-delay:.34s;
-
+  #dropOverlay.v5drop .dropRarity{
     text-shadow:
       0 0 18px
-      var(--dropFX);
-  }
-
-  #dropOverlay.fx5Drop .dropIcon{
-    animation-delay:.55s;
-
-    transform:
-      translateY(12px)
-      scale(.65);
-
-    filter:
-      drop-shadow(
-        0 0 16px
-        var(--dropFX)
-      );
-  }
-
-  #dropOverlay.fx5Drop .dropName{
-    animation-delay:.78s;
-  }
-
-  #dropOverlay.fx5Drop .dropEffect{
-    animation-delay:.98s;
-  }
-
-  #dropOverlay.fx5Drop .dropChance{
-    animation-delay:1.15s;
-  }
-
-  #dropOverlay.fx5Drop .dropButtons{
-    animation-delay:1.32s;
+      var(--dc);
   }
 
 
-  @keyframes fx5DropPart{
-
-    to{
-      opacity:1;
-
-      transform:
-        translateY(0)
-        scale(1);
-    }
-
-  }
-
-
-  #dropOverlay.fx5Drop.GOD
-  .dropRarity{
+  #dropOverlay.v5drop.GOD .dropRarity{
 
     background:
       linear-gradient(
         90deg,
         #fff,
-        #7bf4ff,
-        #d28cff,
-        #ff82d9,
-        #fff2a7,
+        #7ff6ff,
+        #c88cff,
+        #ff8add,
+        #fff2a0,
         #fff
       );
 
-    background-size:230% 100%;
+    background-size:
+      230% 100%;
 
     -webkit-background-clip:text;
     background-clip:text;
 
-    color:transparent !important;
+    color:
+      transparent !important;
 
     animation:
-      fx5DropPart
-      .55s
-      ease-out
-      .34s
-      forwards,
-      fx5GodGradient
-      1.5s
+      v5grad
+      1.4s
       linear
-      .8s
       infinite;
-
   }
 
-
-  @keyframes fx5GodGradient{
+  @keyframes v5grad{
 
     to{
-      background-position:230% 0;
+      background-position:
+        230% 0;
     }
-
-  }
-
-
-  #dropOverlay.fx5Drop.GOD
-  #dropCard{
-
-    border-color:#fff !important;
-
-    box-shadow:
-      0 0 12px rgba(255,255,255,.75),
-      0 0 32px rgba(100,235,255,.38),
-      0 0 58px rgba(230,100,255,.22),
-      0 30px 75px rgba(0,0,0,.88) !important;
-
   }
 
   `;
 
-  document.head.appendChild(style);
+
+  const st =
+    document.createElement(
+      "style"
+    );
+
+  st.id =
+    "one-percent-effects-v5-style";
+
+  st.textContent =
+    css;
+
+  document.head.appendChild(
+    st
+  );
 
 
   // ============================================================
-  // AUDIO ENGINE
+  // AUDIO
   // ============================================================
 
-  let ownCtx = null;
+  let ownAC = null;
 
 
-  function getAudio(){
+  function ac(){
 
     try{
 
       if(
-        typeof audioCtx !== "undefined" &&
+        typeof audioCtx !==
+        "undefined" &&
         audioCtx
       ){
 
-        if(audioCtx.state === "suspended"){
+        if(
+          audioCtx.state ===
+          "suspended"
+        ){
+
           audioCtx.resume();
         }
 
         return audioCtx;
-
       }
 
     }catch(e){}
@@ -1549,104 +1153,1327 @@
 
     try{
 
-      if(!ownCtx){
+      if(!ownAC){
 
-        const AC =
+        const A =
           window.AudioContext ||
           window.webkitAudioContext;
 
-        if(AC){
-          ownCtx = new AC();
+        if(A){
+          ownAC = new A();
         }
-
       }
 
 
       if(
-        ownCtx &&
-        ownCtx.state === "suspended"
+        ownAC &&
+        ownAC.state ===
+        "suspended"
       ){
 
-        ownCtx.resume();
-
+        ownAC.resume();
       }
 
 
-      return ownCtx;
+      return ownAC;
 
     }catch(e){
 
       return null;
-
     }
-
   }
 
 
-  function oscillator(
-    frequency,
-    duration,
-    volume,
-    type="sine",
-    endFrequency=null
+  function osc(
+    f1,
+    f2,
+    d,
+    v,
+    type="sine"
   ){
 
-    const ctx = getAudio();
+    const c = ac();
 
-    if(!ctx) return;
-
-
-    const now =
-      ctx.currentTime;
+    if(!c) return;
 
 
-    const osc =
-      ctx.createOscillator();
+    const t =
+      c.currentTime;
 
 
-    const gain =
-      ctx.createGain();
+    const o =
+      c.createOscillator();
 
 
-    osc.type = type;
+    const g =
+      c.createGain();
 
 
-    osc.frequency
-    .setValueAtTime(
-      frequency,
-      now
+    o.type =
+      type;
+
+
+    o.frequency.setValueAtTime(
+      f1,
+      t
     );
 
 
-    if(
-      endFrequency &&
-      endFrequency > 0
-    ){
+    if(f2 > 0){
 
-      osc.frequency
+      o.frequency
       .exponentialRampToValueAtTime(
-        endFrequency,
-        now + duration
+        f2,
+        t + d
       );
-
     }
 
 
-    gain.gain
-    .setValueAtTime(
-      Math.max(.001,volume),
-      now
+    g.gain.setValueAtTime(
+      Math.max(.001,v),
+      t
     );
 
 
-    gain.gain
+    g.gain
     .exponentialRampToValueAtTime(
       .001,
-      now + duration
+      t + d
     );
 
 
-    osc.connect(gain);
+    o.connect(g);
 
-    gain.connect(
-      ctx.destination
+    g.connect(
+      c.destination
+    );
+
+
+    o.start(t);
+
+    o.stop(
+      t + d + .01
+    );
+  }
+
+
+  // ============================================================
+  // PUCHUN SOUND
+  // sharp cut + instant sub bass
+  // ============================================================
+
+  function puchun(){
+
+    const c = ac();
+
+    if(!c) return;
+
+
+    const t =
+      c.currentTime;
+
+
+    const o =
+      c.createOscillator();
+
+
+    const g =
+      c.createGain();
+
+
+    const f =
+      c.createBiquadFilter();
+
+
+    o.type =
+      "square";
+
+
+    o.frequency
+    .setValueAtTime(
+      1750,
+      t
+    );
+
+
+    o.frequency
+    .exponentialRampToValueAtTime(
+      115,
+      t + .032
+    );
+
+
+    f.type =
+      "bandpass";
+
+    f.frequency.value =
+      1750;
+
+    f.Q.value =
+      .55;
+
+
+    g.gain.setValueAtTime(
+      .18,
+      t
+    );
+
+
+    g.gain
+    .exponentialRampToValueAtTime(
+      .001,
+      t + .045
+    );
+
+
+    o.connect(f);
+
+    f.connect(g);
+
+    g.connect(
+      c.destination
+    );
+
+
+    o.start(t);
+
+    o.stop(
+      t + .05
+    );
+
+
+    // Instant low-frequency impact
+
+    osc(
+      68,
+      38,
+      .09,
+      .26,
+      "sine"
+    );
+
+
+    // Electric snap noise
+
+    const len =
+      Math.floor(
+        c.sampleRate * .035
+      );
+
+
+    const b =
+      c.createBuffer(
+        1,
+        len,
+        c.sampleRate
+      );
+
+
+    const d =
+      b.getChannelData(0);
+
+
+    for(
+      let i=0;
+      i<len;
+      i++
+    ){
+
+      const q =
+        1 - i/len;
+
+      d[i] =
+        (Math.random()*2-1)
+        *
+        q
+        *
+        q;
+    }
+
+
+    const s =
+      c.createBufferSource();
+
+
+    const ng =
+      c.createGain();
+
+
+    const hp =
+      c.createBiquadFilter();
+
+
+    s.buffer =
+      b;
+
+
+    hp.type =
+      "highpass";
+
+    hp.frequency.value =
+      900;
+
+
+    ng.gain.setValueAtTime(
+      .1,
+      t
+    );
+
+
+    ng.gain
+    .exponentialRampToValueAtTime(
+      .001,
+      t + .035
+    );
+
+
+    s.connect(hp);
+
+    hp.connect(ng);
+
+    ng.connect(
+      c.destination
+    );
+
+
+    s.start(t);
+
+
+    try{
+
+      if(
+        typeof vibrate ===
+        "function"
+      ){
+
+        vibrate(65);
+
+      }else{
+
+        navigator.vibrate?.(65);
+      }
+
+    }catch(e){}
+  }
+
+
+  function buildSound(r){
+
+    osc(
+      r === "GOD"
+        ? 48
+        : 72,
+
+      r === "GOD"
+        ? 34
+        : 50,
+
+      .22,
+
+      r === "GOD"
+        ? .06
+        : .035,
+
+      "sine"
+    );
+
+
+    setTimeout(()=>{
+
+      osc(
+        r === "LEGEND" ||
+        r === "GOD"
+          ? 430
+          : 330,
+
+        220,
+        .13,
+        .025,
+        "triangle"
+      );
+
+    },560);
+  }
+
+
+  function hitSound(r){
+
+    osc(
+      r === "GOD"
+        ? 54
+        : 64,
+
+      38,
+      .11,
+
+      r === "GOD"
+        ? .16
+        : .11,
+
+      "sine"
+    );
+
+
+    osc(
+      r === "GOD"
+        ? 960
+        : 760,
+
+      300,
+      .065,
+      .05,
+      "square"
+    );
+
+
+    setTimeout(()=>{
+
+      osc(
+        r === "GOD"
+          ? 1100
+          : r === "LEGEND"
+          ? 920
+          : 780,
+
+        450,
+        .15,
+        .04,
+        "triangle"
+      );
+
+    },70);
+
+
+    try{
+
+      const p =
+        r === "GOD"
+          ? [80,30,120]
+          : 70;
+
+
+      if(
+        typeof vibrate ===
+        "function"
+      ){
+
+        vibrate(p);
+
+      }else{
+
+        navigator.vibrate?.(p);
+      }
+
+    }catch(e){}
+  }
+
+
+  // ============================================================
+  // HELPERS
+  // ============================================================
+
+  const chars =
+    txt =>
+      [...txt]
+      .map(
+        (x,i)=>
+          x === " "
+            ? "<span>&nbsp;</span>"
+            : `<span class="v5char" style="--i:${i}">${x}</span>`
+      )
+      .join("");
+
+
+  // ============================================================
+  // MAIN CINEMATIC
+  // ============================================================
+
+  function playSequence(
+    rarity,
+    done
+  ){
+
+    const cfg =
+      R[rarity] ||
+      R.RARE;
+
+
+    document
+    .querySelectorAll(
+      ".v5fx"
+    )
+    .forEach(
+      x=>x.remove()
+    );
+
+
+    const root =
+      document.createElement(
+        "div"
+      );
+
+
+    root.className =
+      "v5fx";
+
+
+    root.innerHTML = `
+
+      <div
+        class="v5scene ${rarity}"
+        style="
+          --c:${cfg.c};
+          --c2:${cfg.c2}
+        "
+      >
+
+        <div class="v5point"></div>
+
+        <div class="v5line"></div>
+
+        <div class="v5ring"></div>
+
+        <div class="v5ring2"></div>
+
+
+        <i
+          class="v5godray"
+          style="
+            transform:rotate(-18deg);
+            --d:.1s
+          "
+        ></i>
+
+        <i
+          class="v5godray"
+          style="
+            transform:rotate(22deg);
+            --d:.24s
+          "
+        ></i>
+
+        <i
+          class="v5godray"
+          style="
+            transform:rotate(148deg);
+            --d:.38s
+          "
+        ></i>
+
+        <i
+          class="v5godray"
+          style="
+            transform:rotate(205deg);
+            --d:.52s
+          "
+        ></i>
+
+
+        <div class="v5small">
+          RARITY SIGNAL DETECTED
+        </div>
+
+
+        <div class="v5phrase">
+          ${chars(cfg.phrase)}
+        </div>
+
+
+        <div class="v5cut"></div>
+
+        <div class="v5burst"></div>
+
+
+        <div class="v5final">
+
+          <div class="v5word">
+            ${rarity}
+          </div>
+
+        </div>
+
+
+        <div class="v5flash"></div>
+
+      </div>
+
+
+      <div class="v5core"></div>
+
+      <div class="v5beam"></div>
+
+      <div class="v5white"></div>
+
+    `;
+
+
+    document.body.appendChild(
+      root
+    );
+
+
+    const scene =
+      root.querySelector(
+        ".v5scene"
+      );
+
+
+    const white =
+      root.querySelector(
+        ".v5white"
+      );
+
+
+    const core =
+      root.querySelector(
+        ".v5core"
+      );
+
+
+    const beam =
+      root.querySelector(
+        ".v5beam"
+      );
+
+
+    // ==========================================================
+    // Lightweight particles
+    // ==========================================================
+
+    const n =
+      rarity === "GOD"
+        ? 14
+        : rarity === "LEGEND"
+        ? 11
+        : rarity === "EPIC"
+        ? 8
+        : 6;
+
+
+    for(
+      let i=0;
+      i<n;
+      i++
+    ){
+
+      const s =
+        document.createElement(
+          "i"
+        );
+
+
+      s.className =
+        "v5spark";
+
+
+      s.style.cssText = `
+        --a:${Math.random()*360}deg;
+        --r:${80+Math.random()*150}px;
+        --d:${.1+Math.random()*.6}s
+      `;
+
+
+      scene.appendChild(s);
+    }
+
+
+    // ==========================================================
+    // 1. PUSH -> PUCHUN
+    // ==========================================================
+
+    const pre = 260;
+
+
+    setTimeout(()=>{
+
+      white.classList.add(
+        "go"
+      );
+
+      puchun();
+
+    },pre);
+
+
+    // ==========================================================
+    // 2. CRT collapse
+    // ==========================================================
+
+    setTimeout(()=>{
+
+      core.classList.add(
+        "go"
+      );
+
+      beam.classList.add(
+        "go"
+      );
+
+    },pre + 35);
+
+
+    // ==========================================================
+    // 3. Full blackout
+    // ==========================================================
+
+    setTimeout(()=>{
+
+      scene.classList.add(
+        "on"
+      );
+
+
+      white.remove();
+
+      core.remove();
+
+      beam.remove();
+
+    },pre + 275);
+
+
+    const b =
+      pre +
+      275 +
+      cfg.hold;
+
+
+    // ==========================================================
+    // 4. Tiny light
+    // ==========================================================
+
+    setTimeout(()=>{
+
+      scene.classList.add(
+        "point"
+      );
+
+      buildSound(
+        rarity
+      );
+
+    },b);
+
+
+    // ==========================================================
+    // 5. Horizontal line
+    // ==========================================================
+
+    setTimeout(()=>{
+
+      scene.classList.add(
+        "line"
+      );
+
+    },b + 620);
+
+
+    // ==========================================================
+    // 6. Rings + text
+    // ==========================================================
+
+    setTimeout(()=>{
+
+      scene.classList.add(
+        "build"
+      );
+
+    },b + 1030);
+
+
+    const cut =
+      b +
+      1030 +
+      (
+        rarity === "GOD"
+          ? 1950
+          : rarity === "LEGEND"
+          ? 1700
+          : 1500
+      );
+
+
+    // ==========================================================
+    // 7. Second blackout
+    // ==========================================================
+
+    setTimeout(()=>{
+
+      scene
+      .querySelector(
+        ".v5cut"
+      )
+      .classList.add(
+        "go"
+      );
+
+    },cut);
+
+
+    // ==========================================================
+    // 8. Rarity SLAM
+    // ==========================================================
+
+    setTimeout(()=>{
+
+      scene
+      .querySelector(
+        ".v5final"
+      )
+      .classList.add(
+        "go"
+      );
+
+
+      scene
+      .querySelector(
+        ".v5burst"
+      )
+      .classList.add(
+        "go"
+      );
+
+
+      hitSound(
+        rarity
+      );
+
+    },cut + 165);
+
+
+    // ==========================================================
+    // 9. Flash
+    // ==========================================================
+
+    setTimeout(()=>{
+
+      scene
+      .querySelector(
+        ".v5flash"
+      )
+      .classList.add(
+        "go"
+      );
+
+    },cut + 610);
+
+
+    const hold =
+      rarity === "GOD"
+        ? 1250
+        : rarity === "LEGEND"
+        ? 1050
+        : 900;
+
+
+    // ==========================================================
+    // 10. Fade out
+    // ==========================================================
+
+    setTimeout(()=>{
+
+      root.style.transition =
+        "opacity .24s";
+
+      root.style.opacity =
+        "0";
+
+    },
+    cut +
+    760 +
+    hold
+    );
+
+
+    // ==========================================================
+    // 11. Continue game
+    // ==========================================================
+
+    setTimeout(()=>{
+
+      root.remove();
+
+
+      if(
+        typeof done ===
+        "function"
+      ){
+
+        done();
+      }
+
+    },
+    cut +
+    1020 +
+    hold
+    );
+  }
+
+
+  // ============================================================
+  // PREMIUM DROP
+  // ============================================================
+
+  function luxury(item){
+
+    if(!item) return;
+
+
+    const o =
+      document.getElementById(
+        "dropOverlay"
+      );
+
+
+    const c =
+      document.getElementById(
+        "dropCard"
+      );
+
+
+    if(
+      !o ||
+      !c
+    ){
+
+      return;
+    }
+
+
+    const m =
+      {
+
+        NORMAL:[
+          "#d8dce8",
+          "rgba(216,220,232,.16)"
+        ],
+
+        RARE:[
+          "#45a7ff",
+          "rgba(69,167,255,.34)"
+        ],
+
+        EPIC:[
+          "#c367ff",
+          "rgba(195,103,255,.38)"
+        ],
+
+        LEGEND:[
+          "#ffd83d",
+          "rgba(255,216,61,.45)"
+        ],
+
+        GOD:[
+          "#ffffff",
+          "rgba(120,240,255,.5)"
+        ]
+
+      }[item.rarity] ||
+      [
+        "#fff",
+        "rgba(255,255,255,.2)"
+      ];
+
+
+    o.classList.remove(
+      "NORMAL",
+      "RARE",
+      "EPIC",
+      "LEGEND",
+      "GOD"
+    );
+
+
+    o.classList.add(
+      "v5drop",
+      item.rarity
+    );
+
+
+    o.style.setProperty(
+      "--dc",
+      m[0]
+    );
+
+
+    o.style.setProperty(
+      "--dg",
+      m[1]
+    );
+
+
+    c.classList.add(
+      "v5card"
+    );
+
+
+    c.style.animation =
+      "none";
+
+
+    void c.offsetHeight;
+
+
+    c.style.animation =
+      "";
+  }
+
+
+  // ============================================================
+  // INSTALL INTO CURRENT GAME
+  // ============================================================
+
+  function install(){
+
+    // ----------------------------------------------------------
+    // Disable old revival success route
+    // ----------------------------------------------------------
+
+    try{
+
+      if(
+        typeof chooseSuccessPattern ===
+        "function"
+      ){
+
+        chooseSuccessPattern =
+          () => "SUCCESS";
+      }
+
+    }catch(e){}
+
+
+    // ==========================================================
+    // RARE -> EPIC
+    // EPIC -> LEGEND
+    // ==========================================================
+
+    try{
+
+      if(
+        typeof playAscensionSuccess ===
+        "function"
+      ){
+
+        playAscensionSuccess =
+          function(
+            fromRarity,
+            toRarity,
+            premium=false
+          ){
+
+            try{
+
+              ascensionClear();
+
+            }catch(e){}
+
+
+            playSequence(
+              toRarity,
+              ()=>{
+
+                try{
+
+                  ascensionCurrentIndex++;
+
+                  continueAscension();
+
+                }catch(e){
+
+                  console.error(
+                    "V5 ascension continue",
+                    e
+                  );
+                }
+              }
+            );
+          };
+      }
+
+    }catch(e){
+
+      console.error(
+        "V5 install playAscensionSuccess",
+        e
+      );
+    }
+
+
+    // ==========================================================
+    // GOD CHANCE
+    // Removes old simple GOD mini-puchun
+    // ==========================================================
+
+    try{
+
+      if(
+        typeof startGodAscension ===
+        "function"
+      ){
+
+        startGodAscension =
+          function(){
+
+            try{
+
+              ascensionClear();
+
+              ascensionOverlay.className =
+                "show";
+
+              ascensionOverlay.style.background =
+                "#000";
+
+            }catch(e){}
+
+
+            const s =
+              document.createElement(
+                "div"
+              );
+
+
+            s.className =
+              "ascensionStage ascensionGod";
+
+
+            s.innerHTML = `
+
+              <div class="ascensionSub">
+                0.1%
+              </div>
+
+              <div
+                style="
+                  margin-top:14px;
+                  font-size:13px;
+                  font-weight:900;
+                  letter-spacing:7px;
+                  color:#aaa;
+                "
+              >
+                GOD CHANCE
+              </div>
+
+              <div
+                style="
+                  margin-top:10px;
+                  font-size:28px;
+                  font-weight:1000;
+                  letter-spacing:8px;
+                  color:white;
+                "
+              >
+                ????
+              </div>
+
+              <button
+                id="v5GodPush"
+                class="
+                  ascensionPush
+                  ascensionRainbowPush
+                "
+                style="
+                  margin-top:34px
+                "
+              >
+                🌈
+                <br>
+                PUSH
+              </button>
+
+            `;
+
+
+            ascensionOverlay
+            .appendChild(
+              s
+            );
+
+
+            try{
+
+              sfxKyuiin(
+                .1,
+                .7
+              );
+
+            }catch(e){}
+
+
+            const b =
+              document.getElementById(
+                "v5GodPush"
+              );
+
+
+            if(b){
+
+              b.onclick =
+                ()=>{
+
+                  b.disabled =
+                    true;
+
+                  playGodAscensionSuccess();
+                };
+            }
+          };
+      }
+
+    }catch(e){
+
+      console.error(
+        "V5 install startGodAscension",
+        e
+      );
+    }
+
+
+    // ==========================================================
+    // GOD SUCCESS
+    // ==========================================================
+
+    try{
+
+      if(
+        typeof playGodAscensionSuccess ===
+        "function"
+      ){
+
+        playGodAscensionSuccess =
+          function(){
+
+            try{
+
+              ascensionClear();
+
+            }catch(e){}
+
+
+            playSequence(
+              "GOD",
+              ()=>{
+
+                try{
+
+                  const item =
+                    ascensionItem;
+
+
+                  if(
+                    item &&
+                    typeof revealSuperDropCard ===
+                    "function"
+                  ){
+
+                    revealSuperDropCard(
+                      item
+                    );
+                  }
+
+
+                  ascensionItem =
+                    null;
+
+                  ascensionFinalRarity =
+                    null;
+
+                  ascensionCurrentIndex =
+                    0;
+
+                }catch(e){
+
+                  console.error(
+                    "V5 GOD finish",
+                    e
+                  );
+                }
+              }
+            );
+          };
+      }
+
+    }catch(e){
+
+      console.error(
+        "V5 install GOD",
+        e
+      );
+    }
+
+
+    // ==========================================================
+    // PREMIUM DROP CARD
+    // ==========================================================
+
+    try{
+
+      if(
+        typeof revealSuperDropCard ===
+        "function"
+      ){
+
+        const old =
+          revealSuperDropCard;
+
+
+        revealSuperDropCard =
+          function(item){
+
+            old(item);
+
+
+            requestAnimationFrame(
+              ()=>{
+
+                luxury(
+                  item
+                );
+              }
+            );
+          };
+      }
+
+    }catch(e){
+
+      console.error(
+        "V5 install reveal",
+        e
+      );
+    }
+
+
+    console.log(
+      "1% DROP EFFECTS V5 COMPLETE READY"
+    );
+  }
+
+
+  // ============================================================
+  // START
+  // ============================================================
+
+  if(
+    document.readyState ===
+    "loading"
+  ){
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      install,
+      {
+        once:true
+      }
+    );
+
+  }else{
+
+    setTimeout(
+      install,
+      0
+    );
+  }
+
+})();
