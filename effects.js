@@ -1964,3 +1964,576 @@
   );
 
 })();
+// =====================================================
+// ONE PERCENT DROP
+// V4 - CINEMATIC REVEAL PATCH
+//
+// V3のDROP詳細はそのまま。
+// プチュン後のレアリティ確定演出をV4へ。
+// =====================================================
+
+(() => {
+
+  if (window.__OP_V4_REVEAL__) return;
+  window.__OP_V4_REVEAL__ = true;
+
+  const V4 = {
+    RARE: {
+      color:"#35a9ff",
+      light:"#c7efff",
+      phrase:"A SIGN APPEARS",
+      rate:"20%"
+    },
+    EPIC: {
+      color:"#c65cff",
+      light:"#ff9aea",
+      phrase:"POWER BEYOND THE ORDINARY",
+      rate:"8%"
+    },
+    LEGEND: {
+      color:"#ffd84a",
+      light:"#fff2a6",
+      phrase:"THE LEGEND AWAKENS",
+      rate:"1.9%"
+    },
+    GOD: {
+      color:"#ffffff",
+      light:"#aafaff",
+      phrase:"THE WORLD HAS CHOSEN",
+      rate:"0.1%"
+    }
+  };
+
+
+  // =====================================================
+  // CSS
+  // =====================================================
+
+  const css = document.createElement("style");
+
+  css.textContent = `
+
+  .v4Reveal{
+    position:absolute;
+    inset:0;
+    z-index:30;
+    overflow:hidden;
+    background:#000;
+    opacity:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+
+  .v4Reveal.active{
+    opacity:1;
+  }
+
+
+  /* -----------------------------------------
+     最初は本当に真っ暗
+  ----------------------------------------- */
+
+  .v4Point{
+    position:absolute;
+    left:50%;
+    top:50%;
+
+    width:3px;
+    height:3px;
+
+    border-radius:50%;
+
+    background:#fff;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.01);
+
+    opacity:0;
+
+    box-shadow:
+      0 0 5px #fff,
+      0 0 14px var(--v4),
+      0 0 32px var(--v4);
+
+    z-index:5;
+  }
+
+
+  .v4Reveal.phase1 .v4Point{
+    animation:v4PointBirth .85s cubic-bezier(.16,1,.3,1) forwards;
+  }
+
+
+  @keyframes v4PointBirth{
+
+    0%{
+      opacity:0;
+      transform:
+        translate(-50%,-50%)
+        scale(.01);
+    }
+
+    30%{
+      opacity:.35;
+    }
+
+    68%{
+      opacity:1;
+      transform:
+        translate(-50%,-50%)
+        scale(1.8);
+    }
+
+    100%{
+      opacity:1;
+      transform:
+        translate(-50%,-50%)
+        scale(1);
+    }
+
+  }
+
+
+  /* -----------------------------------------
+     光点から左右へ線が走る
+  ----------------------------------------- */
+
+  .v4Line{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:0;
+    height:1px;
+
+    transform:
+      translate(-50%,-50%);
+
+    opacity:0;
+
+    background:
+      linear-gradient(
+        90deg,
+        transparent,
+        var(--v4),
+        #fff,
+        var(--v4),
+        transparent
+      );
+
+    box-shadow:
+      0 0 5px #fff,
+      0 0 14px var(--v4);
+
+    z-index:4;
+  }
+
+
+  .v4Reveal.phase2 .v4Line{
+    animation:v4LineOpen .72s cubic-bezier(.15,.75,.25,1) forwards;
+  }
+
+
+  @keyframes v4LineOpen{
+
+    0%{
+      width:0;
+      opacity:0;
+    }
+
+    15%{
+      opacity:1;
+    }
+
+    100%{
+      width:min(82vw,390px);
+      opacity:.72;
+    }
+
+  }
+
+
+  /* -----------------------------------------
+     奥にある巨大円環
+  ----------------------------------------- */
+
+  .v4Sigil,
+  .v4Sigil2{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    border-radius:50%;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.25)
+      rotate(-25deg);
+
+    opacity:0;
+
+    pointer-events:none;
+  }
+
+
+  .v4Sigil{
+
+    width:min(75vw,360px);
+    aspect-ratio:1;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--v4) 75%,
+        transparent
+      );
+
+    box-shadow:
+      0 0 12px rgba(255,255,255,.08),
+      inset 0 0 20px rgba(255,255,255,.04);
+  }
+
+
+  .v4Sigil2{
+
+    width:min(55vw,265px);
+    aspect-ratio:1;
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--v4) 45%,
+        transparent
+      );
+  }
+
+
+  .v4Reveal.phase3 .v4Sigil{
+
+    animation:
+      v4SigilWake
+      1.8s
+      cubic-bezier(.15,.8,.2,1)
+      forwards;
+
+  }
+
+
+  .v4Reveal.phase3 .v4Sigil2{
+
+    animation:
+      v4SigilWake2
+      1.65s
+      cubic-bezier(.15,.8,.2,1)
+      .12s
+      forwards;
+
+  }
+
+
+  @keyframes v4SigilWake{
+
+    0%{
+      opacity:0;
+      transform:
+        translate(-50%,-50%)
+        scale(.25)
+        rotate(-28deg);
+    }
+
+    50%{
+      opacity:.38;
+    }
+
+    100%{
+      opacity:.15;
+      transform:
+        translate(-50%,-50%)
+        scale(1.04)
+        rotate(7deg);
+    }
+
+  }
+
+
+  @keyframes v4SigilWake2{
+
+    0%{
+      opacity:0;
+      transform:
+        translate(-50%,-50%)
+        scale(.3)
+        rotate(28deg);
+    }
+
+    55%{
+      opacity:.42;
+    }
+
+    100%{
+      opacity:.18;
+      transform:
+        translate(-50%,-50%)
+        scale(1)
+        rotate(-10deg);
+    }
+
+  }
+
+
+  /* -----------------------------------------
+     文章
+
+     「急に全部表示」をやめて
+     ぼやけた暗闇から形成する
+  ----------------------------------------- */
+
+  .v4Phrase{
+
+    position:absolute;
+
+    left:50%;
+    top:42%;
+
+    width:90%;
+
+    transform:
+      translate(-50%,18px)
+      scale(.94);
+
+    text-align:center;
+
+    font-family:
+      Georgia,
+      "Times New Roman",
+      serif;
+
+    font-size:
+      clamp(17px,5vw,24px);
+
+    font-weight:700;
+
+    letter-spacing:4px;
+
+    color:#fff;
+
+    opacity:0;
+
+    filter:blur(7px);
+
+    text-shadow:
+      0 0 8px var(--v4),
+      0 0 22px var(--v4);
+
+    z-index:8;
+  }
+
+
+  .v4Reveal.phase3 .v4Phrase{
+
+    animation:
+      v4PhraseForm
+      1.25s
+      cubic-bezier(.2,.75,.2,1)
+      .2s
+      forwards;
+
+  }
+
+
+  @keyframes v4PhraseForm{
+
+    0%{
+      opacity:0;
+      filter:blur(9px);
+      letter-spacing:10px;
+
+      transform:
+        translate(-50%,18px)
+        scale(.94);
+    }
+
+    50%{
+      opacity:.48;
+    }
+
+    100%{
+      opacity:.94;
+      filter:blur(0);
+      letter-spacing:4px;
+
+      transform:
+        translate(-50%,0)
+        scale(1);
+    }
+
+  }
+
+
+  .v4Sub{
+
+    position:absolute;
+
+    left:50%;
+    top:calc(42% - 34px);
+
+    transform:
+      translateX(-50%);
+
+    white-space:nowrap;
+
+    font-size:9px;
+
+    font-weight:800;
+
+    letter-spacing:7px;
+
+    color:var(--v4);
+
+    opacity:0;
+
+    z-index:8;
+  }
+
+
+  .v4Reveal.phase3 .v4Sub{
+
+    animation:
+      v4SubIn
+      .8s
+      ease-out
+      .65s
+      forwards;
+
+  }
+
+
+  @keyframes v4SubIn{
+
+    from{
+      opacity:0;
+      letter-spacing:11px;
+    }
+
+    to{
+      opacity:.72;
+      letter-spacing:7px;
+    }
+
+  }
+
+
+  /* -----------------------------------------
+     「一瞬また消える」
+  ----------------------------------------- */
+
+  .v4SecondBlack{
+
+    position:absolute;
+    inset:0;
+
+    z-index:50;
+
+    background:#000;
+
+    opacity:0;
+
+    pointer-events:none;
+  }
+
+
+  .v4SecondBlack.hit{
+
+    animation:
+      v4SecondCut
+      260ms
+      steps(1,end)
+      forwards;
+
+  }
+
+
+  @keyframes v4SecondCut{
+
+    0%{
+      opacity:1;
+    }
+
+    62%{
+      opacity:1;
+    }
+
+    63%{
+      opacity:0;
+    }
+
+    100%{
+      opacity:0;
+    }
+
+  }
+
+
+  /* -----------------------------------------
+     最終レアリティ
+  ----------------------------------------- */
+
+  .v4Final{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:40;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    opacity:0;
+
+    pointer-events:none;
+  }
+
+
+  .v4FinalWord{
+
+    position:relative;
+
+    font-size:
+      clamp(70px,23vw,125px);
+
+    line-height:.85;
+
+    font-weight:1000;
+
+    letter-spacing:-2px;
+
+    color:var(--v4);
+
+    opacity:0;
+
+    transform:
+      scale(2.4);
+
+    text-shadow:
+      0 0 8px var(--v4),
+      0 0 25px var(--v4),
+      0 0 60px var(--v4);
+  }
+
+
+  .v4Final.hit{
+    opacity:1;
+  }
+
+
+  .v4Final.hit .v4FinalWord{
+
+    animation:
+     
