@@ -1,83 +1,91 @@
-<scrip// =====================================================
-// ONE PERCENT DROP
-// EFFECTS V3
+// ============================================================
+// 1% DROP
+// EFFECTS V5 - COMPLETE REBUILD
 //
-// PUCHUN CUT
-// ↓
-// BLACKOUT
-// ↓
-// DARK TEXT REVEAL
-// ↓
-// RARITY AWAKENING
-// ↓
-// PREMIUM DROP CARD
-//
-// Mobile / iPhone lightweight version
-// =====================================================
+// ・Sharp PUCHUN + short heavy sub impact
+// ・BLACKOUT
+// ・Text emerging from darkness
+// ・RARE / EPIC / LEGEND / GOD unique presentation
+// ・GOD uses the same real PUCHUN
+// ・Premium rarity-specific DROP CARD
+// ・No old patch dependency
+// ・iPhone lightweight
+// ============================================================
 
 (() => {
 
-  if (window.__ONE_PERCENT_EFFECTS_V3__) return;
-  window.__ONE_PERCENT_EFFECTS_V3__ = true;
+  "use strict";
 
-  // =====================================================
-  // RARITY DATA
-  // =====================================================
+  if (window.__ONE_PERCENT_EFFECTS_V5__) return;
+  window.__ONE_PERCENT_EFFECTS_V5__ = true;
 
-  const RARITY = {
 
-    RARE: {
-      main: "#45a7ff",
-      sub: "#b9e7ff",
-      dark: "#07172b",
-      label: "RARE",
-      message: "THE BLUE LIGHT AWAKENS",
-      chance: "20%"
+  // ============================================================
+  // CONFIG
+  // ============================================================
+
+  const FX = {
+
+    RARE:{
+      color:"#48aaff",
+      light:"#d7f1ff",
+      dark:"#03101e",
+      phrase:"A BLUE SIGN APPEARS",
+      rate:"20%",
+      hold:720,
+      build:1450,
+      particles:6
     },
 
-    EPIC: {
-      main: "#c557ff",
-      sub: "#ff75e8",
-      dark: "#180822",
-      label: "EPIC",
-      message: "A HIGHER POWER EMERGES",
-      chance: "8%"
+    EPIC:{
+      color:"#c45cff",
+      light:"#ff8deb",
+      dark:"#110319",
+      phrase:"POWER BEYOND THE ORDINARY",
+      rate:"8%",
+      hold:820,
+      build:1600,
+      particles:9
     },
 
-    LEGEND: {
-      main: "#ffd63d",
-      sub: "#fff1a3",
-      dark: "#241700",
-      label: "LEGEND",
-      message: "THE LEGEND HAS AWAKENED",
-      chance: "1.9%"
+    LEGEND:{
+      color:"#ffd63f",
+      light:"#fff3ae",
+      dark:"#181000",
+      phrase:"THE LEGEND AWAKENS",
+      rate:"1.9%",
+      hold:950,
+      build:1800,
+      particles:12
     },
 
-    GOD: {
-      main: "#ffffff",
-      sub: "#88f7ff",
-      dark: "#020205",
-      label: "GOD",
-      message: "THE WORLD CHOOSES YOU",
-      chance: "0.1%"
+    GOD:{
+      color:"#ffffff",
+      light:"#8ff7ff",
+      dark:"#000000",
+      phrase:"THE WORLD HAS CHOSEN YOU",
+      rate:"0.1%",
+      hold:1200,
+      build:2150,
+      particles:16
     }
 
   };
 
 
-  // =====================================================
+  // ============================================================
   // CSS
-  // =====================================================
+  // ============================================================
 
   const style = document.createElement("style");
 
   style.textContent = `
 
-  /* =====================================================
-     MASTER EFFECT STAGE
-  ===================================================== */
+  /* ============================================================
+     MASTER STAGE
+  ============================================================ */
 
-  .opV3Stage{
+  .fx5Stage{
     position:fixed;
     inset:0;
     z-index:2147483000;
@@ -87,91 +95,79 @@
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   }
 
-
-  /* =====================================================
-     PUCHUN
-  ===================================================== */
-
-  .opV3Black{
+  .fx5Black{
     position:absolute;
     inset:0;
+    z-index:1;
     background:#000;
     opacity:0;
-    z-index:1;
   }
 
-  .opV3Black.on{
+  .fx5Black.on{
     opacity:1;
   }
 
 
-  .opV3White{
+  /* ============================================================
+     PUCHUN
+  ============================================================ */
+
+  .fx5White{
     position:absolute;
     inset:0;
-    background:#fff;
+    z-index:20;
+    background:white;
     opacity:0;
-    z-index:10;
   }
 
-  .opV3White.fire{
-    animation:opV3WhiteFire 34ms steps(1,end) forwards;
+  .fx5White.fire{
+    animation:fx5White 34ms steps(1,end) forwards;
   }
 
-  @keyframes opV3WhiteFire{
-
-    0%,99%{
-      opacity:1;
-    }
-
-    100%{
-      opacity:0;
-    }
-
+  @keyframes fx5White{
+    0%,98%{opacity:1}
+    100%{opacity:0}
   }
 
 
-  .opV3Flare{
+  .fx5Core{
     position:absolute;
-
     left:50%;
     top:50%;
+    z-index:15;
 
-    width:min(105vw,850px);
+    width:min(108vw,820px);
     aspect-ratio:1;
 
     border-radius:50%;
 
-    transform:
-      translate(-50%,-50%)
-      scale(1.18);
-
     opacity:0;
 
-    z-index:7;
+    transform:
+      translate(-50%,-50%)
+      scale(1.2);
 
     background:
       radial-gradient(
         circle,
         #fff 0%,
         #fff 3%,
-        rgba(230,249,255,1) 7%,
-        rgba(160,220,255,.8) 15%,
-        rgba(70,145,255,.28) 32%,
-        transparent 62%
+        rgba(234,250,255,1) 7%,
+        rgba(175,225,255,.85) 14%,
+        rgba(83,160,255,.33) 30%,
+        transparent 60%
       );
   }
 
-
-  .opV3Flare.cut{
+  .fx5Core.cut{
     animation:
-      opV3FlareCut
+      fx5CoreCut
       195ms
-      cubic-bezier(.78,0,.98,.38)
+      cubic-bezier(.76,0,.97,.35)
       forwards;
   }
 
-
-  @keyframes opV3FlareCut{
+  @keyframes fx5CoreCut{
 
     0%{
       opacity:1;
@@ -180,32 +176,32 @@
         scale(1.2);
     }
 
-    18%{
+    22%{
       opacity:1;
       transform:
         translate(-50%,-50%)
-        scale(.82);
+        scale(.78);
     }
 
-    38%{
-      opacity:1;
+    44%{
+      opacity:.98;
       transform:
         translate(-50%,-50%)
-        scale(.52);
+        scale(.46);
     }
 
-    60%{
-      opacity:.94;
+    65%{
+      opacity:.88;
       transform:
         translate(-50%,-50%)
-        scale(.27);
+        scale(.23);
     }
 
-    80%{
-      opacity:.62;
+    83%{
+      opacity:.55;
       transform:
         translate(-50%,-50%)
-        scale(.09);
+        scale(.07);
     }
 
     100%{
@@ -218,1822 +214,179 @@
   }
 
 
-  .opV3BeamH{
+  .fx5BeamH{
+
     position:absolute;
 
     left:50%;
     top:50%;
 
-    width:180vw;
-    height:13px;
+    z-index:16;
 
-    transform:
-      translate(-50%,-50%)
-      scaleX(1);
+    width:185vw;
+    height:13px;
 
     opacity:0;
 
-    z-index:8;
+    transform:
+      translate(-50%,-50%);
 
     background:
       linear-gradient(
         to bottom,
         transparent,
-        rgba(205,240,255,.4),
+        rgba(210,242,255,.35),
         #fff,
         #fff,
-        rgba(190,230,255,.45),
+        rgba(210,242,255,.35),
         transparent
       );
 
     box-shadow:
       0 0 8px #fff,
-      0 0 22px rgba(205,240,255,.9),
-      0 0 55px rgba(75,165,255,.55);
+      0 0 22px rgba(210,244,255,.9),
+      0 0 52px rgba(90,170,255,.55);
+
   }
 
 
-  .opV3BeamH.cut{
+  .fx5BeamH.cut{
+
     animation:
-      opV3BeamHCut
+      fx5BeamHCut
       195ms
       linear
       forwards;
+
   }
 
 
-  @keyframes opV3BeamHCut{
+  @keyframes fx5BeamHCut{
 
     0%{
       opacity:1;
-      transform:
-        translate(-50%,-50%)
-        scaleX(1);
+      width:185vw;
+      height:13px;
     }
 
-    50%{
-      opacity:.9;
-      height:7px;
-      transform:
-        translate(-50%,-50%)
-        scaleX(.52);
+    45%{
+      opacity:.95;
+      width:100vw;
+      height:8px;
     }
 
-    82%{
-      opacity:.45;
+    75%{
+      opacity:.65;
+      width:35vw;
       height:3px;
-      transform:
-        translate(-50%,-50%)
-        scaleX(.14);
     }
 
     100%{
       opacity:0;
+      width:2px;
       height:1px;
-      transform:
-        translate(-50%,-50%)
-        scaleX(.01);
     }
 
   }
 
 
-  .opV3BeamV{
+  .fx5BeamV{
+
     position:absolute;
 
     left:50%;
     top:50%;
 
-    width:7px;
-    height:90vh;
+    z-index:16;
 
-    transform:
-      translate(-50%,-50%);
+    width:6px;
+    height:85vh;
 
     opacity:0;
 
-    z-index:8;
+    transform:
+      translate(-50%,-50%);
 
     background:
       linear-gradient(
         to right,
         transparent,
-        rgba(220,245,255,.7),
+        rgba(220,247,255,.6),
         #fff,
-        rgba(220,245,255,.7),
+        rgba(220,247,255,.6),
         transparent
       );
 
     box-shadow:
-      0 0 15px #fff,
-      0 0 35px rgba(120,200,255,.5);
+      0 0 12px white,
+      0 0 32px rgba(110,205,255,.45);
+
   }
 
 
-  .opV3BeamV.cut{
+  .fx5BeamV.cut{
+
     animation:
-      opV3BeamVCut
+      fx5BeamVCut
       145ms
       linear
       forwards;
+
   }
 
 
-  @keyframes opV3BeamVCut{
+  @keyframes fx5BeamVCut{
 
     0%{
       opacity:.85;
-      transform:
-        translate(-50%,-50%)
-        scaleY(1);
-    }
-
-    60%{
-      opacity:.55;
-      transform:
-        translate(-50%,-50%)
-        scaleY(.35);
-    }
-
-    100%{
-      opacity:0;
-      transform:
-        translate(-50%,-50%)
-        scaleY(.02);
-    }
-
-  }
-
-
-  /* =====================================================
-     DARK REVEAL
-  ===================================================== */
-
-  .opV3Reveal{
-    position:absolute;
-    inset:0;
-
-    z-index:3;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    opacity:0;
-  }
-
-
-  .opV3Reveal.show{
-    opacity:1;
-  }
-
-
-  .opV3Aura{
-    position:absolute;
-
-    left:50%;
-    top:50%;
-
-    width:75vw;
-    max-width:390px;
-
-    aspect-ratio:1;
-
-    border-radius:50%;
-
-    transform:
-      translate(-50%,-50%)
-      scale(.12);
-
-    opacity:0;
-
-    background:
-      radial-gradient(
-        circle,
-        var(--rarityMain) 0%,
-        rgba(255,255,255,.15) 15%,
-        transparent 65%
-      );
-
-    animation:
-      opV3AuraWake
-      2s
-      ease-out
-      forwards;
-  }
-
-
-  @keyframes opV3AuraWake{
-
-    0%{
-      opacity:0;
-      transform:
-        translate(-50%,-50%)
-        scale(.08);
-    }
-
-    35%{
-      opacity:.15;
-    }
-
-    70%{
-      opacity:.42;
-    }
-
-    100%{
-      opacity:.16;
-      transform:
-        translate(-50%,-50%)
-        scale(1.15);
-    }
-
-  }
-
-
-  .opV3Ring{
-    position:absolute;
-
-    left:50%;
-    top:50%;
-
-    width:min(70vw,330px);
-    aspect-ratio:1;
-
-    border-radius:50%;
-
-    border:
-      1px solid
-      var(--rarityMain);
-
-    opacity:0;
-
-    transform:
-      translate(-50%,-50%)
-      scale(.4);
-
-    animation:
-      opV3RingWake
-      1.5s
-      ease-out
-      .35s
-      forwards;
-  }
-
-
-  @keyframes opV3RingWake{
-
-    0%{
-      opacity:0;
-      transform:
-        translate(-50%,-50%)
-        scale(.35);
-    }
-
-    45%{
-      opacity:.65;
-    }
-
-    100%{
-      opacity:.18;
-      transform:
-        translate(-50%,-50%)
-        scale(1.1);
-    }
-
-  }
-
-
-  .opV3TextWrap{
-    position:relative;
-    z-index:5;
-
-    width:100%;
-
-    text-align:center;
-
-    padding:20px;
-
-    transform:translateY(8px);
-  }
-
-
-  .opV3PreText{
-    font-size:11px;
-
-    font-weight:800;
-
-    letter-spacing:6px;
-
-    color:rgba(255,255,255,.52);
-
-    opacity:0;
-
-    transform:translateY(8px);
-
-    animation:
-      opV3SmallText
-      .85s
-      ease-out
-      forwards;
-  }
-
-
-  @keyframes opV3SmallText{
-
-    to{
-      opacity:1;
-      transform:translateY(0);
-    }
-
-  }
-
-
-  .opV3Message{
-    margin-top:16px;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size:clamp(17px,5vw,25px);
-
-    font-weight:700;
-
-    letter-spacing:3px;
-
-    color:white;
-
-    opacity:0;
-
-    transform:
-      scale(.96)
-      translateY(10px);
-
-    text-shadow:
-      0 0 14px var(--rarityMain);
-
-    animation:
-      opV3MessageIn
-      1.15s
-      cubic-bezier(.2,.8,.2,1)
-      .35s
-      forwards;
-  }
-
-
-  @keyframes opV3MessageIn{
-
-    to{
-      opacity:1;
-      transform:
-        scale(1)
-        translateY(0);
-    }
-
-  }
-
-
-  .opV3Line{
-    width:0;
-    height:1px;
-
-    margin:20px auto 0;
-
-    background:
-      linear-gradient(
-        90deg,
-        transparent,
-        var(--rarityMain),
-        #fff,
-        var(--rarityMain),
-        transparent
-      );
-
-    box-shadow:
-      0 0 12px var(--rarityMain);
-
-    animation:
-      opV3LineOpen
-      .8s
-      ease-out
-      .75s
-      forwards;
-  }
-
-
-  @keyframes opV3LineOpen{
-
-    to{
-      width:min(70vw,300px);
-    }
-
-  }
-
-
-  .opV3Rarity{
-    margin-top:21px;
-
-    font-size:clamp(52px,16vw,82px);
-
-    font-weight:1000;
-
-    letter-spacing:4px;
-
-    color:var(--rarityMain);
-
-    opacity:0;
-
-    transform:
-      scale(1.55);
-
-    text-shadow:
-      0 0 10px var(--rarityMain),
-      0 0 30px var(--rarityMain);
-
-    animation:
-      opV3RarityHit
-      .55s
-      cubic-bezier(.16,1.2,.28,1)
-      1.2s
-      forwards;
-  }
-
-
-  @keyframes opV3RarityHit{
-
-    0%{
-      opacity:0;
-      transform:scale(1.65);
+      height:85vh;
     }
 
     55%{
-      opacity:1;
-      transform:scale(.94);
+      opacity:.55;
+      height:32vh;
     }
 
     100%{
-      opacity:1;
-      transform:scale(1);
-    }
-
-  }
-
-
-  .opV3Chance{
-    margin-top:7px;
-
-    font-size:13px;
-
-    font-weight:900;
-
-    letter-spacing:4px;
-
-    color:white;
-
-    opacity:0;
-
-    animation:
-      opV3ChanceIn
-      .6s
-      ease-out
-      1.5s
-      forwards;
-  }
-
-
-  @keyframes opV3ChanceIn{
-
-    to{
-      opacity:.85;
-    }
-
-  }
-
-
-  /* =====================================================
-     GOD SPECIAL
-  ===================================================== */
-
-  .opV3Reveal.GOD .opV3Rarity{
-
-    background:
-      linear-gradient(
-        90deg,
-        #fff,
-        #75f5ff,
-        #c783ff,
-        #ff72d8,
-        #fff3a8,
-        #fff
-      );
-
-    background-size:250% 100%;
-
-    -webkit-background-clip:text;
-    background-clip:text;
-
-    color:transparent;
-
-    animation:
-      opV3RarityHit
-      .62s
-      cubic-bezier(.16,1.2,.28,1)
-      1.35s
-      forwards,
-      opV3GodFlow
-      1.6s
-      linear
-      1.35s
-      infinite;
-  }
-
-
-  @keyframes opV3GodFlow{
-
-    to{
-      background-position:250% 0;
-    }
-
-  }
-
-
-  .opV3Reveal.GOD .opV3Ring{
-
-    border-color:#fff;
-
-    box-shadow:
-      0 0 16px rgba(100,240,255,.6),
-      inset 0 0 16px rgba(255,100,230,.25);
-
-  }
-
-
-  /* =====================================================
-     PREMIUM DROP RESULT
-  ===================================================== */
-
-  #dropOverlay.opV3Drop{
-    overflow:hidden;
-    background:#03050c !important;
-  }
-
-
-  #dropOverlay.opV3Drop::before{
-    content:"";
-
-    position:absolute;
-    inset:-20%;
-
-    pointer-events:none;
-
-    opacity:.22;
-
-    background:
-      radial-gradient(
-        circle at 50% 45%,
-        var(--dropMain),
-        transparent 42%
-      );
-
-    animation:
-      opV3DropAura
-      2.6s
-      ease-in-out
-      infinite alternate;
-  }
-
-
-  @keyframes opV3DropAura{
-
-    from{
-      transform:scale(.88);
-      opacity:.12;
-    }
-
-    to{
-      transform:scale(1.08);
-      opacity:.3;
-    }
-
-  }
-
-
-  #dropCard.opV3PremiumCard{
-
-    position:relative;
-
-    overflow:hidden;
-
-    border:
-      1px solid
-      var(--dropMain) !important;
-
-    background:
-      linear-gradient(
-        180deg,
-        rgba(255,255,255,.075),
-        rgba(8,10,20,.96) 28%,
-        rgba(3,4,10,.98)
-      ) !important;
-
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,.06),
-      0 0 24px var(--dropGlow),
-      0 28px 65px rgba(0,0,0,.75) !important;
-
-    animation:
-      opV3DropCardIn
-      .65s
-      cubic-bezier(.16,1,.3,1)
-      forwards !important;
-  }
-
-
-  @keyframes opV3DropCardIn{
-
-    0%{
       opacity:0;
-      transform:
-        translateY(28px)
-        scale(.84);
-    }
-
-    65%{
-      opacity:1;
-      transform:
-        translateY(-4px)
-        scale(1.025);
-    }
-
-    100%{
-      opacity:1;
-      transform:
-        translateY(0)
-        scale(1);
+      height:2px;
     }
 
   }
 
 
-  #dropCard.opV3PremiumCard::before{
+  /* ============================================================
+     AFTER PUCHUN
+  ============================================================ */
 
-    content:"";
+  .fx5Awaken{
 
-    position:absolute;
-
-    left:-40%;
-    top:-45%;
-
-    width:180%;
-    height:70%;
-
-    transform:rotate(-12deg);
-
-    background:
-      linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,.04),
-        rgba(255,255,255,.18),
-        rgba(255,255,255,.04),
-        transparent
-      );
-
-    animation:
-      opV3CardSweep
-      2.4s
-      ease-in-out
-      .5s
-      infinite;
-  }
-
-
-  @keyframes opV3CardSweep{
-
-    0%,30%{
-      transform:
-        translateX(-65%)
-        rotate(-12deg);
-    }
-
-    75%,100%{
-      transform:
-        translateX(65%)
-        rotate(-12deg);
-    }
-
-  }
-
-
-  #dropOverlay.opV3Drop .dropLabel{
-    opacity:0;
-    animation:
-      opV3DropPart
-      .5s
-      ease-out
-      .25s
-      forwards;
-  }
-
-
-  #dropOverlay.opV3Drop .dropRarity{
-    opacity:0;
-    transform:translateY(8px);
-    text-shadow:
-      0 0 16px var(--dropMain);
-
-    animation:
-      opV3DropPart
-      .55s
-      ease-out
-      .38s
-      forwards;
-  }
-
-
-  #dropOverlay.opV3Drop .dropIcon{
-    opacity:0;
-
-    transform:
-      scale(.65)
-      translateY(10px);
-
-    filter:
-      drop-shadow(
-        0 0 18px
-        var(--dropMain)
-      );
-
-    animation:
-      opV3DropIcon
-      .7s
-      cubic-bezier(.16,1.2,.3,1)
-      .58s
-      forwards;
-  }
-
-
-  #dropOverlay.opV3Drop .dropName{
-    opacity:0;
-    animation:
-      opV3DropPart
-      .55s
-      ease-out
-      .82s
-      forwards;
-  }
-
-
-  #dropOverlay.opV3Drop .dropEffect{
-    opacity:0;
-    animation:
-      opV3DropPart
-      .55s
-      ease-out
-      1.02s
-      forwards;
-  }
-
-
-  #dropOverlay.opV3Drop .dropChance{
-    opacity:0;
-    animation:
-      opV3DropPart
-      .55s
-      ease-out
-      1.18s
-      forwards;
-  }
-
-
-  #dropOverlay.opV3Drop .dropButtons{
-    opacity:0;
-    transform:translateY(8px);
-
-    animation:
-      opV3DropPart
-      .55s
-      ease-out
-      1.35s
-      forwards;
-  }
-
-
-  @keyframes opV3DropPart{
-
-    to{
-      opacity:1;
-      transform:translateY(0);
-    }
-
-  }
-
-
-  @keyframes opV3DropIcon{
-
-    0%{
-      opacity:0;
-      transform:
-        scale(.5)
-        translateY(12px);
-    }
-
-    70%{
-      opacity:1;
-      transform:
-        scale(1.12)
-        translateY(-3px);
-    }
-
-    100%{
-      opacity:1;
-      transform:
-        scale(1)
-        translateY(0);
-    }
-
-  }
-
-
-  /* GOD result is deliberately special */
-
-  #dropOverlay.opV3Drop.GOD{
-    background:#000 !important;
-  }
-
-
-  #dropOverlay.opV3Drop.GOD::before{
-
-    opacity:.34;
-
-    background:
-      radial-gradient(
-        circle at 50% 45%,
-        rgba(255,255,255,.45),
-        rgba(82,235,255,.18) 18%,
-        rgba(223,92,255,.12) 32%,
-        transparent 55%
-      );
-
-  }
-
-
-  #dropOverlay.opV3Drop.GOD
-  #dropCard{
-
-    border-color:#fff !important;
-
-    box-shadow:
-      0 0 12px rgba(255,255,255,.8),
-      0 0 30px rgba(80,230,255,.45),
-      0 0 55px rgba(225,80,255,.25),
-      0 30px 70px rgba(0,0,0,.8) !important;
-
-  }
-
-
-  #dropOverlay.opV3Drop.GOD
-  .dropRarity{
-
-    background:
-      linear-gradient(
-        90deg,
-        #fff,
-        #7ff3ff,
-        #d99bff,
-        #ff86d8,
-        #fff4a8,
-        #fff
-      );
-
-    background-size:240%;
-
-    -webkit-background-clip:text;
-    background-clip:text;
-
-    color:transparent !important;
-
-    animation:
-      opV3DropPart
-      .55s
-      ease-out
-      .38s
-      forwards,
-      opV3GodFlow
-      1.5s
-      linear
-      .7s
-      infinite;
-  }
-
-  `;
-
-  document.head.appendChild(style);
-
-
-  // =====================================================
-  // AUDIO
-  // Sharp "cut" + instantaneous sub impact
-  // No long BOOM tail
-  // =====================================================
-
-  function puchunSoundV3(){
-
-    try{
-      if(typeof initAudio === "function"){
-        initAudio();
-      }
-    }catch(e){}
-
-
-    if(
-      typeof audioCtx === "undefined" ||
-      !audioCtx
-    ){
-
-      if(typeof tone === "function"){
-        tone(82,.07,"square",.14);
-      }
-
-      return;
-    }
-
-
-    const ctx = audioCtx;
-    const now = ctx.currentTime;
-
-
-    // -----------------------------------------------------
-    // 1. HARD ELECTRIC SNAP
-    // -----------------------------------------------------
-
-    const snap = ctx.createOscillator();
-    const snapGain = ctx.createGain();
-    const snapFilter = ctx.createBiquadFilter();
-
-    snap.type = "square";
-
-    snap.frequency.setValueAtTime(
-      1650,
-      now
-    );
-
-    snap.frequency.exponentialRampToValueAtTime(
-      110,
-      now + .032
-    );
-
-    snapFilter.type = "bandpass";
-    snapFilter.frequency.value = 1850;
-    snapFilter.Q.value = .6;
-
-    snapGain.gain.setValueAtTime(
-      .19,
-      now
-    );
-
-    snapGain.gain.exponentialRampToValueAtTime(
-      .001,
-      now + .048
-    );
-
-    snap.connect(snapFilter);
-    snapFilter.connect(snapGain);
-    snapGain.connect(ctx.destination);
-
-    snap.start(now);
-    snap.stop(now + .052);
-
-
-    // -----------------------------------------------------
-    // 2. SUB IMPACT
-    // Short, heavy, no tail
-    // -----------------------------------------------------
-
-    const sub = ctx.createOscillator();
-    const subGain = ctx.createGain();
-
-    sub.type = "sine";
-
-    sub.frequency.setValueAtTime(
-      92,
-      now
-    );
-
-    sub.frequency.exponentialRampToValueAtTime(
-      34,
-      now + .075
-    );
-
-    subGain.gain.setValueAtTime(
-      .24,
-      now
-    );
-
-    subGain.gain.exponentialRampToValueAtTime(
-      .001,
-      now + .095
-    );
-
-    sub.connect(subGain);
-    subGain.connect(ctx.destination);
-
-    sub.start(now);
-    sub.stop(now + .10);
-
-
-    // -----------------------------------------------------
-    // 3. SHORT IMPULSE NOISE
-    // -----------------------------------------------------
-
-    const duration = .035;
-
-    const buffer =
-      ctx.createBuffer(
-        1,
-        Math.floor(ctx.sampleRate * duration),
-        ctx.sampleRate
-      );
-
-    const data =
-      buffer.getChannelData(0);
-
-    for(let i=0;i<data.length;i++){
-
-      const life =
-        1 - i/data.length;
-
-      data[i] =
-        (Math.random()*2-1)
-        *
-        life
-        *
-        life;
-
-    }
-
-    const noise =
-      ctx.createBufferSource();
-
-    const noiseGain =
-      ctx.createGain();
-
-    const noiseFilter =
-      ctx.createBiquadFilter();
-
-    noise.buffer = buffer;
-
-    noiseFilter.type =
-      "highpass";
-
-    noiseFilter.frequency.value =
-      900;
-
-    noiseGain.gain.setValueAtTime(
-      .11,
-      now
-    );
-
-    noiseGain.gain.exponentialRampToValueAtTime(
-      .001,
-      now + duration
-    );
-
-    noise.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(ctx.destination);
-
-    noise.start(now);
-
-
-    // -----------------------------------------------------
-    // vibration = instant shock
-    // -----------------------------------------------------
-
-    try{
-
-      if(typeof vibrate === "function"){
-        vibrate(75);
-      }
-
-    }catch(e){}
-
-  }
-
-
-  // =====================================================
-  // REVEAL SOUND
-  // =====================================================
-
-  function revealSound(rarity){
-
-    try{
-
-      if(typeof tone !== "function") return;
-
-      if(rarity === "RARE"){
-
-        tone(190,.20,"sine",.035);
-
-        setTimeout(()=>{
-          tone(480,.12,"sine",.05);
-        },850);
-
-      }
-
-
-      if(rarity === "EPIC"){
-
-        tone(105,.26,"sine",.045);
-
-        setTimeout(()=>{
-          tone(520,.16,"sine",.055);
-        },700);
-
-        setTimeout(()=>{
-          tone(760,.18,"sine",.06);
-        },1150);
-
-      }
-
-
-      if(rarity === "LEGEND"){
-
-        tone(76,.30,"sine",.055);
-
-        setTimeout(()=>{
-          tone(420,.16,"sine",.055);
-        },620);
-
-        setTimeout(()=>{
-          tone(720,.18,"sine",.07);
-        },1050);
-
-        setTimeout(()=>{
-          tone(980,.14,"sine",.075);
-        },1300);
-
-      }
-
-
-      if(rarity === "GOD"){
-
-        tone(45,.32,"sine",.07);
-
-        setTimeout(()=>{
-          tone(330,.22,"sine",.055);
-        },700);
-
-        setTimeout(()=>{
-          tone(660,.22,"sine",.07);
-        },1100);
-
-        setTimeout(()=>{
-          tone(1040,.20,"sine",.08);
-        },1450);
-
-      }
-
-    }catch(e){}
-
-  }
-
-
-  // =====================================================
-  // PUCHUN + BLACK REVEAL
-  // =====================================================
-
-  function playV3Sequence(
-    rarity,
-    done
-  ){
-
-    const data =
-      RARITY[rarity] ||
-      RARITY.RARE;
-
-
-    const old =
-      document.querySelector(
-        ".opV3Stage"
-      );
-
-    if(old){
-      old.remove();
-    }
-
-
-    const stage =
-      document.createElement("div");
-
-    stage.className =
-      "opV3Stage";
-
-
-    const black =
-      document.createElement("div");
-
-    black.className =
-      "opV3Black";
-
-
-    const white =
-      document.createElement("div");
-
-    white.className =
-      "opV3White";
-
-
-    const flare =
-      document.createElement("div");
-
-    flare.className =
-      "opV3Flare";
-
-
-    const beamH =
-      document.createElement("div");
-
-    beamH.className =
-      "opV3BeamH";
-
-
-    const beamV =
-      document.createElement("div");
-
-    beamV.className =
-      "opV3BeamV";
-
-
-    const reveal =
-      document.createElement("div");
-
-    reveal.className =
-      "opV3Reveal " +
-      rarity;
-
-
-    reveal.style.setProperty(
-      "--rarityMain",
-      data.main
-    );
-
-
-    reveal.style.setProperty(
-      "--raritySub",
-      data.sub
-    );
-
-
-    reveal.innerHTML = `
-
-      <div class="opV3Aura"></div>
-
-      <div class="opV3Ring"></div>
-
-      <div class="opV3TextWrap">
-
-        <div class="opV3PreText">
-          RARITY AWAKENING
-        </div>
-
-        <div class="opV3Message">
-          ${data.message}
-        </div>
-
-        <div class="opV3Line"></div>
-
-        <div class="opV3Rarity">
-          ${data.label}
-        </div>
-
-        <div class="opV3Chance">
-          DROP RATE ${data.chance}
-        </div>
-
-      </div>
-
-    `;
-
-
-    stage.append(
-      black,
-      reveal,
-      flare,
-      beamH,
-      beamV,
-      white
-    );
-
-
-    document.body.appendChild(stage);
-
-
-    // ---------------------------------------------
-    // PUSH -> tiny delay
-    // ---------------------------------------------
-
-    const PRE =
-      300;
-
-
-    setTimeout(()=>{
-
-      white.classList.add(
-        "fire"
-      );
-
-      puchunSoundV3();
-
-    },PRE);
-
-
-    // ---------------------------------------------
-    // POWER OFF
-    // ---------------------------------------------
-
-    setTimeout(()=>{
-
-      black.classList.add(
-        "on"
-      );
-
-      flare.classList.add(
-        "cut"
-      );
-
-      beamH.classList.add(
-        "cut"
-      );
-
-      beamV.classList.add(
-        "cut"
-      );
-
-    },PRE + 34);
-
-
-    // ---------------------------------------------
-    // PURE BLACK
-    // ---------------------------------------------
-
-    setTimeout(()=>{
-
-      flare.remove();
-      beamH.remove();
-      beamV.remove();
-      white.remove();
-
-    },PRE + 280);
-
-
-    // ---------------------------------------------
-    // DARK SILENCE
-    // GOD waits longer
-    // ---------------------------------------------
-
-    const darkHold =
-      rarity === "GOD"
-      ? 1450
-      : rarity === "LEGEND"
-      ? 1100
-      : 850;
-
-
-    setTimeout(()=>{
-
-      reveal.classList.add(
-        "show"
-      );
-
-      revealSound(
-        rarity
-      );
-
-    },PRE + 280 + darkHold);
-
-
-    // ---------------------------------------------
-    // Finish reveal
-    // ---------------------------------------------
-
-    const revealLength =
-      rarity === "GOD"
-      ? 2650
-      : rarity === "LEGEND"
-      ? 2400
-      : 2200;
-
-
-    setTimeout(()=>{
-
-      stage.style.transition =
-        "opacity .24s ease";
-
-      stage.style.opacity =
-        "0";
-
-    },
-    PRE +
-    280 +
-    darkHold +
-    revealLength
-    );
-
-
-    setTimeout(()=>{
-
-      stage.remove();
-
-      if(
-        typeof done ===
-        "function"
-      ){
-        done();
-      }
-
-    },
-    PRE +
-    280 +
-    darkHold +
-    revealLength +
-    260
-    );
-
-  }
-
-
-  // =====================================================
-  // NORMAL ASCENSION
-  // =====================================================
-
-  if(
-    typeof playAscensionSuccess ===
-    "function"
-  ){
-
-    const originalAscensionSuccess =
-      playAscensionSuccess;
-
-
-    playAscensionSuccess =
-    function(
-      fromRarity,
-      toRarity,
-      premium=false
-    ){
-
-      playV3Sequence(
-        toRarity,
-        ()=>{
-
-          originalAscensionSuccess(
-            fromRarity,
-            toRarity,
-            premium
-          );
-
-        }
-      );
-
-    };
-
-  }
-
-
-  // =====================================================
-  // GOD PUSH SUCCESS
-  // GOD now uses exactly the same PUCHUN system
-  // =====================================================
-
-  if(
-    typeof playGodAscensionSuccess ===
-    "function"
-  ){
-
-    const originalGodSuccess =
-      playGodAscensionSuccess;
-
-
-    playGodAscensionSuccess =
-    function(){
-
-      playV3Sequence(
-        "GOD",
-        ()=>{
-
-          originalGodSuccess();
-
-        }
-      );
-
-    };
-
-  }
-
-
-  // =====================================================
-  // PREMIUM DROP CARD
-  // =====================================================
-
-  function applyDropLuxury(
-    item
-  ){
-
-    if(!item) return;
-
-
-    const overlay =
-      document.getElementById(
-        "dropOverlay"
-      );
-
-
-    const card =
-      document.getElementById(
-        "dropCard"
-      );
-
-
-    if(
-      !overlay ||
-      !card
-    ){
-      return;
-    }
-
-
-    const rarity =
-      item.rarity ||
-      "NORMAL";
-
-
-    const data =
-      RARITY[rarity] || {
-        main:"#d8dce8",
-        sub:"#ffffff"
-      };
-
-
-    overlay.classList.remove(
-      "RARE",
-      "EPIC",
-      "LEGEND",
-      "GOD"
-    );
-
-
-    overlay.classList.add(
-      "opV3Drop",
-      rarity
-    );
-
-
-    overlay.style.setProperty(
-      "--dropMain",
-      data.main
-    );
-
-
-    const glow =
-
-      rarity === "GOD"
-      ? "rgba(110,235,255,.48)"
-
-      : rarity === "LEGEND"
-      ? "rgba(255,214,61,.42)"
-
-      : rarity === "EPIC"
-      ? "rgba(197,87,255,.36)"
-
-      : rarity === "RARE"
-      ? "rgba(69,167,255,.30)"
-
-      : "rgba(220,225,240,.18)";
-
-
-    overlay.style.setProperty(
-      "--dropGlow",
-      glow
-    );
-
-
-    card.classList.add(
-      "opV3PremiumCard"
-    );
-
-
-    // restart stagger animations
-    card
-      .querySelectorAll(
-        ".dropLabel,.dropRarity,.dropIcon,.dropName,.dropEffect,.dropChance,.dropButtons"
-      )
-      .forEach(el=>{
-
-        el.style.animation = "none";
-
-        void el.offsetHeight;
-
-        el.style.animation = "";
-
-      });
-
-
-    // result impact
-    setTimeout(()=>{
-
-      try{
-
-        if(typeof vibrate === "function"){
-
-          if(rarity === "GOD"){
-            vibrate([
-              70,
-              30,
-              100,
-              40,
-              150
-            ]);
-          }
-
-          else if(
-            rarity === "LEGEND"
-          ){
-            vibrate([
-              55,
-              35,
-              100
-            ]);
-          }
-
-          else{
-            vibrate(40);
-          }
-
-        }
-
-      }catch(e){}
-
-    },430);
-
-  }
-
-
-  if(
-    typeof revealSuperDropCard ===
-    "function"
-  ){
-
-    const originalRevealDrop =
-      revealSuperDropCard;
-
-
-    revealSuperDropCard =
-    function(item){
-
-      originalRevealDrop(
-        item
-      );
-
-
-      requestAnimationFrame(()=>{
-
-        applyDropLuxury(
-          item
-        );
-
-      });
-
-    };
-
-  }
-
-
-  // =====================================================
-  // Also catch ordinary DROP screens
-  // =====================================================
-
-  if(
-    typeof showDrop ===
-    "function"
-  ){
-
-    const originalShowDrop =
-      showDrop;
-
-
-    showDrop =
-    function(item){
-
-      originalShowDrop(
-        item
-      );
-
-
-      setTimeout(()=>{
-
-        const overlay =
-          document.getElementById(
-            "dropOverlay"
-          );
-
-
-        if(
-          overlay &&
-          overlay.classList.contains(
-            "show"
-          )
-        ){
-
-          applyDropLuxury(
-            item
-          );
-
-        }
-
-      },30);
-
-    };
-
-  }
-
-
-  console.log(
-    "ONE PERCENT DROP EFFECTS V3 READY"
-  );
-
-})();
-// =====================================================
-// ONE PERCENT DROP
-// V4 - CINEMATIC REVEAL PATCH
-//
-// V3のDROP詳細はそのまま。
-// プチュン後のレアリティ確定演出をV4へ。
-// =====================================================
-
-(() => {
-
-  if (window.__OP_V4_REVEAL__) return;
-  window.__OP_V4_REVEAL__ = true;
-
-  const V4 = {
-    RARE: {
-      color:"#35a9ff",
-      light:"#c7efff",
-      phrase:"A SIGN APPEARS",
-      rate:"20%"
-    },
-    EPIC: {
-      color:"#c65cff",
-      light:"#ff9aea",
-      phrase:"POWER BEYOND THE ORDINARY",
-      rate:"8%"
-    },
-    LEGEND: {
-      color:"#ffd84a",
-      light:"#fff2a6",
-      phrase:"THE LEGEND AWAKENS",
-      rate:"1.9%"
-    },
-    GOD: {
-      color:"#ffffff",
-      light:"#aafaff",
-      phrase:"THE WORLD HAS CHOSEN",
-      rate:"0.1%"
-    }
-  };
-
-
-  // =====================================================
-  // CSS
-  // =====================================================
-
-  const css = document.createElement("style");
-
-  css.textContent = `
-
-  .v4Reveal{
     position:absolute;
     inset:0;
-    z-index:30;
+
+    z-index:5;
+
     overflow:hidden;
+
     background:#000;
+
     opacity:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
+    color:var(--fx);
+
   }
 
-  .v4Reveal.active{
+  .fx5Awaken.show{
     opacity:1;
   }
 
 
-  /* -----------------------------------------
-     最初は本当に真っ暗
-  ----------------------------------------- */
+  /* ---- tiny point ---- */
 
-  .v4Point{
+  .fx5Point{
+
     position:absolute;
+
     left:50%;
     top:50%;
 
@@ -2044,27 +397,32 @@
 
     background:#fff;
 
+    opacity:0;
+
     transform:
       translate(-50%,-50%)
       scale(.01);
 
-    opacity:0;
-
     box-shadow:
-      0 0 5px #fff,
-      0 0 14px var(--v4),
-      0 0 32px var(--v4);
+      0 0 5px white,
+      0 0 14px var(--fx),
+      0 0 35px var(--fx);
 
-    z-index:5;
   }
 
 
-  .v4Reveal.phase1 .v4Point{
-    animation:v4PointBirth .85s cubic-bezier(.16,1,.3,1) forwards;
+  .fx5Awaken.point .fx5Point{
+
+    animation:
+      fx5Point
+      .8s
+      cubic-bezier(.12,.8,.25,1)
+      forwards;
+
   }
 
 
-  @keyframes v4PointBirth{
+  @keyframes fx5Point{
 
     0%{
       opacity:0;
@@ -2073,15 +431,15 @@
         scale(.01);
     }
 
-    30%{
-      opacity:.35;
+    50%{
+      opacity:.8;
     }
 
-    68%{
+    80%{
       opacity:1;
       transform:
         translate(-50%,-50%)
-        scale(1.8);
+        scale(2.2);
     }
 
     100%{
@@ -2094,11 +452,10 @@
   }
 
 
-  /* -----------------------------------------
-     光点から左右へ線が走る
-  ----------------------------------------- */
+  /* ---- thin light ---- */
 
-  .v4Line{
+  .fx5Line{
+
     position:absolute;
 
     left:50%;
@@ -2116,26 +473,677 @@
       linear-gradient(
         90deg,
         transparent,
-        var(--v4),
+        var(--fx),
         #fff,
-        var(--v4),
+        var(--fx),
         transparent
       );
 
     box-shadow:
-      0 0 5px #fff,
-      0 0 14px var(--v4);
+      0 0 7px white,
+      0 0 18px var(--fx);
 
-    z-index:4;
   }
 
 
-  .v4Reveal.phase2 .v4Line{
-    animation:v4LineOpen .72s cubic-bezier(.15,.75,.25,1) forwards;
+  .fx5Awaken.line .fx5Line{
+
+    animation:
+      fx5Line
+      .72s
+      cubic-bezier(.15,.78,.25,1)
+      forwards;
+
   }
 
 
-  @keyframes v4LineOpen{
+  @keyframes fx5Line{
+
+    0%{
+      width:0;
+      opacity:0;
+    }
+
+    12%{
+      opacity:1;
+    }
+
+    100%{
+      width:min(84vw,390px);
+      opacity:.7;
+    }
+
+  }
+
+
+  /* ---- rings ---- */
+
+  .fx5Ring,
+  .fx5Ring2{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    border-radius:50%;
+
+    opacity:0;
+
+    color:var(--fx);
+
+    transform:
+      translate(-50%,-50%)
+      scale(.2);
+
+  }
+
+
+  .fx5Ring{
+
+    width:min(76vw,360px);
+    aspect-ratio:1;
+
+    border:1px solid currentColor;
+
+  }
+
+
+  .fx5Ring2{
+
+    width:min(54vw,255px);
+    aspect-ratio:1;
+
+    border:1px solid currentColor;
+
+  }
+
+
+  .fx5Awaken.build .fx5Ring{
+
+    animation:
+      fx5Ring1
+      2s
+      ease-out
+      forwards;
+
+  }
+
+
+  .fx5Awaken.build .fx5Ring2{
+
+    animation:
+      fx5Ring2
+      1.8s
+      ease-out
+      .12s
+      forwards;
+
+  }
+
+
+  @keyframes fx5Ring1{
+
+    0%{
+      opacity:0;
+      transform:
+        translate(-50%,-50%)
+        scale(.2)
+        rotate(-30deg);
+    }
+
+    50%{
+      opacity:.4;
+    }
+
+    100%{
+      opacity:.13;
+      transform:
+        translate(-50%,-50%)
+        scale(1.05)
+        rotate(15deg);
+    }
+
+  }
+
+
+  @keyframes fx5Ring2{
+
+    0%{
+      opacity:0;
+      transform:
+        translate(-50%,-50%)
+        scale(.25)
+        rotate(30deg);
+    }
+
+    55%{
+      opacity:.4;
+    }
+
+    100%{
+      opacity:.17;
+      transform:
+        translate(-50%,-50%)
+        scale(1)
+        rotate(-12deg);
+    }
+
+  }
+
+
+  /* ---- text ---- */
+
+  .fx5Signal{
+
+    position:absolute;
+
+    left:50%;
+    top:38%;
+
+    width:100%;
+
+    transform:
+      translateX(-50%);
+
+    text-align:center;
+
+    font-size:9px;
+
+    font-weight:900;
+
+    letter-spacing:8px;
+
+    color:var(--fx);
+
+    opacity:0;
+
+  }
+
+
+  .fx5Awaken.build .fx5Signal{
+
+    animation:
+      fx5Signal
+      .7s
+      ease-out
+      forwards;
+
+  }
+
+
+  @keyframes fx5Signal{
+
+    from{
+      opacity:0;
+      letter-spacing:13px;
+    }
+
+    to{
+      opacity:.75;
+      letter-spacing:8px;
+    }
+
+  }
+
+
+  .fx5Phrase{
+
+    position:absolute;
+
+    left:5%;
+    right:5%;
+
+    top:43%;
+
+    text-align:center;
+
+    font-family:
+      Georgia,
+      "Times New Roman",
+      serif;
+
+    font-size:
+      clamp(18px,5.3vw,26px);
+
+    font-weight:700;
+
+    letter-spacing:3px;
+
+    color:white;
+
+    text-shadow:
+      0 0 10px var(--fx),
+      0 0 25px var(--fx);
+
+  }
+
+
+  .fx5Letter{
+
+    display:inline-block;
+
+    opacity:0;
+
+    transform:
+      translateY(12px)
+      scale(.88);
+
+    filter:blur(5px);
+
+  }
+
+
+  .fx5Awaken.build .fx5Letter{
+
+    animation:
+      fx5Letter
+      .52s
+      ease-out
+      forwards;
+
+    animation-delay:
+      calc(var(--i) * 42ms);
+
+  }
+
+
+  @keyframes fx5Letter{
+
+    to{
+      opacity:1;
+
+      filter:blur(0);
+
+      transform:
+        translateY(0)
+        scale(1);
+    }
+
+  }
+
+
+  /* ============================================================
+     PARTICLES
+  ============================================================ */
+
+  .fx5Spark{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:2px;
+    height:2px;
+
+    border-radius:50%;
+
+    background:#fff;
+
+    box-shadow:
+      0 0 7px #fff,
+      0 0 15px var(--fx);
+
+    opacity:0;
+
+    transform:
+      rotate(var(--a))
+      translateX(10px);
+
+  }
+
+
+  .fx5Awaken.build .fx5Spark{
+
+    animation:
+      fx5Spark
+      1.5s
+      ease-out
+      var(--d)
+      forwards;
+
+  }
+
+
+  @keyframes fx5Spark{
+
+    0%{
+      opacity:0;
+
+      transform:
+        rotate(var(--a))
+        translateX(10px)
+        scale(.4);
+    }
+
+    25%{
+      opacity:.9;
+    }
+
+    100%{
+      opacity:0;
+
+      transform:
+        rotate(var(--a))
+        translateX(var(--r))
+        scale(1);
+    }
+
+  }
+
+
+  /* ============================================================
+     SECOND BLACKOUT
+  ============================================================ */
+
+  .fx5SecondBlack{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:30;
+
+    background:#000;
+
+    opacity:0;
+
+  }
+
+
+  .fx5SecondBlack.hit{
+
+    animation:
+      fx5SecondBlack
+      230ms
+      steps(1,end)
+      forwards;
+
+  }
+
+
+  @keyframes fx5SecondBlack{
+
+    0%,68%{
+      opacity:1;
+    }
+
+    69%,100%{
+      opacity:0;
+    }
+
+  }
+
+
+  /* ============================================================
+     FINAL RARITY
+  ============================================================ */
+
+  .fx5Final{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:25;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    opacity:0;
+
+  }
+
+
+  .fx5Final.hit{
+    opacity:1;
+  }
+
+
+  .fx5FinalWord{
+
+    position:relative;
+
+    font-size:
+      clamp(72px,23vw,125px);
+
+    line-height:.85;
+
+    font-weight:1000;
+
+    letter-spacing:-2px;
+
+    color:var(--fx);
+
+    opacity:0;
+
+    transform:scale(2.6);
+
+    filter:blur(8px);
+
+    text-shadow:
+      0 0 10px var(--fx),
+      0 0 30px var(--fx),
+      0 0 70px var(--fx);
+
+  }
+
+
+  .fx5Final.hit
+  .fx5FinalWord{
+
+    animation:
+      fx5Final
+      .72s
+      cubic-bezier(.12,1.25,.25,1)
+      forwards;
+
+  }
+
+
+  @keyframes fx5Final{
+
+    0%{
+      opacity:0;
+      transform:scale(2.6);
+      filter:blur(8px);
+    }
+
+    18%{
+      opacity:1;
+      filter:blur(0);
+    }
+
+    55%{
+      transform:scale(.88);
+    }
+
+    78%{
+      transform:scale(1.06);
+    }
+
+    100%{
+      opacity:1;
+      transform:scale(1);
+      filter:blur(0);
+    }
+
+  }
+
+
+  .fx5Burst{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    z-index:22;
+
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:#fff;
+
+    opacity:0;
+
+    transform:
+      translate(-50%,-50%)
+      scale(.01);
+
+    box-shadow:
+      0 0 25px white,
+      0 0 70px var(--fx);
+
+  }
+
+
+  .fx5Burst.hit{
+
+    animation:
+      fx5Burst
+      .62s
+      ease-out
+      forwards;
+
+  }
+
+
+  @keyframes fx5Burst{
+
+    0%{
+      opacity:1;
+
+      transform:
+        translate(-50%,-50%)
+        scale(.01);
+    }
+
+    50%{
+      opacity:.7;
+    }
+
+    100%{
+      opacity:0;
+
+      transform:
+        translate(-50%,-50%)
+        scale(110);
+    }
+
+  }
+
+
+  /* ============================================================
+     GOD SPECIAL
+  ============================================================ */
+
+  .fx5Awaken.GOD .fx5FinalWord{
+
+    background:
+      linear-gradient(
+        90deg,
+        #fff,
+        #7ff5ff,
+        #bd8cff,
+        #ff82dc,
+        #fff1a5,
+        #fff
+      );
+
+    background-size:240% 100%;
+
+    -webkit-background-clip:text;
+    background-clip:text;
+
+    color:transparent;
+
+    text-shadow:none;
+
+    filter:
+      drop-shadow(
+        0 0 12px
+        rgba(255,255,255,.85)
+      );
+
+  }
+
+
+  .fx5GodCrack{
+
+    display:none;
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    z-index:8;
+
+    width:1px;
+    height:1px;
+
+  }
+
+
+  .fx5Awaken.GOD
+  .fx5GodCrack{
+
+    display:block;
+
+  }
+
+
+  .fx5GodRay{
+
+    position:absolute;
+
+    left:0;
+    top:0;
+
+    width:0;
+    height:2px;
+
+    opacity:0;
+
+    transform-origin:0 50%;
+
+    background:
+      linear-gradient(
+        90deg,
+        #fff,
+        #85f6ff,
+        #d38cff,
+        #ff8edc,
+        transparent
+      );
+
+    box-shadow:
+      0 0 8px white,
+      0 0 18px #8bf5ff;
+
+  }
+
+
+  .fx5Awaken.GOD.build
+  .fx5GodRay{
+
+    animation:
+      fx5GodRay
+      .85s
+      ease-out
+      var(--delay)
+      forwards;
+
+  }
+
+
+  @keyframes fx5GodRay{
 
     0%{
       width:0;
@@ -2147,393 +1155,498 @@
     }
 
     100%{
-      width:min(82vw,390px);
-      opacity:.72;
+      width:70vw;
+      opacity:.55;
     }
 
   }
 
 
-  /* -----------------------------------------
-     奥にある巨大円環
-  ----------------------------------------- */
+  /* ============================================================
+     FINAL FLASH
+  ============================================================ */
 
-  .v4Sigil,
-  .v4Sigil2{
+  .fx5Flash{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:60;
+
+    background:#fff;
+
+    opacity:0;
+
+  }
+
+
+  .fx5Flash.hit{
+
+    animation:
+      fx5Flash
+      160ms
+      ease-out
+      forwards;
+
+  }
+
+
+  @keyframes fx5Flash{
+
+    from{opacity:.92}
+    to{opacity:0}
+
+  }
+
+
+  /* ============================================================
+     PREMIUM DROP SCREEN
+  ============================================================ */
+
+  #dropOverlay.fx5Drop{
+
+    overflow:hidden;
+
+    background:#02040a !important;
+
+  }
+
+
+  #dropOverlay.fx5Drop::before{
+
+    content:"";
 
     position:absolute;
 
     left:50%;
-    top:50%;
+    top:45%;
+
+    width:min(120vw,600px);
+    aspect-ratio:1;
 
     border-radius:50%;
 
-    transform:
-      translate(-50%,-50%)
-      scale(.25)
-      rotate(-25deg);
-
-    opacity:0;
-
     pointer-events:none;
+
+    opacity:.25;
+
+    transform:
+      translate(-50%,-50%);
+
+    background:
+      radial-gradient(
+        circle,
+        var(--dropFX) 0%,
+        transparent 58%
+      );
+
+    animation:
+      fx5DropAura
+      2.8s
+      ease-in-out
+      infinite alternate;
+
   }
 
 
-  .v4Sigil{
+  @keyframes fx5DropAura{
 
-    width:min(75vw,360px);
-    aspect-ratio:1;
+    from{
+      opacity:.12;
+      transform:
+        translate(-50%,-50%)
+        scale(.82);
+    }
+
+    to{
+      opacity:.3;
+      transform:
+        translate(-50%,-50%)
+        scale(1.08);
+    }
+
+  }
+
+
+  #dropCard.fx5Card{
+
+    position:relative;
+
+    overflow:hidden;
 
     border:
       1px solid
-      color-mix(
-        in srgb,
-        var(--v4) 75%,
-        transparent
-      );
+      var(--dropFX) !important;
+
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255,255,255,.075),
+        rgba(10,12,23,.97) 30%,
+        rgba(3,4,9,.99)
+      ) !important;
 
     box-shadow:
-      0 0 12px rgba(255,255,255,.08),
-      inset 0 0 20px rgba(255,255,255,.04);
-  }
-
-
-  .v4Sigil2{
-
-    width:min(55vw,265px);
-    aspect-ratio:1;
-
-    border:
-      1px solid
-      color-mix(
-        in srgb,
-        var(--v4) 45%,
-        transparent
-      );
-  }
-
-
-  .v4Reveal.phase3 .v4Sigil{
+      0 0 0 1px rgba(255,255,255,.05),
+      0 0 28px var(--dropGlow),
+      0 30px 70px rgba(0,0,0,.8) !important;
 
     animation:
-      v4SigilWake
-      1.8s
-      cubic-bezier(.15,.8,.2,1)
-      forwards;
+      fx5CardIn
+      .68s
+      cubic-bezier(.15,1,.28,1)
+      forwards !important;
 
   }
 
 
-  .v4Reveal.phase3 .v4Sigil2{
-
-    animation:
-      v4SigilWake2
-      1.65s
-      cubic-bezier(.15,.8,.2,1)
-      .12s
-      forwards;
-
-  }
-
-
-  @keyframes v4SigilWake{
+  @keyframes fx5CardIn{
 
     0%{
       opacity:0;
+
       transform:
-        translate(-50%,-50%)
-        scale(.25)
-        rotate(-28deg);
+        translateY(28px)
+        scale(.78);
     }
 
-    50%{
-      opacity:.38;
+    65%{
+      opacity:1;
+
+      transform:
+        translateY(-4px)
+        scale(1.025);
     }
 
     100%{
-      opacity:.15;
-      transform:
-        translate(-50%,-50%)
-        scale(1.04)
-        rotate(7deg);
-    }
-
-  }
-
-
-  @keyframes v4SigilWake2{
-
-    0%{
-      opacity:0;
-      transform:
-        translate(-50%,-50%)
-        scale(.3)
-        rotate(28deg);
-    }
-
-    55%{
-      opacity:.42;
-    }
-
-    100%{
-      opacity:.18;
-      transform:
-        translate(-50%,-50%)
-        scale(1)
-        rotate(-10deg);
-    }
-
-  }
-
-
-  /* -----------------------------------------
-     文章
-
-     「急に全部表示」をやめて
-     ぼやけた暗闇から形成する
-  ----------------------------------------- */
-
-  .v4Phrase{
-
-    position:absolute;
-
-    left:50%;
-    top:42%;
-
-    width:90%;
-
-    transform:
-      translate(-50%,18px)
-      scale(.94);
-
-    text-align:center;
-
-    font-family:
-      Georgia,
-      "Times New Roman",
-      serif;
-
-    font-size:
-      clamp(17px,5vw,24px);
-
-    font-weight:700;
-
-    letter-spacing:4px;
-
-    color:#fff;
-
-    opacity:0;
-
-    filter:blur(7px);
-
-    text-shadow:
-      0 0 8px var(--v4),
-      0 0 22px var(--v4);
-
-    z-index:8;
-  }
-
-
-  .v4Reveal.phase3 .v4Phrase{
-
-    animation:
-      v4PhraseForm
-      1.25s
-      cubic-bezier(.2,.75,.2,1)
-      .2s
-      forwards;
-
-  }
-
-
-  @keyframes v4PhraseForm{
-
-    0%{
-      opacity:0;
-      filter:blur(9px);
-      letter-spacing:10px;
+      opacity:1;
 
       transform:
-        translate(-50%,18px)
-        scale(.94);
-    }
-
-    50%{
-      opacity:.48;
-    }
-
-    100%{
-      opacity:.94;
-      filter:blur(0);
-      letter-spacing:4px;
-
-      transform:
-        translate(-50%,0)
+        translateY(0)
         scale(1);
     }
 
   }
 
 
-  .v4Sub{
+  #dropCard.fx5Card::after{
+
+    content:"";
 
     position:absolute;
 
-    left:50%;
-    top:calc(42% - 34px);
+    left:-65%;
+    top:-30%;
 
-    transform:
-      translateX(-50%);
+    width:45%;
+    height:160%;
 
-    white-space:nowrap;
+    pointer-events:none;
 
-    font-size:9px;
+    transform:rotate(18deg);
 
-    font-weight:800;
+    background:
+      linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.05),
+        rgba(255,255,255,.22),
+        rgba(255,255,255,.05),
+        transparent
+      );
 
-    letter-spacing:7px;
+    animation:
+      fx5Sweep
+      2.7s
+      ease-in-out
+      .6s
+      infinite;
 
-    color:var(--v4);
-
-    opacity:0;
-
-    z-index:8;
   }
 
 
-  .v4Reveal.phase3 .v4Sub{
+  @keyframes fx5Sweep{
+
+    0%,30%{
+      left:-65%;
+    }
+
+    70%,100%{
+      left:125%;
+    }
+
+  }
+
+
+  #dropOverlay.fx5Drop .dropLabel,
+  #dropOverlay.fx5Drop .dropRarity,
+  #dropOverlay.fx5Drop .dropIcon,
+  #dropOverlay.fx5Drop .dropName,
+  #dropOverlay.fx5Drop .dropEffect,
+  #dropOverlay.fx5Drop .dropChance,
+  #dropOverlay.fx5Drop .dropButtons{
+
+    opacity:0;
+
+    transform:
+      translateY(10px);
 
     animation:
-      v4SubIn
-      .8s
+      fx5DropPart
+      .55s
       ease-out
-      .65s
       forwards;
 
   }
 
 
-  @keyframes v4SubIn{
-
-    from{
-      opacity:0;
-      letter-spacing:11px;
-    }
-
-    to{
-      opacity:.72;
-      letter-spacing:7px;
-    }
-
+  #dropOverlay.fx5Drop .dropLabel{
+    animation-delay:.18s;
   }
 
-
-  /* -----------------------------------------
-     「一瞬また消える」
-  ----------------------------------------- */
-
-  .v4SecondBlack{
-
-    position:absolute;
-    inset:0;
-
-    z-index:50;
-
-    background:#000;
-
-    opacity:0;
-
-    pointer-events:none;
-  }
-
-
-  .v4SecondBlack.hit{
-
-    animation:
-      v4SecondCut
-      260ms
-      steps(1,end)
-      forwards;
-
-  }
-
-
-  @keyframes v4SecondCut{
-
-    0%{
-      opacity:1;
-    }
-
-    62%{
-      opacity:1;
-    }
-
-    63%{
-      opacity:0;
-    }
-
-    100%{
-      opacity:0;
-    }
-
-  }
-
-
-  /* -----------------------------------------
-     最終レアリティ
-  ----------------------------------------- */
-
-  .v4Final{
-
-    position:absolute;
-
-    inset:0;
-
-    z-index:40;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    opacity:0;
-
-    pointer-events:none;
-  }
-
-
-  .v4FinalWord{
-
-    position:relative;
-
-    font-size:
-      clamp(70px,23vw,125px);
-
-    line-height:.85;
-
-    font-weight:1000;
-
-    letter-spacing:-2px;
-
-    color:var(--v4);
-
-    opacity:0;
-
-    transform:
-      scale(2.4);
+  #dropOverlay.fx5Drop .dropRarity{
+    animation-delay:.34s;
 
     text-shadow:
-      0 0 8px var(--v4),
-      0 0 25px var(--v4),
-      0 0 60px var(--v4);
+      0 0 18px
+      var(--dropFX);
+  }
+
+  #dropOverlay.fx5Drop .dropIcon{
+    animation-delay:.55s;
+
+    transform:
+      translateY(12px)
+      scale(.65);
+
+    filter:
+      drop-shadow(
+        0 0 16px
+        var(--dropFX)
+      );
+  }
+
+  #dropOverlay.fx5Drop .dropName{
+    animation-delay:.78s;
+  }
+
+  #dropOverlay.fx5Drop .dropEffect{
+    animation-delay:.98s;
+  }
+
+  #dropOverlay.fx5Drop .dropChance{
+    animation-delay:1.15s;
+  }
+
+  #dropOverlay.fx5Drop .dropButtons{
+    animation-delay:1.32s;
   }
 
 
-  .v4Final.hit{
-    opacity:1;
+  @keyframes fx5DropPart{
+
+    to{
+      opacity:1;
+
+      transform:
+        translateY(0)
+        scale(1);
+    }
+
   }
 
 
-  .v4Final.hit .v4FinalWord{
+  #dropOverlay.fx5Drop.GOD
+  .dropRarity{
+
+    background:
+      linear-gradient(
+        90deg,
+        #fff,
+        #7bf4ff,
+        #d28cff,
+        #ff82d9,
+        #fff2a7,
+        #fff
+      );
+
+    background-size:230% 100%;
+
+    -webkit-background-clip:text;
+    background-clip:text;
+
+    color:transparent !important;
 
     animation:
-     
+      fx5DropPart
+      .55s
+      ease-out
+      .34s
+      forwards,
+      fx5GodGradient
+      1.5s
+      linear
+      .8s
+      infinite;
+
+  }
+
+
+  @keyframes fx5GodGradient{
+
+    to{
+      background-position:230% 0;
+    }
+
+  }
+
+
+  #dropOverlay.fx5Drop.GOD
+  #dropCard{
+
+    border-color:#fff !important;
+
+    box-shadow:
+      0 0 12px rgba(255,255,255,.75),
+      0 0 32px rgba(100,235,255,.38),
+      0 0 58px rgba(230,100,255,.22),
+      0 30px 75px rgba(0,0,0,.88) !important;
+
+  }
+
+  `;
+
+  document.head.appendChild(style);
+
+
+  // ============================================================
+  // AUDIO ENGINE
+  // ============================================================
+
+  let ownCtx = null;
+
+
+  function getAudio(){
+
+    try{
+
+      if(
+        typeof audioCtx !== "undefined" &&
+        audioCtx
+      ){
+
+        if(audioCtx.state === "suspended"){
+          audioCtx.resume();
+        }
+
+        return audioCtx;
+
+      }
+
+    }catch(e){}
+
+
+    try{
+
+      if(!ownCtx){
+
+        const AC =
+          window.AudioContext ||
+          window.webkitAudioContext;
+
+        if(AC){
+          ownCtx = new AC();
+        }
+
+      }
+
+
+      if(
+        ownCtx &&
+        ownCtx.state === "suspended"
+      ){
+
+        ownCtx.resume();
+
+      }
+
+
+      return ownCtx;
+
+    }catch(e){
+
+      return null;
+
+    }
+
+  }
+
+
+  function oscillator(
+    frequency,
+    duration,
+    volume,
+    type="sine",
+    endFrequency=null
+  ){
+
+    const ctx = getAudio();
+
+    if(!ctx) return;
+
+
+    const now =
+      ctx.currentTime;
+
+
+    const osc =
+      ctx.createOscillator();
+
+
+    const gain =
+      ctx.createGain();
+
+
+    osc.type = type;
+
+
+    osc.frequency
+    .setValueAtTime(
+      frequency,
+      now
+    );
+
+
+    if(
+      endFrequency &&
+      endFrequency > 0
+    ){
+
+      osc.frequency
+      .exponentialRampToValueAtTime(
+        endFrequency,
+        now + duration
+      );
+
+    }
+
+
+    gain.gain
+    .setValueAtTime(
+      Math.max(.001,volume),
+      now
+    );
+
+
+    gain.gain
+    .exponentialRampToValueAtTime(
+      .001,
+      now + duration
+    );
+
+
+    osc.connect(gain);
+
+    gain.connect(
+      ctx.destination
